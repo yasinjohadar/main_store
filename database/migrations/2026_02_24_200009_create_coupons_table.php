@@ -34,35 +34,12 @@ return new class extends Migration
             $table->index('expires_at');
         });
 
-        Schema::create('coupon_usage', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
-            $table->string('order_number')->nullable();
-            $table->decimal('discount_amount', 12, 2)->default(0);
-            $table->timestamp('used_at')->useCurrent();
-        });
-
         DB::table('coupons')->insert([
             ['code' => 'WELCOME10', 'name' => 'خصم ترحيبي', 'description' => 'خصم 10% على طلباتك الأولى', 'type' => 'percentage', 'value' => 10, 'minimum_order_amount' => 100, 'usage_limit' => null, 'status' => 'active', 'created_at' => now(), 'updated_at' => now()],
             ['code' => 'SAVE20', 'name' => 'خصم 20%', 'description' => 'خصم 20% على جميع المنتجات', 'type' => 'percentage', 'value' => 20, 'minimum_order_amount' => 200, 'usage_limit' => null, 'status' => 'active', 'created_at' => now(), 'updated_at' => now()],
             ['code' => 'NEWUSER', 'name' => 'خصم 15% لعملاء جدد', 'description' => 'خصم 15% لأول 10 طلبات', 'type' => 'percentage', 'value' => 15, 'minimum_order_amount' => 50, 'usage_limit' => 1, 'status' => 'active', 'created_at' => now(), 'updated_at' => now()],
             ['code' => 'SUMMER50', 'name' => 'خصم 50%', 'description' => 'خصم 50% على طلبات فوق 100 ريال', 'type' => 'percentage', 'value' => 50, 'minimum_order_amount' => 100, 'usage_limit' => 3, 'status' => 'active', 'created_at' => now(), 'updated_at' => now()],
         ]);
-
-        Schema::table('coupon_usages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
-            $table->string('order_number')->nullable();
-            $table->decimal('discount_amount', 12, 2)->default(0);
-            $table->timestamp('used_at')->useCurrent();
-            $table->text('customer_ip')->nullable();
-            $table->text('customer_user_agent')->nullable();
-            $table->timestamps();
-
-            $table->index(['user_id', 'coupon_id', 'order_number', 'used_at']);
-        });
     }
 
     public function down(): void
