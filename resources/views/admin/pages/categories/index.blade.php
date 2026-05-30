@@ -96,12 +96,8 @@
                                             <tr>
                                                 <th scope="row">{{ $loop->iteration + ($categories->currentPage() - 1) * $categories->perPage() }}</th>
                                                 <td>
-                                                    @if($category->image)
-                                                        <img src="{{ Storage::url($category->image) }}" alt="{{ $category->name }}" 
-                                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
+                                                    <img src="{{ $category->image_url }}" alt="{{ $category->name }}" 
+                                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                                 </td>
                                                 <td>
                                                     <a href="{{ route('admin.categories.show', $category->id) }}" class="text-decoration-none">

@@ -60,6 +60,27 @@ class CurrencyService
     }
 
     /**
+     * Get the currency selected for storefront display.
+     */
+    public function getFrontendDisplayCurrency(): ?Currency
+    {
+        $code = session('frontend_display_currency');
+        if ($code) {
+            $currency = Currency::where('code', $code)->where('is_active', true)->first();
+            if ($currency) {
+                return $currency;
+            }
+        }
+
+        return Currency::default()->active()->first();
+    }
+
+    public function setFrontendDisplayCurrency(string $code): void
+    {
+        session(['frontend_display_currency' => $code]);
+    }
+
+    /**
      * Format amount in default currency for display (using session currency).
      */
     public function format(float $amountInDefault, ?string $targetCurrencyCode = null): string

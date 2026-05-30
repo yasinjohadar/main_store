@@ -145,6 +145,68 @@ if (!function_exists('course_cover_url')) {
     }
 }
 
+if (!function_exists('product_image_url')) {
+    /**
+     * Get the URL for a product image with fallback to default image
+     * 
+     * @param string|null $imagePath The image path from database
+     * @param int|null $seed Seed for generating varied default images
+     * @return string The full URL to the image
+     */
+    function product_image_url($imagePath, $seed = null)
+    {
+        if (empty($imagePath)) {
+            $seed = $seed ?? rand(1, 100);
+            return "https://picsum.photos/seed/product{$seed}/400/450";
+        }
+
+        $imagePath = ltrim($imagePath, '/');
+        
+        try {
+            $storageHelper = app(\App\Services\Storage\StorageHelperService::class);
+            $url = $storageHelper->getFileUrl('public', $imagePath);
+            if (!empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+                return $url;
+            }
+        } catch (\Exception $e) {
+            // Continue to fallback
+        }
+        
+        return asset('storage/' . $imagePath);
+    }
+}
+
+if (!function_exists('category_image_url')) {
+    /**
+     * Get the URL for a category image with fallback to default image
+     * 
+     * @param string|null $imagePath The image path from database
+     * @param int|null $seed Seed for generating varied default images
+     * @return string The full URL to the image
+     */
+    function category_image_url($imagePath, $seed = null)
+    {
+        if (empty($imagePath)) {
+            $seed = $seed ?? rand(1, 50);
+            return "https://picsum.photos/seed/cat{$seed}/300/300";
+        }
+
+        $imagePath = ltrim($imagePath, '/');
+        
+        try {
+            $storageHelper = app(\App\Services\Storage\StorageHelperService::class);
+            $url = $storageHelper->getFileUrl('public', $imagePath);
+            if (!empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+                return $url;
+            }
+        } catch (\Exception $e) {
+            // Continue to fallback
+        }
+        
+        return asset('storage/' . $imagePath);
+    }
+}
+
 if (!function_exists('storage_disk_url')) {
     /**
      * Get the URL for a file stored in a specific disk (dynamic storage)

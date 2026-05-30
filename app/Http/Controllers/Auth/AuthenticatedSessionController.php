@@ -16,7 +16,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'socialGoogleEnabled' => social_login_enabled('google'),
+            'socialFacebookEnabled' => social_login_enabled('facebook'),
+        ]);
     }
 
     /**
@@ -40,7 +43,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(auth_home_route());
     }
 
     /**

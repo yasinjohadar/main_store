@@ -1,433 +1,165 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }} - {{ __('Log in') }}</title>
+    @php
+        use App\Services\SiteSettingsService as SiteSettings;
+        $siteName = site_setting(SiteSettings::KEY_SITE_NAME, config('app.name'));
+    @endphp
+    <title>{{ $siteName }} - تسجيل الدخول</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #020617; /* slate-950 - خلفية داكنة بدون تدرج */
-            color: #e5e7eb;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 960px;
-            display: flex;
-            gap: 2.5rem;
-            align-items: stretch;
-        }
-
-        .brand-panel {
-            flex: 1.1;
-            background-color: #020617;
-            border-radius: 1.25rem;
-            border: 1px solid rgba(148, 163, 184, 0.25);
-            padding: 2rem 2.25rem;
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .brand-logo {
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 0.9rem;
-            background-color: #0f172a;
-            border: 1px solid rgba(148, 163, 184, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .brand-logo svg {
-            width: 1.8rem;
-            height: 1.8rem;
-            fill: #22c55e;
-        }
-
-        .brand-title {
-            display: flex;
-            flex-direction: column;
-            gap: 0.1rem;
-        }
-
-        .brand-title span:first-child {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #f9fafb;
-        }
-
-        .brand-title span:last-child {
-            font-size: 0.9rem;
-            color: #9ca3af;
-        }
-
-        .brand-highlights {
-            margin-top: 2.25rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        .brand-highlight {
-            padding: 0.9rem 1rem;
-            border-radius: 0.9rem;
-            background-color: #020617;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-        }
-
-        .brand-highlight-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #e5e7eb;
-            margin-bottom: 0.25rem;
-        }
-
-        .brand-highlight-desc {
-            font-size: 0.85rem;
-            color: #9ca3af;
-        }
-
-        .brand-footer {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            color: #6b7280;
-        }
-
-        .auth-panel {
-            flex: 1;
-            background-color: #020617;
-            border-radius: 1.25rem;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            box-shadow: 0 18px 60px rgba(15, 23, 42, 0.85);
-            padding: 2.25rem 2.4rem 2.1rem;
-        }
-
-        .page-title {
-            margin-bottom: 1.75rem;
-        }
-
-        .page-title h1 {
-            font-size: 1.45rem;
-            font-weight: 700;
-            color: #f9fafb;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.6rem;
-        }
-
-        .page-title .icon-edu {
-            width: 2.1rem;
-            height: 2.1rem;
-            fill: #22c55e;
-        }
-
-        .page-title p {
-            margin-top: 0.3rem;
-            font-size: 0.9rem;
-            color: #9ca3af;
-        }
-
-        .session-status {
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: #22c55e;
-            margin-bottom: 1rem;
-            padding: 0.45rem 0.75rem;
-            border-radius: 0.6rem;
-            background-color: rgba(34, 197, 94, 0.08);
-            border: 1px solid rgba(34, 197, 94, 0.35);
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group:last-of-type {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.88rem;
-            color: #e5e7eb;
-            margin-bottom: 0.35rem;
-        }
-
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 0.7rem 0.95rem;
-            border-radius: 0.65rem;
-            border: 1px solid #374151;
-            font-size: 0.94rem;
-            font-family: 'Cairo', sans-serif;
-            color: #f9fafb;
-            background-color: #020617;
-            transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-        }
-
-        input[type="email"]::placeholder,
-        input[type="password"]::placeholder {
-            color: #6b7280;
-        }
-
-        input[type="email"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #22c55e;
-            box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.65);
-            background-color: #020617;
-        }
-
-        input[type="checkbox"] {
-            width: 1.05rem;
-            height: 1.05rem;
-            border-radius: 0.3rem;
-            border: 1px solid #4b5563;
-            accent-color: #22c55e;
-            cursor: pointer;
-        }
-
-        .remember-me {
-            display: block;
-            margin-top: 0.85rem;
-        }
-
-        .remember-me label {
-            display: inline-flex;
-            align-items: center;
-            font-weight: 500;
-            margin-bottom: 0;
-            cursor: pointer;
-        }
-
-        .remember-me span {
-            margin-right: 0.5rem;
-            font-size: 0.88rem;
-            color: #9ca3af;
-        }
-
-        .error-messages {
-            font-size: 0.82rem;
-            color: #f97373;
-            margin-top: 0.4rem;
-        }
-
-        .error-messages ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .error-messages li {
-            margin-top: 0.18rem;
-        }
-
-        .admin-fill-row {
-            margin-top: 1.1rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .btn-admin-fill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.5rem 0.9rem;
-            font-family: 'Cairo', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #22c55e;
-            background-color: rgba(34, 197, 94, 0.08);
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            border-radius: 0.6rem;
-            cursor: pointer;
-            transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
-        }
-
-        .btn-admin-fill:hover {
-            background-color: rgba(34, 197, 94, 0.16);
-            border-color: #22c55e;
-        }
-
-        .btn-admin-fill svg {
-            width: 1rem;
-            height: 1rem;
-            fill: currentColor;
-        }
-
-        .form-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 1.35rem;
-        }
-
-        .form-actions a {
-            font-size: 0.85rem;
-            color: #9ca3af;
-            text-decoration: none;
-        }
-
-        .form-actions a:hover {
-            color: #e5e7eb;
-        }
-
-        button[type="submit"] {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.7rem 1.6rem;
-            font-family: 'Cairo', sans-serif;
-            font-size: 0.96rem;
-            font-weight: 600;
-            background-color: #22c55e;
-            color: #020617;
-            border: none;
-            border-radius: 0.7rem;
-            cursor: pointer;
-            transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.08s ease;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #16a34a;
-            box-shadow: 0 10px 26px rgba(22, 163, 74, 0.55);
-        }
-
-        button[type="submit"]:active {
-            transform: translateY(1px);
-            box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                max-width: 420px;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .auth-panel {
-                padding: 1.75rem 1.7rem 1.6rem;
-            }
-        }
-
-        @media (min-width: 900px) {
-            .brand-panel {
-                display: flex;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/vendor/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/auth-login.css') }}">
 </head>
-<body>
-    <div class="container">
-        <div class="page-title">
-            <h1>
-                <svg class="icon-edu" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
-                تسجيل الدخول
-            </h1>
-        </div>
-
-        <div class="form-container">
-            @if (session('status'))
-                <div class="session-status">
-                    {{ session('status') }}
+<body class="auth-login-page">
+    <div class="auth-login">
+        <aside class="auth-login__visual" aria-hidden="true">
+            <div class="auth-login__visual-inner">
+                <div class="auth-login__brand">
+                    <span class="auth-login__brand-icon"><i class="fas fa-store"></i></span>
+                    <div>
+                        <p class="auth-login__brand-name">{{ $siteName }}</p>
+                        <p class="auth-login__brand-tagline">تسوّق بذكاء واطمئنان</p>
+                    </div>
                 </div>
-            @endif
+                <h2 class="auth-login__visual-title">مرحباً بعودتك!</h2>
+                <p class="auth-login__visual-text">
+                    سجّل دخولك لمتابعة طلباتك، إدارة حسابك، والاستمتاع بتجربة تسوق سلسة وآمنة.
+                </p>
+            </div>
+            <div class="auth-login__features">
+                <div class="auth-login__feature"><i class="fas fa-truck"></i><span>شحن سريع وموثوق</span></div>
+                <div class="auth-login__feature"><i class="fas fa-shield-alt"></i><span>دفع آمن ومتعدد الخيارات</span></div>
+                <div class="auth-login__feature"><i class="fas fa-heart"></i><span>قائمة مفضلة ومقارنة منتجات</span></div>
+            </div>
+        </aside>
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+        <main class="auth-login__main">
+            <div class="auth-login__top">
+                <a href="{{ route('frontend.home') }}" class="auth-login__back">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة للمتجر
+                </a>
+            </div>
 
-                <div class="form-group">
-                    <label for="email">{{ __('Email') }}</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="admin@admin.com" />
-                    @if ($errors->get('email'))
-                        <div class="error-messages">
-                            <ul>
-                                @foreach ((array) $errors->get('email') as $message)
-                                    <li>{{ $message }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
+            <div class="auth-login__card">
+                <header class="auth-login__head">
+                    <h1 class="auth-login__title">تسجيل الدخول</h1>
+                    <p class="auth-login__subtitle">أدخل بياناتك للمتابعة إلى حسابك</p>
+                </header>
 
-                <div class="form-group">
-                    <label for="password">{{ __('Password') }}</label>
-                    <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="كلمة المرور" />
-                    @if ($errors->get('password'))
-                        <div class="error-messages">
-                            <ul>
-                                @foreach ((array) $errors->get('password') as $message)
-                                    <li>{{ $message }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-
-                <div class="remember-me">
-                    <label for="remember_me">
-                        <input id="remember_me" type="checkbox" name="remember">
-                        <span>{{ __('Remember me') }}</span>
-                    </label>
-                </div>
-
-                @if (config('app.debug'))
-                <div class="admin-fill-row">
-                    <button type="button" class="btn-admin-fill" id="btnAdminFill" title="تعبئة البريد وكلمة المرور من بيانات الأدمن في الـ seed">
-                        <svg viewBox="0 0 24 24"><path d="M19 2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 2c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3zm6 14H6v-.23c0-1.47 2.94-2.24 4.5-2.24 1.56 0 4.5.77 4.5 2.24V18z"/></svg>
-                        استخدام بيانات الأدمن
-                    </button>
-                </div>
+                @if ($socialGoogleEnabled || $socialFacebookEnabled)
+                    <div class="auth-login__social">
+                        @if ($socialGoogleEnabled)
+                            <a href="{{ route('auth.social.redirect', 'google') }}" class="auth-login__social-btn auth-login__social-btn--google">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.6h5.1c-.2 1.2-1.5 3.6-5.1 3.6-3.1 0-5.6-2.5-5.6-5.6s2.5-5.6 5.6-5.6c1.8 0 3 .8 3.7 1.5l2.5-2.4C16.9 3.6 14.7 2.6 12 2.6 6.9 2.6 2.7 6.8 2.7 12s4.2 9.4 9.3 9.4c5.4 0 9-3.8 9-9.2 0-.6-.1-1.1-.2-1.6H12z"/></svg>
+                                <span>المتابعة باستخدام Google</span>
+                            </a>
+                        @endif
+                        @if ($socialFacebookEnabled)
+                            <a href="{{ route('auth.social.redirect', 'facebook') }}" class="auth-login__social-btn auth-login__social-btn--facebook">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 3H16V0h-2.5C9.6 0 7 2.6 7 6v2H4v3h3v12h3.5V11H16l.5-3H10.5V6c0-1.4 1.1-3 3-3z"/></svg>
+                                <span>المتابعة باستخدام Facebook</span>
+                            </a>
+                        @endif
+                    </div>
+                    <div class="auth-login__divider">أو</div>
+                @elseif (config('app.debug'))
+                    <p class="auth-login__social-hint">
+                        لتفعيل Google/Facebook أضف مفاتيح OAuth في ملف <code>.env</code>
+                    </p>
                 @endif
 
-                <div class="form-actions">
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}">
-                            {{ __('Forgot your password?') }}
-                        </a>
+                @if (session('status'))
+                    <div class="auth-login__alert auth-login__alert--success">{{ session('status') }}</div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <div class="auth-login__field">
+                        <label for="email">البريد الإلكتروني</label>
+                        <div class="auth-login__input-wrap">
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="example@email.com" @class(['auth-login__input--error' => $errors->has('email')])>
+                            <span class="auth-login__input-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
+                        </div>
+                        @if ($errors->get('email'))
+                            <div class="auth-login__errors">
+                                <ul>@foreach ((array) $errors->get('email') as $message)<li>{{ $message }}</li>@endforeach</ul>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="auth-login__field">
+                        <label for="password">كلمة المرور</label>
+                        <div class="auth-login__input-wrap">
+                            <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور" @class(['auth-login__input--error' => $errors->has('password')])>
+                            <button type="button" class="auth-login__toggle-pass" id="togglePassword" aria-label="إظهار كلمة المرور">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <span class="auth-login__input-icon" aria-hidden="true"><i class="fas fa-lock"></i></span>
+                        </div>
+                        @if ($errors->get('password'))
+                            <div class="auth-login__errors">
+                                <ul>@foreach ((array) $errors->get('password') as $message)<li>{{ $message }}</li>@endforeach</ul>
+                            </div>
+                        @endif
+                    </div>
+
+                    <label class="auth-login__remember" for="remember_me">
+                        <input id="remember_me" type="checkbox" name="remember">
+                        <span>تذكرني</span>
+                    </label>
+
+                    @if (config('app.debug'))
+                        <button type="button" class="auth-login__admin-btn" id="btnAdminFill" title="تعبئة بيانات الأدمن للتطوير">
+                            <i class="fas fa-user-shield"></i>
+                            استخدام بيانات الأدمن
+                        </button>
                     @endif
-                    <button type="submit">
-                        {{ __('Log in') }}
-                    </button>
-                </div>
-            </form>
-        </div>
+
+                    <div class="auth-login__actions">
+                        <button type="submit" class="auth-login__submit">
+                            <i class="fas fa-sign-in-alt"></i>
+                            دخول
+                        </button>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="auth-login__forgot">نسيت كلمة المرور؟</a>
+                        @endif
+                    </div>
+                </form>
+
+                @if (Route::has('register'))
+                    <p class="auth-login__footer">
+                        ليس لديك حساب؟
+                        <a href="{{ route('register') }}">إنشاء حساب جديد</a>
+                    </p>
+                @endif
+            </div>
+        </main>
     </div>
 
-    @if (config('app.debug'))
     <script>
-        document.getElementById('btnAdminFill').addEventListener('click', function() {
+        document.getElementById('togglePassword')?.addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const icon = this.querySelector('i');
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.classList.toggle('fa-eye', !isHidden);
+            icon.classList.toggle('fa-eye-slash', isHidden);
+            this.setAttribute('aria-label', isHidden ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
+        });
+
+        @if (config('app.debug'))
+        document.getElementById('btnAdminFill')?.addEventListener('click', function () {
             document.getElementById('email').value = 'admin@admin.com';
             document.getElementById('password').value = '123456789';
         });
+        @endif
     </script>
-    @endif
 </body>
 </html>

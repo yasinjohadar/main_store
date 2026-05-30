@@ -49,6 +49,10 @@ use App\Http\Controllers\Admin\SystemStatusController;
 */
 
 Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
     // System status
     Route::get('system-status', [SystemStatusController::class, 'index'])->name('system-status.index');
 

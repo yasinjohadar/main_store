@@ -6,13 +6,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 
-Route::get('/', function () {
-    return view('admin.dashboard');
-})->middleware('auth');
-
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return redirect(auth_home_route());
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth', 'check.user.active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -51,3 +47,4 @@ Route::prefix('store')->name('store.')->group(function () {
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
+require __DIR__.'/frontend.php';

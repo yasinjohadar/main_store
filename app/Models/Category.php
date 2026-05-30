@@ -105,7 +105,8 @@ class Category extends Model
         if ($this->image) {
             return Storage::url($this->image);
         }
-        return null;
+        $seed = $this->id ?? rand(1, 50);
+        return "https://picsum.photos/seed/cat{$seed}/300/300";
     }
 
     /**
@@ -116,7 +117,17 @@ class Category extends Model
         if ($this->cover_image) {
             return Storage::url($this->cover_image);
         }
-        return null;
+        $seed = $this->id ?? rand(1, 50);
+        return "https://picsum.photos/seed/catcover{$seed}/800/400";
+    }
+
+    /**
+     * Get the default image URL for categories.
+     */
+    public function getDefaultImageUrlAttribute()
+    {
+        $seed = $this->id ?? rand(1, 50);
+        return "https://picsum.photos/seed/cat{$seed}/300/300";
     }
 
     /**

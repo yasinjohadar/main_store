@@ -13,14 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // تشغيل seeder الصلاحيات أولاً
         $this->call([
             PermissionSeeder::class,
             AdminUserSeeder::class,
-            CategoryAndProductSeeder::class,
+            CategorySeeder::class,
+            ProductSeeder::class,
         ]);
 
-        // إنشاء مستخدم تجريبي إضافي
         User::factory()->create([
             'name' => 'user',
             'email' => 'user@example.com',

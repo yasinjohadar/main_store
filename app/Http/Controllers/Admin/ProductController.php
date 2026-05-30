@@ -12,6 +12,7 @@ use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
+use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -44,8 +45,9 @@ class ProductController extends Controller
 
         $products = $query->paginate(15);
         $categories = Category::orderBy('name')->get();
+        $currencyService = app(CurrencyService::class);
 
-        return view('admin.pages.products.index', compact('products', 'categories'));
+        return view('admin.pages.products.index', compact('products', 'categories', 'currencyService'));
     }
 
     public function duplicate(Product $product)

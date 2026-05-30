@@ -9,6 +9,7 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
         "laravel/framework": "^12.0",
+        "laravel/socialite": "^5.27",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.0",
         "platformcommunity/flysystem-bunnycdn": "^3.3",
@@ -35,7 +36,10 @@
         "files": [
             "app/Helpers/StorageHelper.php",
             "app/Helpers/SiteSettingsHelper.php",
-            "app/Helpers/ActivityLogHelper.php"
+            "app/Helpers/ActivityLogHelper.php",
+            "app/Helpers/ShopHelper.php",
+            "app/Helpers/AuthRedirectHelper.php",
+            "app/Helpers/SocialAuthHelper.php"
         ]
     },
     "autoload-dev": {

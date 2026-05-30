@@ -53,11 +53,7 @@
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-body text-center">
-                            @if($product->primary_image_url)
-                                <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="img-fluid rounded" style="max-height: 300px; object-fit: contain;">
-                            @else
-                                <p class="text-muted">لا توجد صورة</p>
-                            @endif
+                            <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="img-fluid rounded" style="max-height: 300px; object-fit: contain;">
                             @if($product->images->count() > 1)
                                 <div class="d-flex gap-2 justify-content-center mt-2 flex-wrap">
                                     @foreach($product->images as $img)

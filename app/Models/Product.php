@@ -189,7 +189,17 @@ class Product extends Model
     public function getPrimaryImageUrlAttribute()
     {
         $img = $this->primary_image;
-        return $img ? Storage::url($img->path) : null;
+        if ($img) {
+            return Storage::url($img->path);
+        }
+        $seed = $this->id ?? rand(1, 100);
+        return "https://picsum.photos/seed/product{$seed}/400/450";
+    }
+
+    public function getDefaultImageUrlAttribute()
+    {
+        $seed = $this->id ?? rand(1, 100);
+        return "https://picsum.photos/seed/product{$seed}/400/450";
     }
 
     public function getHasDiscountAttribute()
@@ -203,5 +213,13 @@ class Product extends Model
             return 0;
         }
         return (int) round((1 - ($this->effective_price / $this->compare_at_price)) * 100);
+    }
+
+    public function getReviewsAvgRatingAttribute()
+    {
+        if (!$this->relationLoaded('reviews') || $this->reviews->isEmpty()) {
+            return 0;
+        }
+        return $this->reviews->avg('rating');
     }
 }

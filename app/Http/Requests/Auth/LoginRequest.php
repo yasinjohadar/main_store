@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +42,27 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $credentials = $this->only('email', 'password');
+        $remember = $this->boolean('remember');
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && ! $this->isBcryptHash($user->password)) {
+            if ($this->validateLegacyPassword($user, $credentials['password'])) {
+                $user->forceFill(['password' => $credentials['password']])->save();
+                Auth::login($user, $remember);
+                RateLimiter::clear($this->throttleKey());
+
+                return;
+            }
+
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        if (! Auth::attempt($credentials, $remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -50,6 +71,22 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    protected function isBcryptHash(string $hash): bool
+    {
+        return preg_match('/^\$2[ayb]\$.{56}$/', $hash) === 1;
+    }
+
+    protected function validateLegacyPassword(User $user, string $password): bool
+    {
+        $stored = $user->password;
+
+        if (hash_equals($stored, md5($password))) {
+            return true;
+        }
+
+        return hash_equals($stored, $password);
     }
 
     /**
