@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\RespondsWithAdminTable;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Product;
@@ -12,6 +13,7 @@ use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
+use App\Http\Requests\Admin\InlineUpdateProductRequest;
 use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,6 +21,8 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    use RespondsWithAdminTable;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -26,7 +30,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'images'])->orderBy('order')->orderByDesc('created_at');
+        $query = Product::with(['category', 'images'])->withCount('variants')->orderBy('order')->orderByDesc('created_at');
 
         if ($request->filled('query')) {
             $q = $request->input('query');
@@ -43,11 +47,24 @@ class ProductController extends Controller
             $query->where('category_id', $request->input('category_id'));
         }
 
-        $products = $query->paginate(15);
+        $perPageOptions = [10, 15, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 15);
+        if (! in_array($perPage, $perPageOptions)) {
+            $perPage = 15;
+        }
+
+        $products = $query->paginate($perPage)->withQueryString();
         $categories = Category::orderBy('name')->get();
         $currencyService = app(CurrencyService::class);
 
-        return view('admin.pages.products.index', compact('products', 'categories', 'currencyService'));
+        $data = compact('products', 'categories', 'currencyService');
+
+        return $this->adminTableView(
+            $request,
+            'admin.pages.products.index',
+            'admin.pages.products.partials.table-body',
+            $data
+        );
     }
 
     public function duplicate(Product $product)
@@ -126,6 +143,69 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', $message);
     }
 
+    public function inlineUpdate(InlineUpdateProductRequest $request, Product $product)
+    {
+        $field = $request->input('field');
+        $value = $request->input('value');
+
+        match ($field) {
+            'name' => $product->update(['name' => $value]),
+            'price' => $this->updateProductPrice($product, (float) $value),
+            'status' => $product->update(['status' => $value]),
+            'category_id' => $product->update(['category_id' => $value ?: null]),
+            default => null,
+        };
+
+        $product->refresh()->load('category');
+
+        return response()->json([
+            'success' => true,
+            'field' => $field,
+            'product_id' => $product->id,
+            'display' => $this->productInlineDisplay($product),
+        ]);
+    }
+
+    protected function updateProductPrice(Product $product, float $price): void
+    {
+        $variant = $product->variants()->where('is_default', true)->first()
+            ?? $product->variants()->first();
+
+        if ($variant) {
+            $variant->update(['price' => $price]);
+        } else {
+            $product->update(['price' => $price]);
+        }
+    }
+
+    protected function productInlineDisplay(Product $product): array
+    {
+        $currencyService = app(CurrencyService::class);
+        $statusMeta = $this->productStatusMeta($product->status);
+
+        return [
+            'name' => $product->name,
+            'price' => (float) $product->effective_price,
+            'price_formatted' => $currencyService->format((float) $product->effective_price),
+            'status' => $product->status,
+            'status_label' => $statusMeta['label'],
+            'status_class' => $statusMeta['class'],
+            'category_id' => $product->category_id,
+            'category_name' => $product->category?->name,
+            'has_variants' => $product->variants_count > 0 || $product->variants()->exists(),
+        ];
+    }
+
+    protected function productStatusMeta(string $status): array
+    {
+        return match ($status) {
+            'active' => ['label' => 'نشط', 'class' => 'admin-table__badge--success'],
+            'draft' => ['label' => 'مسودة', 'class' => 'admin-table__badge--secondary'],
+            'archived' => ['label' => 'أرشيف', 'class' => 'admin-table__badge--danger'],
+            default => ['label' => $status, 'class' => 'admin-table__badge--secondary'],
+        };
+    }
+
     public function create()
     {
         $categories = Category::orderBy('name')->get();
@@ -178,12 +258,16 @@ class ProductController extends Controller
     {
         $product->load([
             'category',
+            'brand',
             'images',
             'variants.attributeValues.attribute',
             'reviews',
             'stockMovements.user',
         ]);
-        return view('admin.pages.products.show', compact('product'));
+
+        $currencyService = app(CurrencyService::class);
+
+        return view('admin.pages.products.show', compact('product', 'currencyService'));
     }
 
     public function edit(Product $product)
@@ -262,6 +346,10 @@ class ProductController extends Controller
                     'is_primary' => false,
                 ]);
             }
+        }
+
+        if ($product->status === 'active' && $product->is_visible) {
+            app(\App\Services\Seo\IndexNowService::class)->ping(route('frontend.product.show', $product->slug));
         }
 
         return redirect()->route('admin.products.edit', $product)->with('success', 'تم تحديث المنتج بنجاح.');

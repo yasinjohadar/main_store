@@ -104,11 +104,15 @@
                 <form method="POST" action="{{ route('frontend.cart.apply-coupon') }}" class="store-cart-coupon__form">
                     @csrf
                     <input type="text" name="coupon" class="form-control store-cart-coupon__input"
-                        placeholder="أدخل كود الخصم..." value="{{ old('coupon', session('coupon_code')) }}">
+                        placeholder="أدخل كود الخصم..." value="{{ old('coupon', $couponCode ?? session('coupon_code')) }}">
                     <button type="submit" class="store-cart-coupon__btn">تطبيق</button>
                 </form>
-                @if(session('coupon_code'))
-                    <p class="store-cart-coupon__note">* تطبيق أكواد الخصم سيتم تفعيله لاحقاً</p>
+                @if($cart->coupon_code ?? session('coupon_code'))
+                    <p class="store-cart-coupon__note text-success">الكوبون <strong>{{ $cart->coupon_code ?? session('coupon_code') }}</strong> مفعّل</p>
+                    <form method="POST" action="{{ route('frontend.cart.remove-coupon') }}" class="mt-2">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">إزالة الكوبون</button>
+                    </form>
                 @endif
             </div>
         </div>

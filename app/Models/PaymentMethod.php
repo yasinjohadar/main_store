@@ -29,6 +29,6 @@ class PaymentMethod extends Model
 
     public static function getDriverSlugs(): array
     {
-        return ['cod', 'bank_transfer', 'paypal', 'card'];
+        return ['cod', 'bank_transfer', 'paypal', 'card', 'stripe'];
     }
 }

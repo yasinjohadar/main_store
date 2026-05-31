@@ -121,6 +121,25 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="config-stripe" class="config-section card custom-card mb-4" style="display: {{ old('driver') === 'stripe' ? 'block' : 'none' }};">
+                            <div class="card-header"><div class="card-title">إعدادات Stripe</div></div>
+                            <div class="card-body">
+                                <p class="small text-muted">الافتراضي: المفاتيح من <a href="{{ route('admin.stripe-settings.index') }}">إعدادات Stripe</a>.</p>
+                                <div class="form-check mb-3">
+                                    <input type="hidden" name="config[use_global_keys]" value="0">
+                                    <input class="form-check-input" type="checkbox" name="config[use_global_keys]" value="1" id="stripe_use_global" {{ old('config.use_global_keys', true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="stripe_use_global">استخدام المفاتيح العامة</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Publishable Key</label>
+                                    <input type="text" class="form-control font-monospace" dir="ltr" name="config[public_key]" value="{{ old('config.public_key') }}">
+                                </div>
+                                <div>
+                                    <label class="form-label">Secret Key</label>
+                                    <input type="password" class="form-control font-monospace" dir="ltr" name="config[secret_key]" value="{{ old('config.secret_key') }}">
+                                </div>
+                            </div>
+                        </div>
                         <div id="config-card" class="config-section card custom-card mb-4" style="display: {{ old('driver') === 'card' ? 'block' : 'none' }};">
                             <div class="card-header"><div class="card-title">إعدادات فيزا / ماستركارد (بوابة الدفع)</div></div>
                             <div class="card-body">

@@ -81,6 +81,8 @@ class BlogPostController extends Controller
             'title' => 'required|string|max:255',
             'slug' => ['required', 'string', 'max:255', 'regex:/^[\p{Arabic}a-zA-Z0-9\s-]+$/u', 'unique:blog_posts,slug'],
             'excerpt' => 'nullable|string',
+            'tldr' => 'nullable|string',
+            'key_takeaways_text' => 'nullable|string',
             'content' => 'required|string',
             'category_id' => 'required|exists:blog_categories,id',
             'status' => 'required|in:draft,published,scheduled',
@@ -93,6 +95,12 @@ class BlogPostController extends Controller
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
             'focus_keyword' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:500',
+            'focus_keyword_synonyms' => 'nullable|string|max:500',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|string|max:500',
+            'robots_meta' => 'nullable|string|max:50',
 
             // Schema.org
             'schema_type' => 'nullable|string|max:50',
@@ -171,6 +179,7 @@ class BlogPostController extends Controller
             // Extract tags before creating post
             $tags = $validated['tags'] ?? [];
             unset($validated['tags']);
+            $validated = $this->mergeBlogContentFields($request, $validated);
 
             // Create post
             $post = BlogPost::create($validated);
@@ -260,6 +269,8 @@ class BlogPostController extends Controller
             'title' => 'required|string|max:255',
             'slug' => ['required', 'string', 'max:255', 'regex:/^[\p{Arabic}a-zA-Z0-9\s-]+$/u', 'unique:blog_posts,slug,' . $post->id],
             'excerpt' => 'nullable|string',
+            'tldr' => 'nullable|string',
+            'key_takeaways_text' => 'nullable|string',
             'content' => 'required|string',
             'category_id' => 'required|exists:blog_categories,id',
             'status' => 'required|in:draft,published,scheduled',
@@ -272,6 +283,12 @@ class BlogPostController extends Controller
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
             'focus_keyword' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:500',
+            'focus_keyword_synonyms' => 'nullable|string|max:500',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|string|max:500',
+            'robots_meta' => 'nullable|string|max:50',
 
             // Schema.org
             'schema_type' => 'nullable|string|max:50',
@@ -365,6 +382,7 @@ class BlogPostController extends Controller
             // Extract tags before updating post
             $tags = $validated['tags'] ?? [];
             unset($validated['tags']);
+            $validated = $this->mergeBlogContentFields($request, $validated);
 
             // Get old tags for count update
             $oldTags = $post->tags->pluck('id')->toArray();
@@ -387,6 +405,10 @@ class BlogPostController extends Controller
 
             // Recalculate reading time
             $post->calculateReadingTime();
+
+            if ($post->status === 'published') {
+                app(\App\Services\Seo\IndexNowService::class)->ping(route('frontend.blog.show', $post->slug));
+            }
 
             DB::commit();
 
@@ -518,5 +540,18 @@ class BlogPostController extends Controller
         }
 
         return back()->with('error', 'لا توجد صورة لحذفها');
+    }
+
+    protected function mergeBlogContentFields(Request $request, array $validated): array
+    {
+        if ($request->filled('key_takeaways_text')) {
+            $validated['key_takeaways'] = array_values(array_filter(array_map(
+                'trim',
+                preg_split('/\r\n|\r|\n/', $request->input('key_takeaways_text'))
+            )));
+        }
+        unset($validated['key_takeaways_text']);
+
+        return $validated;
     }
 }

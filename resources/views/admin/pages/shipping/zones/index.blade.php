@@ -63,11 +63,14 @@
                                                 <td>
                                                     <div class="d-flex gap-2">
                                                         <a href="{{ route('admin.shipping.zones.edit', $zone) }}" class="btn btn-sm btn-primary">تعديل</a>
-                                                        <form action="{{ route('admin.shipping.zones.destroy', $zone) }}" method="POST" onsubmit="return confirm('حذف هذه المنطقة مع جميع طرق الشحن التابعة لها؟');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                                        </form>
+                                                        <x-admin.delete-trigger
+                                                            :action="route('admin.shipping.zones.destroy', $zone)"
+                                                            title="حذف منطقة الشحن"
+                                                            :item="$zone->name"
+                                                            message="حذف هذه المنطقة مع جميع طرق الشحن التابعة لها؟"
+                                                            button-class="btn-sm btn-danger"
+                                                            label="حذف"
+                                                        />
                                                     </div>
                                                 </td>
                                             </tr>

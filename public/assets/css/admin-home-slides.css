@@ -1,0 +1,102 @@
+/* Admin mini preview for home slides form */
+.admin-slide-preview__frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--preview-bg, #e8edf3);
+    min-height: 220px;
+    aspect-ratio: 16 / 7;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.admin-slide-preview__bg {
+    position: absolute;
+    inset: -4%;
+    background-size: cover;
+    background-position: center;
+}
+
+.admin-slide-preview__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.55) 38%,
+        rgba(248, 250, 252, 0.92) 62%,
+        rgba(255, 255, 255, 0.98) 100%
+    );
+    pointer-events: none;
+}
+
+.admin-slide-preview__product {
+    position: absolute;
+    left: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 38%;
+    max-height: 75%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.15));
+    z-index: 2;
+}
+
+.admin-slide-preview__content {
+    position: absolute;
+    right: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 52%;
+    text-align: right;
+    z-index: 3;
+}
+
+.admin-slide-preview__badge {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--preview-accent, #336699);
+    border-radius: 1rem;
+}
+
+.admin-slide-preview__subtitle {
+    margin: 0 0 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.admin-slide-preview__title {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #111;
+}
+
+.admin-slide-preview__desc {
+    margin: 0 0 0.5rem;
+    font-size: 0.65rem;
+    line-height: 1.5;
+    color: #666;
+}
+
+.admin-slide-preview__btn {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--preview-accent, #336699);
+    border-radius: 0.5rem;
+}
+
+.admin-slide-preview__badge:empty,
+.admin-slide-preview__subtitle:empty,
+.admin-slide-preview__desc:empty {
+    display: none;
+}

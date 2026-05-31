@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         require_once app_path('Helpers/ShopHelper.php');
         require_once app_path('Helpers/SocialAuthHelper.php');
         require_once app_path('Helpers/AuthRedirectHelper.php');
+        require_once app_path('Helpers/StoreSettingsHelper.php');
     }
 
     /**
@@ -32,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
+
+        $this->app->booted(function () {
+            app(\App\Services\DynamicConfigLoader::class)->load();
+        });
         
         // تسجيل PermissionServiceProvider
         $this->app->register(PermissionServiceProvider::class);
@@ -42,6 +47,29 @@ class AppServiceProvider extends ServiceProvider
             AutoReplyWhatsAppListener::class
         );
 
+        Event::listen(
+            \App\Events\OrderPlaced::class,
+            [\App\Listeners\SendOrderConfirmationEmail::class, 'handle']
+        );
+        Event::listen(
+            \App\Events\OrderPlaced::class,
+            [\App\Listeners\SendAdminNewOrderEmail::class, 'handle']
+        );
+        Event::listen(
+            \App\Events\OrderStatusChanged::class,
+            [\App\Listeners\HandleOrderStatusChanged::class, 'handle']
+        );
+        Event::listen(
+            \App\Events\OrderPlaced::class,
+            [\App\Listeners\DispatchOrderWebhooks::class, 'handleOrderPlaced']
+        );
+        Event::listen(
+            \App\Events\OrderStatusChanged::class,
+            [\App\Listeners\DispatchOrderWebhooks::class, 'handleOrderStatusChanged']
+        );
+
+        \App\Models\Product::observe(\App\Observers\ProductObserver::class);
+
         View::composer('admin.layouts.main-header', function ($view) {
             $currencies = Currency::active()->ordered()->get();
             $currencyService = app(CurrencyService::class);
@@ -49,8 +77,16 @@ class AppServiceProvider extends ServiceProvider
             $view->with(compact('currencies', 'displayCurrency'));
         });
 
-        View::composer('admin.layouts.master', function ($view) {
-            $view->with('currencyService', app(CurrencyService::class));
+        View::composer('admin.*', function ($view) {
+            if (! $view->offsetExists('currencyService')) {
+                $view->with('currencyService', app(CurrencyService::class));
+            }
+        });
+
+        View::composer('frontend.layouts.master', function ($view) {
+            if (! $view->offsetExists('seo')) {
+                $view->with('seo', app(\App\Services\Seo\SeoResolverService::class)->forSite());
+            }
         });
 
         View::composer([
@@ -59,25 +95,15 @@ class AppServiceProvider extends ServiceProvider
             'components.frontend.header-middle',
             'components.frontend.sticky-footer',
         ], function ($view) {
-            $cart = session('cart', []);
-            $cartItems = [];
-            $cartTotal = 0;
-
-            if (is_array($cart)) {
-                foreach ($cart as $rowId => $item) {
-                    $subtotal = ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
-                    $cartItems[] = array_merge($item, [
-                        'row_id' => $rowId,
-                        'subtotal' => $subtotal,
-                    ]);
-                    $cartTotal += $subtotal;
-                }
-            }
+            $cartService = app(\App\Services\CartService::class);
+            $presenter = app(\App\Services\CartPresenter::class);
+            $cart = $cartService->getCart();
+            $viewData = $presenter->toViewData($cart);
 
             $view->with([
-                'cartCount' => count($cartItems),
-                'cartItems' => $cartItems,
-                'cartTotal' => $cartTotal,
+                'cartCount' => $viewData['cartCount'],
+                'cartItems' => $viewData['cartItems'],
+                'cartTotal' => $viewData['cartTotal'],
                 'wishlistIds' => app(WishlistService::class)->ids(),
                 'wishlistCount' => app(WishlistService::class)->count(),
                 'compareIds' => app(CompareService::class)->ids(),

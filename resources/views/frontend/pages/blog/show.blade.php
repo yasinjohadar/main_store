@@ -9,25 +9,24 @@
 @endpush
 
 @section('content')
-    <x-frontend.page-hero
-        :title="$post->title"
-        eyebrow="المدونة"
-        icon="w-icon-comments"
-        :breadcrumb-items="[
-            ['label' => 'المدونة', 'url' => route('frontend.blog.index')],
-            ['label' => $post->title],
-        ]"
-    />
-
     <div class="page-content store-blog-show-page">
-        <div class="container">
-            <div class="row gutter-lg store-blog-show-layout">
-                <div class="col-lg-8 order-1">
+        <div class="container store-blog-show-page__container">
+            <x-frontend.page-hero
+                :title="$post->title"
+                eyebrow="المدونة"
+                icon="w-icon-comments"
+                :embedded="true"
+                :breadcrumb-items="[
+                    ['label' => 'المدونة', 'url' => route('frontend.blog.index')],
+                    ['label' => $post->title],
+                ]"
+            />
+
+            <div class="row store-blog-show-layout">
+                <div class="main-content post-single-content store-blog-show-main">
                     @include('frontend.partials.blog.show-content')
                 </div>
-                <div class="col-lg-4 order-2">
-                    @include('frontend.partials.blog.sidebar', ['context' => 'show', 'post' => $post])
-                </div>
+                @include('frontend.partials.blog.sidebar', ['context' => 'show', 'post' => $post])
             </div>
         </div>
     </div>

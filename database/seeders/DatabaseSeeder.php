@@ -17,7 +17,10 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             AdminUserSeeder::class,
             CategorySeeder::class,
+            ProductAttributeSeeder::class,
             ProductSeeder::class,
+            HomeSlideSeeder::class,
+            HomePageSeeder::class,
         ]);
 
         User::factory()->create([

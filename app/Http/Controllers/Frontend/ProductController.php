@@ -6,12 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Review;
 use App\Services\ProductLayoutService;
+use App\Services\ProductVariantOptionService;
+use App\Services\Analytics\PageViewTracker;
+use App\Services\Seo\SeoResolverService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     public function __construct(
-        protected ProductLayoutService $layoutService
+        protected ProductLayoutService $layoutService,
+        protected SeoResolverService $seoResolver,
+        protected PageViewTracker $pageViewTracker,
+        protected ProductVariantOptionService $variantOptionService,
     ) {}
 
     public function show(Request $request, $slug)
@@ -40,6 +46,8 @@ class ProductController extends Controller
             ->get();
 
         $relatedProducts = $this->relatedQuery($product)->limit(4)->get();
+        $upsellProducts = $product->upsellProducts();
+        $crossSellProducts = $product->crossSellProducts();
 
         $vendorProducts = Product::active()
             ->where('id', '!=', $product->id)
@@ -69,28 +77,51 @@ class ProductController extends Controller
                 ->limit(6)
                 ->get();
 
+        $this->pageViewTracker->track($request, $product);
+
+        $seo = $this->seoResolver->forProduct($product);
+
+        $variantOptions = $this->variantOptionService->forProduct($product);
+        $variantsJson = $this->variantOptionService->variantsPayload($product);
+
+        $analyticsProductView = [
+            'item_id' => (string) $product->id,
+            'item_name' => $product->name,
+            'value' => (float) $product->price,
+            'currency' => 'SAR',
+        ];
+
         return view('frontend.pages.product.show', compact(
             'product',
             'reviews',
             'relatedProducts',
+            'upsellProducts',
+            'crossSellProducts',
             'vendorProducts',
             'frequentlyBoughtProducts',
             'sidebarProducts',
             'productLayout',
-            'productLayoutPartial'
+            'productLayoutPartial',
+            'variantOptions',
+            'variantsJson',
+            'seo',
+            'analyticsProductView',
         ));
     }
 
     public function quickView($slug)
     {
-        $product = Product::with(['category', 'brand', 'images', 'attributes.values', 'reviews'])
+        $product = Product::with(['category', 'brand', 'images', 'attributes.values', 'variants.attributeValues.attribute', 'reviews'])
             ->withAvg('reviews', 'rating')
             ->where('slug', $slug)
             ->where('status', 'active')
             ->where('is_visible', true)
             ->firstOrFail();
 
-        return view('frontend.partials.quick-view-content', compact('product'));
+        $variantOptions = $this->variantOptionService->forProduct($product);
+        $variantsJson = $this->variantOptionService->variantsPayload($product);
+
+        return view('frontend.partials.quick-view-content', compact('product', 'variantOptions', 'variantsJson'));
     }
 
     protected function relatedQuery(Product $product)

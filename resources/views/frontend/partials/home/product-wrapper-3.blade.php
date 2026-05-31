@@ -1,15 +1,20 @@
 @php
-    $category = $sectionCategories->get(2);
-    $shopUrl = $category ? route('frontend.category.show', $category->slug) : route('frontend.shop.index');
+    use App\Models\HomeProductBlock;
+
+    $block = $homeProductBlocks->get(HomeProductBlock::KEY_PRODUCT_3);
+    if (! $block?->is_active) {
+        return;
+    }
+    $products = $blockProducts[HomeProductBlock::KEY_PRODUCT_3] ?? collect();
 @endphp
 
 @include('frontend.partials.home.product-wrapper-section', [
-    'title' => $category?->name ?? 'المنزل والمطبخ',
-    'products' => $homeProducts,
-    'bannerImage' => asset('frontend/assets/images/demos/demo-rtl/banners/banner-8.jpg'),
-    'bannerBg' => '#EAEFF3',
-    'bannerSubtitle' => 'عروض وتخفيضات',
-    'bannerTitle' => 'الأكثر رواجاً<br><span class="font-weight-normal text-capitalize">أدوات منزلية</span>',
-    'shopUrl' => $shopUrl,
-    'wrapperClass' => 'product-wrapper-1 product-wrapper-home appear-animate mb-7',
+    'title' => $block->section_title ?? 'المنزل والمطبخ',
+    'products' => $products,
+    'bannerImage' => $block->banner_image_url,
+    'bannerBg' => $block->banner_bg_color ?? '#EAEFF3',
+    'bannerSubtitle' => $block->banner_subtitle,
+    'bannerTitle' => $block->banner_title,
+    'shopUrl' => $block->resolvedShopUrl(),
+    'wrapperClass' => $block->wrapper_class ?? 'product-wrapper-1 product-wrapper-home appear-animate mb-7',
 ])

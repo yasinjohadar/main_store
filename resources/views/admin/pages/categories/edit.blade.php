@@ -157,41 +157,10 @@
 
                             <!-- SEO -->
                             <div class="col-12">
-                                <h6 class="text-primary mb-3">إعدادات SEO</h6>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control @error('meta_title') is-invalid @enderror" 
-                                           name="meta_title" placeholder="عنوان SEO" value="{{ old('meta_title', $category->meta_title) }}">
-                                    <label>عنوان SEO (Meta Title)</label>
-                                    @error('meta_title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <textarea class="form-control @error('meta_description') is-invalid @enderror" 
-                                              name="meta_description" placeholder="وصف SEO" style="height: 100px">{{ old('meta_description', $category->meta_description) }}</textarea>
-                                    <label>وصف SEO (Meta Description)</label>
-                                    @error('meta_description')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control @error('meta_keywords') is-invalid @enderror" 
-                                           name="meta_keywords" placeholder="الكلمات المفتاحية" value="{{ old('meta_keywords', $category->meta_keywords) }}">
-                                    <label>الكلمات المفتاحية (Meta Keywords)</label>
-                                    <div class="form-text">افصل بين الكلمات بفواصل</div>
-                                    @error('meta_keywords')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                <x-admin.seo-panel entity-type="category" :values="$category->only([
+                                    'meta_title','meta_description','meta_keywords','canonical_url',
+                                    'focus_keyword','og_title','og_description','og_image','robots_meta','schema_type'
+                                ])" />
                             </div>
 
                             <!-- الحالة -->

@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Contracts\Seoable;
+use App\Traits\HasSeoFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class Category extends Model
+class Category extends Model implements Seoable
 {
-    use HasFactory;
+    use HasFactory, HasSeoFields;
 
     protected $fillable = [
         'name',
@@ -20,6 +22,14 @@ class Category extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'canonical_url',
+        'focus_keyword',
+        'focus_keyword_synonyms',
+        'og_title',
+        'og_description',
+        'og_image',
+        'robots_meta',
+        'schema_type',
         'parent_id',
         'status',
         'order',
@@ -112,13 +122,13 @@ class Category extends Model
     /**
      * Get the full URL for the cover image.
      */
-    public function getCoverImageUrlAttribute()
+    public function getCoverImageUrlAttribute(): ?string
     {
         if ($this->cover_image) {
             return Storage::url($this->cover_image);
         }
-        $seed = $this->id ?? rand(1, 50);
-        return "https://picsum.photos/seed/catcover{$seed}/800/400";
+
+        return null;
     }
 
     /**

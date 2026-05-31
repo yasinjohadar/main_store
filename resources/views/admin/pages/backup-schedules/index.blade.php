@@ -71,13 +71,13 @@
                                                             <i class="fas fa-{{ $schedule->is_active ? 'ban' : 'check' }}"></i>
                                                         </button>
                                                     </form>
-                                                    <form action="{{ route('admin.backup-schedules.destroy', $schedule->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه الجدولة؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.backup-schedules.destroy', $schedule->id)"
+                                                        title="حذف الجدولة"
+                                                        message="هل أنت متأكد من حذف هذه الجدولة؟"
+                                                        button-class="btn-sm btn-danger"
+                                                        icon="fas fa-trash"
+                                                    />
                                                 </div>
                                             </td>
                                         </tr>

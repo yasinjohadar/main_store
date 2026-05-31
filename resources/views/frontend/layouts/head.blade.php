@@ -1,13 +1,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
-    <meta name="keywords" content="Marketplace ecommerce responsive HTML5 Template" />
-    <meta name="description"
-        content="Wolmart is powerful marketplace &amp; ecommerce responsive Html5 Template.">
-    <meta name="author" content="D-THEMES">
+    @php
+        $siteSettings = app(\App\Services\SiteSettingsService::class);
+        $defaultDescription = $siteSettings->get(\App\Services\SiteSettingsService::KEY_SITE_META_DESCRIPTION, '');
+        $defaultKeywords = $siteSettings->get(\App\Services\SiteSettingsService::KEY_SITE_META_KEYWORDS, '');
+    @endphp
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('frontend/assets/images/icons/favicon.png') }}">
+    @if(! isset($seo))
+        <meta name="description" content="{{ Str::limit($defaultDescription, 320) }}">
+        @if($defaultKeywords)
+            <meta name="keywords" content="{{ $defaultKeywords }}">
+        @endif
+    @endif
+
+    <x-seo.head :seo="$seo ?? null" />
+
+    @php($faviconUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_FAVICON) ?: asset('frontend/assets/images/icons/favicon.png'))
+    <link rel="icon" href="{{ $faviconUrl }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,3 +59,4 @@
 
     <!-- Default CSS -->
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/demo-rtl.min.css') }}">
+    @include('frontend.partials.store-theme')

@@ -52,6 +52,9 @@
             });
             Wolmart.initQtyInput($product.find('.quantity'));
             initQuickViewQty($product);
+            if (typeof window.initProductVariants === 'function') {
+                window.initProductVariants($container[0] || $container);
+            }
         }, 150);
 
         Wolmart.ratingTooltip();

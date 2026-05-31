@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use App\Contracts\Seoable;
+use App\Traits\HasSeoFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class Product extends Model
+class Product extends Model implements Seoable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasSeoFields;
 
     protected $fillable = [
         'category_id',
@@ -42,6 +44,16 @@ class Product extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'canonical_url',
+        'focus_keyword',
+        'focus_keyword_synonyms',
+        'og_title',
+        'og_description',
+        'og_image',
+        'robots_meta',
+        'schema_type',
+        'upsell_product_ids',
+        'cross_sell_product_ids',
     ];
 
     protected $casts = [
@@ -59,6 +71,8 @@ class Product extends Model
         'allow_reviews' => 'boolean',
         'reviews_require_approval' => 'boolean',
         'order' => 'integer',
+        'upsell_product_ids' => 'array',
+        'cross_sell_product_ids' => 'array',
     ];
 
     protected static function boot()
@@ -103,6 +117,23 @@ class Product extends Model
         return $this->belongsToMany(ProductAttribute::class, 'product_product_attribute')->withPivot([])->orderBy('product_attributes.order');
     }
 
+    public function hasPurchasableVariants(): bool
+    {
+        if ($this->relationLoaded('variants')) {
+            return $this->variants->isNotEmpty();
+        }
+
+        return $this->variants()->exists();
+    }
+
+    /**
+     * @return list<array{attribute: ProductAttribute, values: \Illuminate\Support\Collection}>
+     */
+    public function variantOptions(): array
+    {
+        return app(\App\Services\ProductVariantOptionService::class)->forProduct($this);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class)->orderBy('order')->orderBy('id');
@@ -116,6 +147,64 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(ProductTag::class, 'product_tag');
+    }
+
+    public function upsellProducts()
+    {
+        $ids = array_filter($this->upsell_product_ids ?? []);
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return static::active()->whereIn('id', $ids)->with(['images', 'reviews'])->withAvg('reviews', 'rating')->get();
+    }
+
+    public function crossSellProducts()
+    {
+        $ids = array_filter($this->cross_sell_product_ids ?? []);
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return static::active()->whereIn('id', $ids)->with(['images', 'reviews'])->withAvg('reviews', 'rating')->get();
+    }
+
+    public static function crossSellsForCartItems(iterable $productIds, int $limit = 4)
+    {
+        $ids = collect($productIds)->unique()->filter()->values();
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        $crossSellIds = static::whereIn('id', $ids)
+            ->pluck('cross_sell_product_ids')
+            ->flatten()
+            ->filter(fn ($id) => ! $ids->contains($id))
+            ->unique()
+            ->take($limit * 2)
+            ->values();
+
+        if ($crossSellIds->isEmpty()) {
+            return static::active()
+                ->whereNotIn('id', $ids)
+                ->with(['images', 'reviews'])
+                ->withAvg('reviews', 'rating')
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+        }
+
+        return static::active()
+            ->whereIn('id', $crossSellIds)
+            ->with(['images', 'reviews'])
+            ->withAvg('reviews', 'rating')
+            ->limit($limit)
+            ->get();
     }
 
     public function stockMovements()

@@ -10,6 +10,9 @@
     <script src="{{ asset('frontend/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
 
     <!-- Main JS -->
+    <script>
+        window.storeNewsletterPopup = @json(app(\App\Services\SiteSettingsService::class)->newsletterPopupConfig());
+    </script>
     <script src="{{ asset('frontend/assets/js/main.min.js') }}"></script>
     <script>
         window.LaravelCart = {
@@ -37,7 +40,11 @@
     <script src="{{ asset('frontend/assets/js/custom-cart.js') }}"></script>
     <script src="{{ asset('frontend/assets/js/custom-wishlist.js') }}"></script>
     <script src="{{ asset('frontend/assets/js/custom-compare.js') }}"></script>
+    <script src="{{ asset('frontend/assets/js/product-variants.js') }}"></script>
     <script src="{{ asset('frontend/assets/js/custom-quickview.js') }}"></script>
     <script src="{{ asset('frontend/assets/js/custom-search-category.js') }}"></script>
     <script src="{{ asset('frontend/assets/js/custom-shop.js') }}"></script>
+    <script src="{{ asset('frontend/assets/js/custom-newsletter-popup.js') }}"></script>
+    @stack('analytics-config')
+    @include('frontend.partials.analytics-scripts')
 @stack('scripts')

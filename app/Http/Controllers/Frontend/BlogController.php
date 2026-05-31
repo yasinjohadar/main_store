@@ -8,9 +8,16 @@ use App\Models\BlogPost;
 use App\Models\BlogCategory;
 use App\Models\BlogTag;
 use App\Models\BlogComment;
+use App\Services\Analytics\PageViewTracker;
+use App\Services\Seo\SeoResolverService;
 
 class BlogController extends Controller
 {
+    public function __construct(
+        protected SeoResolverService $seoResolver,
+        protected PageViewTracker $pageViewTracker,
+    ) {}
+
     public function index(Request $request)
     {
         $query = BlogPost::with(['author', 'category', 'tags'])->published();
@@ -71,6 +78,8 @@ class BlogController extends Controller
 
         $totalPosts = BlogPost::published()->count();
 
+        $seo = $this->seoResolver->forSite($pageTitle, 'مدونة المتجر — مقالات ونصائح');
+
         return view('frontend.pages.blog.index', compact(
             'posts',
             'categories',
@@ -80,7 +89,8 @@ class BlogController extends Controller
             'activeTag',
             'pageTitle',
             'breadcrumbItems',
-            'totalPosts'
+            'totalPosts',
+            'seo',
         ));
     }
 
@@ -92,6 +102,7 @@ class BlogController extends Controller
             ->firstOrFail();
 
         $post->incrementViews();
+        $this->pageViewTracker->track(request(), $post);
 
         $comments = BlogComment::where('blog_post_id', $post->id)
             ->where('is_approved', true)
@@ -108,7 +119,9 @@ class BlogController extends Controller
             ->limit(3)
             ->get();
 
-        return view('frontend.pages.blog.show', compact('post', 'comments', 'categories', 'tags', 'recentPosts', 'relatedPosts'));
+        $seo = $this->seoResolver->forBlogPost($post);
+
+        return view('frontend.pages.blog.show', compact('post', 'comments', 'categories', 'tags', 'recentPosts', 'relatedPosts', 'seo'));
     }
 
     public function storeComment(Request $request, $slug)

@@ -31,3 +31,7 @@
 
 <!-- Custom Css -->
 <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}" media="all">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-confirm-modal.css') }}" media="all">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-data-table.css') }}" media="all">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-record-detail.css') }}" media="all">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-sidebar.css') }}" media="all">

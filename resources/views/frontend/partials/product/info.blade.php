@@ -10,7 +10,20 @@
 <div class="col-md-6 mb-4 mb-md-0">
     <div class="store-product-info">
         <div class="product-details" data-sticky-options="{'minWidth': 767}">
-            <h2 class="product-title">{{ $product->name }}</h2>
+            <div class="store-product-info__head">
+                <h2 class="product-title">{{ $product->name }}</h2>
+                @auth
+                    @if(auth()->user()->hasRole('admin'))
+                        <a href="{{ route('admin.products.edit', $product) }}"
+                            class="store-product-info__admin-edit"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fas fa-pen-to-square" aria-hidden="true"></i>
+                            <span>تعديل المنتج</span>
+                        </a>
+                    @endif
+                @endauth
+            </div>
 
             <div class="store-product-info__meta">
                 @if($product->brand)
@@ -26,7 +39,7 @@
                         </span>
                     @endif
                     @if($product->sku)
-                        <span class="store-product-info__chip">SKU: {{ $product->sku }}</span>
+                        <span class="store-product-info__chip">SKU: <span data-product-sku>{{ $product->sku }}</span></span>
                     @endif
                     <span class="store-product-info__chip store-product-info__chip--{{ $product->in_stock ? 'success' : 'danger' }}">
                         {{ $product->in_stock ? 'متوفر' : 'غير متوفر' }}
@@ -70,32 +83,22 @@
 
             <hr class="product-divider">
 
-            @if($product->attributes->isNotEmpty())
-                @foreach($product->attributes as $attribute)
-                    @if($attribute->values->isNotEmpty())
-                        <div class="product-form product-variation-form product-{{ $attribute->type === 'color' ? 'color' : 'size' }}-swatch mb-3">
-                            <label class="mb-1">{{ $attribute->name }}:</label>
-                            <div class="flex-wrap d-flex align-items-center product-variations">
-                                @foreach($attribute->values as $value)
-                                    @if($attribute->type === 'color' && $value->color_hex)
-                                        <a href="#" class="color" style="background-color: {{ $value->color_hex }};" title="{{ $value->value }}"></a>
-                                    @else
-                                        <a href="#" class="size">{{ $value->value }}</a>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                @endforeach
-            @endif
+            @php
+                $variantOptions = $variantOptions ?? $product->variantOptions();
+                $variantsJson = $variantsJson ?? app(\App\Services\ProductVariantOptionService::class)->variantsPayload($product);
+            @endphp
+
+            @include('frontend.partials.product.attribute-options', compact('variantOptions'))
 
             <form method="POST" action="{{ route('frontend.cart.store') }}"
                 class="product-form product-variation-form cart-add-form store-product-purchase"
                 data-product-name="{{ $product->name }}"
                 data-product-url="{{ route('frontend.product.show', $product->slug) }}"
-                data-product-image="{{ $product->primary_image_url }}">
+                data-product-image="{{ $product->primary_image_url }}"
+                @if(! empty($variantsJson)) data-variants='@json($variantsJson)' @endif>
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <input type="hidden" name="product_variant_id" id="product-variant-id" value="">
                 <div class="store-product-purchase__row">
                     <div class="store-product-purchase__qty">
                         <label>الكمية:</label>
@@ -108,12 +111,27 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-add-cart store-product-purchase__submit" {{ $product->in_stock ? '' : 'disabled' }}>
+                    <button type="submit" class="btn btn-primary btn-add-cart store-product-purchase__submit"
+                        data-analytics-add-cart
+                        data-product-id="{{ $product->id }}"
+                        data-product-name="{{ $product->name }}"
+                        data-product-price="{{ $product->price }}"
+                        {{ $product->in_stock ? '' : 'disabled' }}>
                         <i class="w-icon-cart"></i>
                         <span>{{ $product->in_stock ? 'أضف للسلة' : 'غير متوفر' }}</span>
                     </button>
                 </div>
             </form>
+
+            @if(! $product->in_stock && $product->track_quantity)
+                <form method="POST" action="{{ route('frontend.products.notify-stock', $product) }}" class="mt-3 store-product-notify">
+                    @csrf
+                    @guest
+                        <input type="email" name="email" class="form-control mb-2" placeholder="بريدك الإلكتروني" required>
+                    @endguest
+                    <button type="submit" class="btn btn-outline-primary btn-sm">أبلغني عند التوفر</button>
+                </form>
+            @endif
 
             <div class="social-links-wrapper store-product-info__actions">
                 <div class="social-links">

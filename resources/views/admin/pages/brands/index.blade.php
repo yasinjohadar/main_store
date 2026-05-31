@@ -68,11 +68,15 @@
                                                 <td>
                                                     <div class="d-flex gap-2">
                                                         <a href="{{ route('admin.brands.edit', $brand) }}" class="btn btn-sm btn-primary" title="تعديل">تعديل</a>
-                                                        <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST" class="d-inline" onsubmit="return confirm('حذف هذه الماركة؟');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-danger" title="حذف">حذف</button>
-                                                        </form>
+                                                        <x-admin.delete-trigger
+                                                            :action="route('admin.brands.destroy', $brand)"
+                                                            title="حذف الماركة"
+                                                            :item="$brand->name"
+                                                            message="هل تريد حذف هذه الماركة؟"
+                                                            button-class="btn-sm btn-danger"
+                                                            label="حذف"
+                                                            title-attr="حذف"
+                                                        />
                                                     </div>
                                                 </td>
                                             </tr>

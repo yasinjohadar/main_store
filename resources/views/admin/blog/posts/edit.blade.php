@@ -96,6 +96,16 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label">ملخص سريع (TL;DR)</label>
+                                <textarea name="tldr" rows="2" class="form-control" placeholder="2–3 جمل للقارئ السريع وGEO">{{ old('tldr', $post->tldr) }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">النقاط الرئيسية (سطر لكل نقطة)</label>
+                                <textarea name="key_takeaways_text" rows="4" class="form-control" placeholder="• نقطة 1&#10;• نقطة 2">{{ old('key_takeaways_text', is_array($post->key_takeaways) ? implode("\n", $post->key_takeaways) : '') }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label">المحتوى <span class="text-danger">*</span></label>
                                 <textarea name="content" id="content" class="form-control">{{ old('content', $post->content) }}</textarea>
                             </div>
@@ -103,32 +113,11 @@
                     </div>
 
                     <div class="card custom-card mb-4">
-                        <div class="card-header">
-                            <div class="card-title">إعدادات SEO</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">عنوان SEO</label>
-                                <input type="text" name="meta_title" class="form-control"
-                                       value="{{ old('meta_title', $post->meta_title) }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">وصف SEO</label>
-                                <textarea name="meta_description" rows="2" class="form-control">{{ old('meta_description', $post->meta_description) }}</textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">الكلمات المفتاحية</label>
-                                <input type="text" name="meta_keywords" class="form-control"
-                                       value="{{ old('meta_keywords', $post->meta_keywords) }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">الكلمة المفتاحية الرئيسية</label>
-                                <input type="text" name="focus_keyword" class="form-control"
-                                       value="{{ old('focus_keyword', $post->focus_keyword) }}">
-                            </div>
+                        <div class="card-body p-0">
+                            <x-admin.seo-panel entity-type="blog" :values="$post->only([
+                                'meta_title','meta_description','meta_keywords','canonical_url',
+                                'focus_keyword','og_title','og_description','og_image','robots_meta','schema_type'
+                            ])" />
                         </div>
                     </div>
 

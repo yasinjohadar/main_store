@@ -16,6 +16,26 @@
 
     <div class="sidebar-content scrollable">
         <div class="sticky-sidebar">
+            @auth
+                @if(auth()->user()->hasRole('admin') && isset($post))
+                    <div class="store-blog-sidebar__widget store-blog-sidebar__admin">
+                        <a href="{{ route('admin.blog.posts.edit', $post) }}"
+                            class="store-blog-sidebar__admin-edit"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <span class="store-blog-sidebar__admin-edit-icon" aria-hidden="true">
+                                <i class="fas fa-pen-to-square"></i>
+                            </span>
+                            <span class="store-blog-sidebar__admin-edit-text">
+                                <strong>تعديل المقال</strong>
+                                <small>يفتح في تبويب جديد</small>
+                            </span>
+                            <i class="w-icon-long-arrow-left store-blog-sidebar__admin-edit-arrow" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                @endif
+            @endauth
+
             <div class="store-blog-sidebar__widget store-blog-sidebar__search">
                 <h3 class="store-blog-sidebar__title">
                     <span class="store-blog-sidebar__title-icon"><i class="w-icon-search"></i></span>

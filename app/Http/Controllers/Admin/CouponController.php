@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\RespondsWithAdminTable;
+use App\Http\Requests\Admin\InlineUpdateCouponRequest;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
@@ -12,6 +14,8 @@ use Illuminate\Support\Str;
 
 class CouponController extends Controller
 {
+    use RespondsWithAdminTable;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -44,9 +48,139 @@ class CouponController extends Controller
             $query->whereDate('expires_at', '<=', $expiresTo);
         }
 
-        $coupons = $query->paginate(15)->withQueryString();
+        $perPageOptions = [10, 15, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 15);
+        if (! in_array($perPage, $perPageOptions, true)) {
+            $perPage = 15;
+        }
 
-        return view('admin.pages.coupons.index', compact('coupons'));
+        $coupons = $query->paginate($perPage)->withQueryString();
+
+        $data = compact('coupons');
+
+        return $this->adminTableView(
+            $request,
+            'admin.pages.coupons.index',
+            'admin.pages.coupons.partials.table-body',
+            $data
+        );
+    }
+
+    public function inlineUpdate(InlineUpdateCouponRequest $request, Coupon $coupon)
+    {
+        $field = $request->input('field');
+        $value = $request->input('value');
+
+        if ($field === 'applicable_to') {
+            $coupon->loadCount(['products', 'categories']);
+            if ($value === 'specific_products' && $coupon->products_count === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'اربط منتجاتاً واحدة على الأقل من صفحة التعديل قبل اختيار «منتجات محددة».',
+                ], 422);
+            }
+            if ($value === 'specific_categories' && $coupon->categories_count === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'اربط تصنيفات من صفحة التعديل قبل اختيار «تصنيفات محددة».',
+                ], 422);
+            }
+        }
+
+        if ($field === 'expires_at' && $value && $coupon->starts_at && $value < $coupon->starts_at->format('Y-m-d')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية.',
+            ], 422);
+        }
+
+        if ($field === 'starts_at' && $value && $coupon->expires_at && $value > $coupon->expires_at->format('Y-m-d')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'تاريخ البداية يجب أن يكون قبل تاريخ الانتهاء.',
+            ], 422);
+        }
+
+        $coupon->update([$field => $value]);
+        $coupon->refresh()->loadCount(['usages', 'products', 'categories']);
+
+        return response()->json([
+            'success' => true,
+            'field' => $field,
+            'coupon_id' => $coupon->id,
+            'display' => $this->couponInlineDisplay($coupon),
+        ]);
+    }
+
+    protected function couponInlineDisplay(Coupon $coupon): array
+    {
+        $statusMeta = $this->couponStatusMeta($coupon->status);
+
+        return [
+            'code' => $coupon->code,
+            'name' => $coupon->name,
+            'type' => $coupon->type,
+            'type_label' => $this->couponTypeLabel($coupon->type),
+            'value' => (float) $coupon->value,
+            'value_formatted' => $this->couponValueFormatted($coupon),
+            'usage_limit' => $coupon->usage_limit,
+            'usage_display' => $this->couponUsageDisplay($coupon),
+            'status' => $coupon->status,
+            'status_label' => $statusMeta['label'],
+            'status_class' => $statusMeta['class'],
+            'starts_at' => $coupon->starts_at?->format('Y-m-d'),
+            'starts_at_display' => $coupon->starts_at?->format('Y-m-d') ?? '—',
+            'expires_at' => $coupon->expires_at?->format('Y-m-d'),
+            'expires_at_display' => $coupon->expires_at?->format('Y-m-d') ?? '—',
+            'applicable_to' => $coupon->applicable_to ?? 'entire_store',
+            'applicable_to_label' => $this->couponApplicableLabel($coupon),
+        ];
+    }
+
+    protected function couponStatusMeta(string $status): array
+    {
+        return match ($status) {
+            'active' => ['label' => 'نشط', 'class' => 'admin-table__badge--success'],
+            'inactive' => ['label' => 'غير نشط', 'class' => 'admin-table__badge--secondary'],
+            'expired' => ['label' => 'منتهي', 'class' => 'admin-table__badge--danger'],
+            default => ['label' => $status, 'class' => 'admin-table__badge--secondary'],
+        };
+    }
+
+    protected function couponTypeLabel(string $type): string
+    {
+        return match ($type) {
+            'percentage' => 'نسبة مئوية',
+            'fixed_amount' => 'مبلغ ثابت',
+            'buy_x_get_y' => 'اشترِ واحصل على',
+            default => $type,
+        };
+    }
+
+    protected function couponValueFormatted(Coupon $coupon): string
+    {
+        if ($coupon->type === 'percentage') {
+            return rtrim(rtrim(number_format((float) $coupon->value, 2), '0'), '.') . '%';
+        }
+
+        return number_format((float) $coupon->value, 2) . ' ر.س';
+    }
+
+    protected function couponUsageDisplay(Coupon $coupon): string
+    {
+        $used = (int) ($coupon->usages_count ?? $coupon->usages()->count());
+        $limit = $coupon->usage_limit;
+
+        return $limit !== null ? "{$used} / {$limit}" : "{$used} / —";
+    }
+
+    protected function couponApplicableLabel(Coupon $coupon): string
+    {
+        return match ($coupon->applicable_to ?? 'entire_store') {
+            'specific_products' => 'منتجات محددة (' . ($coupon->products_count ?? $coupon->products()->count()) . ')',
+            'specific_categories' => 'تصنيفات محددة (' . ($coupon->categories_count ?? $coupon->categories()->count()) . ')',
+            default => 'المتجر كامل',
+        };
     }
 
     public function create()

@@ -22,7 +22,8 @@ class PaymentMethodController extends Controller
             'cod' => ['label' => 'الدفع عند الاستلام', 'config_keys' => ['instructions']],
             'bank_transfer' => ['label' => 'التحويل البنكي / الآيبان', 'config_keys' => ['bank_name', 'iban', 'account_name', 'instructions']],
             'paypal' => ['label' => 'باي بال', 'config_keys' => ['client_id', 'client_secret', 'sandbox']],
-            'card' => ['label' => 'فيزا / ماستركارد (بوابة دفع)', 'config_keys' => ['gateway', 'public_key', 'secret_key', 'sandbox']],
+            'card' => ['label' => 'فيزا / ماستركارد (بوابة دفع — قديم)', 'config_keys' => ['gateway', 'public_key', 'secret_key', 'sandbox']],
+            'stripe' => ['label' => 'Stripe (بطاقة ائتمان)', 'config_keys' => ['use_global_keys', 'public_key', 'secret_key', 'sandbox']],
         ];
     }
 
@@ -81,7 +82,7 @@ class PaymentMethodController extends Controller
                 $config['client_secret'] = $existing['client_secret'];
             }
         }
-        if ($paymentMethod->driver === 'card') {
+        if (in_array($paymentMethod->driver, ['card', 'stripe'], true)) {
             $existing = $paymentMethod->config ?? [];
             if (empty($config['secret_key']) && !empty($existing['secret_key'])) {
                 $config['secret_key'] = $existing['secret_key'];
@@ -117,7 +118,7 @@ class PaymentMethodController extends Controller
         $config = [];
         foreach ($keys as $key) {
             $value = $request->input("config.{$key}");
-            if ($key === 'sandbox') {
+            if (in_array($key, ['sandbox', 'use_global_keys'], true)) {
                 $config[$key] = filter_var($value, FILTER_VALIDATE_BOOL);
             } else {
                 $config[$key] = $value !== null ? (string) $value : null;

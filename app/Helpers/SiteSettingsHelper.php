@@ -2,7 +2,7 @@
 
 use App\Services\SiteSettingsService;
 
-if (!function_exists('site_setting')) {
+if (! function_exists('site_setting')) {
     /**
      * Get a site setting value by key (cached).
      *
@@ -16,24 +16,19 @@ if (!function_exists('site_setting')) {
     }
 }
 
-if (!function_exists('site_setting_url')) {
+if (! function_exists('site_setting_url')) {
     /**
-     * Get the full URL for a site setting that stores a file path (e.g. site_logo, site_favicon).
-     *
-     * @param string $key Key such as SiteSettingsService::KEY_SITE_LOGO or KEY_SITE_FAVICON
-     * @return string|null URL or null if not set
+     * Get the public URL for a site setting that stores a file path (logo, favicon).
      */
     function site_setting_url(string $key): ?string
     {
-        $path = site_setting($key);
-        if (empty($path)) {
-            return null;
-        }
-        $disk = config('filesystems.default', 'public');
-        try {
-            return \Illuminate\Support\Facades\Storage::disk($disk)->url($path);
-        } catch (\Throwable $e) {
-            return asset('storage/' . ltrim($path, '/'));
-        }
+        return app(SiteSettingsService::class)->assetUrl(site_setting($key));
+    }
+}
+
+if (! function_exists('site_setting_asset_exists')) {
+    function site_setting_asset_exists(string $key): bool
+    {
+        return app(SiteSettingsService::class)->assetExists(site_setting($key));
     }
 }

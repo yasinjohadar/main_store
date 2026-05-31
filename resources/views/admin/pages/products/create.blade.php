@@ -201,23 +201,11 @@
                             </div>
                             <div class="card-body">
                                 <p class="text-muted small mb-3">
-                                    اختر السمات التي تنطبق على هذا المنتج (مثل اللون، المقاس). بعد الحفظ ستُنقل لصفحة التعديل لإضافة المتغيرات.
+                                    اختر السمات التي تنطبق على هذا المنتج (مثل اللون، المقاس). ستظهر قيم كل سمة أسفلها مباشرة.
                                 </p>
-                                <div class="d-flex flex-wrap gap-3">
-                                    @foreach($attributes as $attr)
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="attribute_ids[]" value="{{ $attr->id }}" id="create_attr_{{ $attr->id }}" {{ in_array($attr->id, old('attribute_ids', [])) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="create_attr_{{ $attr->id }}">{{ $attr->name }}</label>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                @if($attributes->isEmpty())
-                                    <p class="text-muted small mb-0">
-                                        لا توجد سمات. يمكنك
-                                        <a href="{{ route('admin.attributes.index') }}">إنشاء سمات من هنا</a>
-                                        ثم العودة.
-                                    </p>
-                                @endif
+                                @include('admin.pages.products.partials.attributes-picker', [
+                                    'selectedAttributeIds' => old('attribute_ids', []),
+                                ])
                             </div>
                         </div>
 
@@ -296,6 +284,13 @@
                             </div>
                         </div>
 
+                        <!-- SEO -->
+                        <div class="card custom-card mb-4">
+                            <div class="card-body p-0">
+                                <x-admin.seo-panel entity-type="product" :values="[]" />
+                            </div>
+                        </div>
+
                         <!-- أزرار الحفظ -->
                         <div class="card custom-card">
                             <div class="card-body">
@@ -319,6 +314,7 @@
 @stop
 
 @section('script')
+<script src="{{ asset('assets/js/admin-product-attributes.js') }}"></script>
 <!-- TinyMCE Editor (نفس محرر المدونة) -->
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/tinymce.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>

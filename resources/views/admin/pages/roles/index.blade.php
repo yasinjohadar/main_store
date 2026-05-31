@@ -78,14 +78,16 @@
                                                     <a href="{{route("roles.edit" , $role->id)}}" class="btn btn-sm btn-info text-white">
                                                         <i class="fas fa-edit"></i> تعديل
                                                 </a>
-                                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                                        data-bs-target="#delete{{ $role->id }}">
-                                                        <i class="fas fa-trash-alt"></i> حذف
-                                                    </button>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('roles.destroy', $role)"
+                                                        title="حذف الدور"
+                                                        :item="$role->name"
+                                                        message="هل تريد حذف هذا الدور نهائياً؟"
+                                                        button-class="btn-sm btn-danger"
+                                                        label="حذف"
+                                                    />
                                                 </td>
                                             </tr>
-
-                                            @include('admin.pages.roles.delete');
                                         @empty
                                             <tr>
                                                 <td colspan="3" class="text-danger fw-bold text-center">

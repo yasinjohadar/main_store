@@ -97,13 +97,14 @@
                                                             <i class="fas fa-{{ $model->is_active ? 'ban' : 'check' }}"></i>
                                                         </button>
                                                     </form>
-                                                    <form action="{{ route('admin.ai.models.destroy', $model->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الموديل؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.ai.models.destroy', $model->id)"
+                                                        title="حذف الموديل"
+                                                        :item="$model->name ?? $model->model_id ?? null"
+                                                        message="هل أنت متأكد من حذف هذا الموديل؟"
+                                                        button-class="btn-sm btn-danger"
+                                                        icon="fas fa-trash"
+                                                    />
                                                 </div>
                                             </td>
                                         </tr>

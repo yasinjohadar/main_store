@@ -19,4 +19,14 @@ Schedule::command('backup:cleanup-expired')
     ->at('02:00')
     ->withoutOverlapping();
 
+Schedule::job(new \App\Jobs\LowStockAlertJob())
+    ->daily()
+    ->at('08:00')
+    ->withoutOverlapping();
+
+Schedule::job(new \App\Jobs\SeoAuditJob())
+    ->daily()
+    ->at('03:00')
+    ->withoutOverlapping();
+
 // Zoom sync command removed

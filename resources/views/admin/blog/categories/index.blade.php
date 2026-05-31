@@ -135,16 +135,14 @@
                                             </button>
                                         </form>
 
-                                        <form action="{{ route('admin.blog.categories.destroy', $category->id) }}"
-                                              method="POST"
-                                              class="d-inline"
-                                              onsubmit="return confirm('هل أنت متأكد؟')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger-light">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <x-admin.delete-trigger
+                                            :action="route('admin.blog.categories.destroy', $category->id)"
+                                            title="حذف التصنيف"
+                                            :item="$category->name"
+                                            message="هل أنت متأكد من حذف هذا التصنيف؟"
+                                            button-class="btn-sm btn-danger-light"
+                                            icon="bi bi-trash"
+                                        />
                                     </div>
                                 </td>
                             </tr>

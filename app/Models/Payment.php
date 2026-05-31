@@ -37,6 +37,18 @@ class Payment extends Model
         return $this->belongsTo(PaymentMethod::class, 'payment_method_id');
     }
 
+    public function events()
+    {
+        return $this->hasMany(PaymentEvent::class)->orderByDesc('created_at');
+    }
+
+    public function isStripe(): bool
+    {
+        $driver = $this->paymentMethod?->driver;
+
+        return in_array($driver, ['stripe', 'card'], true);
+    }
+
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');

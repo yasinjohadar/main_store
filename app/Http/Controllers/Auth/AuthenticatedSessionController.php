@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,8 +26,10 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request, CartService $cartService): RedirectResponse
     {
+        $guestSessionId = $request->session()->getId();
+
         $request->authenticate();
 
         // التحقق من أن المستخدم نشط
@@ -40,6 +43,8 @@ class AuthenticatedSessionController extends Controller
                 'email' => 'تم إلغاء تفعيل حسابك. يرجى التواصل مع الإدارة.',
             ]);
         }
+
+        $cartService->mergeGuestCartIntoUser($user->id, $guestSessionId);
 
         $request->session()->regenerate();
 

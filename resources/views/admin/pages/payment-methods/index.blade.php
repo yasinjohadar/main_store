@@ -69,13 +69,16 @@
                                         <td>{{ $method->payments_count ?? 0 }}</td>
                                         <td>
                                             <a href="{{ route('admin.payment-methods.edit', $method) }}" class="btn btn-sm btn-primary">تعديل</a>
-                                            @if(!$method->payments_count)
-                                                <form action="{{ route('admin.payment-methods.destroy', $method) }}" method="POST" class="d-inline" onsubmit="return confirm('هل تريد حذف وسيلة الدفع هذه؟');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                                </form>
-                                            @endif
+                                                @if(!$method->payments_count)
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.payment-methods.destroy', $method)"
+                                                        title="حذف وسيلة الدفع"
+                                                        :item="$method->name"
+                                                        message="هل تريد حذف وسيلة الدفع هذه؟"
+                                                        button-class="btn-sm btn-danger"
+                                                        label="حذف"
+                                                    />
+                                                @endif
                                         </td>
                                     </tr>
                                 @empty

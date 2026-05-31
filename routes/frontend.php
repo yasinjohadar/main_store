@@ -46,9 +46,25 @@ Route::prefix('')->name('frontend.')->group(function () {
 
     // Checkout
     Route::prefix('checkout')->name('checkout.')->group(function () {
-        Route::get('/', [CheckoutController::class, 'index'])->name('index')->middleware('auth');
-        Route::post('/', [CheckoutController::class, 'store'])->name('store')->middleware('auth');
+        Route::get('success/{order}', [CheckoutController::class, 'success'])->name('success');
+        Route::get('invoice/{order}', [CheckoutController::class, 'invoice'])->name('invoice');
+        Route::get('paypal/return/{order}', [CheckoutController::class, 'paypalReturn'])->name('paypal.return');
+
+        Route::middleware('checkout.access')->group(function () {
+            Route::get('/', [CheckoutController::class, 'index'])->name('index');
+            Route::post('/', [CheckoutController::class, 'store'])->name('store');
+        });
     });
+
+    Route::get('downloads/{token}', [\App\Http\Controllers\Frontend\DownloadController::class, 'download'])->name('downloads.show');
+
+    Route::get('orders/{order}/pay', [\App\Http\Controllers\Frontend\PayOrderController::class, 'show'])->name('orders.pay');
+    Route::post('orders/{order}/pay', [\App\Http\Controllers\Frontend\PayOrderController::class, 'store'])->name('orders.pay.store');
+
+    Route::post('products/{product}/notify-stock', [\App\Http\Controllers\Frontend\StockNotificationController::class, 'store'])->name('products.notify-stock');
+
+    Route::post('product/{slug}/reviews', [\App\Http\Controllers\Frontend\ProductReviewController::class, 'store'])
+        ->name('product.reviews.store')->middleware('auth');
 
     // Blog
     Route::prefix('blog')->name('blog.')->group(function () {
@@ -76,6 +92,9 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::get('account/addresses', [AccountController::class, 'addresses'])->name('account.addresses');
         Route::get('account/details', [AccountController::class, 'details'])->name('account.details');
         Route::get('account/orders/{order}', [AccountController::class, 'showOrder'])->name('account.orders.show');
+        Route::post('account/addresses', [\App\Http\Controllers\Frontend\CustomerAddressController::class, 'store'])->name('account.addresses.store');
+        Route::put('account/addresses/{address}', [\App\Http\Controllers\Frontend\CustomerAddressController::class, 'update'])->name('account.addresses.update');
+        Route::delete('account/addresses/{address}', [\App\Http\Controllers\Frontend\CustomerAddressController::class, 'destroy'])->name('account.addresses.destroy');
     });
 
     Route::get('wishlist', [WishlistController::class, 'index'])->name('wishlist');
@@ -85,4 +104,9 @@ Route::prefix('')->name('frontend.')->group(function () {
     Route::post('compare/toggle', [CompareController::class, 'toggle'])->name('compare.toggle');
     Route::delete('compare/{product}', [CompareController::class, 'destroy'])->name('compare.destroy');
     Route::post('compare/clear', [CompareController::class, 'clear'])->name('compare.clear');
+
+    Route::post('analytics/event', [\App\Http\Controllers\Frontend\AnalyticsBeaconController::class, 'store'])->name('analytics.event');
 });
+
+Route::get('sitemap.xml', [\App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap');
+Route::get('robots.txt', [\App\Http\Controllers\Frontend\RobotsController::class, 'index'])->name('robots');

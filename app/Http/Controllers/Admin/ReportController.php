@@ -43,6 +43,7 @@ class ReportController extends Controller
 
         $topProducts = $this->buildTopProducts($startDate, $endDate);
         $couponSummary = $this->buildCouponSummary($startDate, $endDate);
+        $taxSummary = $this->buildTaxSummary($startDate, $endDate);
 
         $filters = [
             'start' => $startDate->toDateString(),
@@ -56,6 +57,7 @@ class ReportController extends Controller
             'salesSeries' => $salesSeries,
             'topProducts' => $topProducts,
             'couponSummary' => $couponSummary,
+            'taxSummary' => $taxSummary,
         ]);
     }
 
@@ -173,6 +175,22 @@ class ReportController extends Controller
         return [
             'rows' => $rows->toArray(),
             'total_discount' => $totalDiscount,
+        ];
+    }
+
+    private function buildTaxSummary(Carbon $start, Carbon $end): array
+    {
+        $rows = Order::query()
+            ->whereBetween('created_at', [$start, $end])
+            ->whereHas('status', fn ($q) => $q->whereIn('slug', ['processing', 'completed']))
+            ->selectRaw('DATE(created_at) as day, SUM(tax_amount) as total_tax, COUNT(*) as orders_count')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get();
+
+        return [
+            'rows' => $rows->toArray(),
+            'total_tax' => (float) $rows->sum('total_tax'),
         ];
     }
 }

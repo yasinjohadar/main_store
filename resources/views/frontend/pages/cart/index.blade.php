@@ -23,6 +23,10 @@
                 @include('frontend.partials.cart.items')
                 @include('frontend.partials.cart.summary')
             </div>
+
+            @if(isset($crossSellProducts) && $crossSellProducts->isNotEmpty())
+                @include('frontend.partials.cart.cross-sells')
+            @endif
         </div>
     </div>
 @endsection

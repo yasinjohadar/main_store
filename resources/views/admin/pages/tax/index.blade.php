@@ -62,11 +62,15 @@
                                                     <div class="d-flex gap-2">
                                                         <a href="{{ route('admin.tax.classes.rates', $class) }}" class="btn btn-sm btn-outline-primary">معدلات الضرائب</a>
                                                         <a href="{{ route('admin.tax.classes.edit', $class) }}" class="btn btn-sm btn-primary">تعديل</a>
-                                                        <form action="{{ route('admin.tax.classes.destroy', $class) }}" method="POST" onsubmit="return confirm('حذف هذه الفئة الضريبية؟ سيتم حذف جميع المعدلات التابعة لها.');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-danger" {{ $class->is_default ? 'disabled' : '' }}>حذف</button>
-                                                        </form>
+                                                        <x-admin.delete-trigger
+                                                            :action="route('admin.tax.classes.destroy', $class)"
+                                                            title="حذف الفئة الضريبية"
+                                                            :item="$class->name"
+                                                            message="حذف هذه الفئة الضريبية؟ سيتم حذف جميع المعدلات التابعة لها."
+                                                            button-class="btn-sm btn-danger"
+                                                            label="حذف"
+                                                            :disabled="$class->is_default"
+                                                        />
                                                     </div>
                                                 </td>
                                             </tr>

@@ -10,6 +10,7 @@
         @include('frontend.partials.product.frequently-bought')
         @include('frontend.partials.product.tabs')
         @include('frontend.partials.product.vendor-products')
+        @include('frontend.partials.product.upsell-cross-sell')
         @include('frontend.partials.product.related-products')
     </div>
 

@@ -6,12 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\BlogPost;
+use App\Models\HomeProductBlock;
+use App\Services\HomePageService;
 
 class HomeController extends Controller
 {
+    public function __construct(
+        protected HomePageService $homePage
+    ) {}
+
     public function index()
     {
         $productWith = ['category', 'images', 'reviews'];
+
+        $composed = $this->homePage->compose();
 
         $categories = Category::active()->root()->ordered()->withCount(['products' => function ($q) {
             $q->where('status', 'active')->where('is_visible', true);
@@ -32,29 +40,27 @@ class HomeController extends Controller
             ->limit(10)
             ->get();
 
-        $sectionCategories = $categories->take(3);
-        $fashionProducts = $this->productsForCategory($sectionCategories->get(0), 8, $productWith);
-        $electronicsProducts = $this->productsForCategory($sectionCategories->get(1), 8, $productWith);
-        $homeProducts = $this->productsForCategory($sectionCategories->get(2), 8, $productWith);
+        $homeProductBlocks = $composed['homeProductBlocks'];
+        $blockProducts = [
+            HomeProductBlock::KEY_PRODUCT_1 => $this->productsForBlock($homeProductBlocks->get(HomeProductBlock::KEY_PRODUCT_1), 8, $productWith),
+            HomeProductBlock::KEY_PRODUCT_2 => $this->productsForBlock($homeProductBlocks->get(HomeProductBlock::KEY_PRODUCT_2), 8, $productWith),
+            HomeProductBlock::KEY_PRODUCT_3 => $this->productsForBlock($homeProductBlocks->get(HomeProductBlock::KEY_PRODUCT_3), 8, $productWith),
+        ];
 
         $dealProducts = $onSale->take(3);
-
         $blogPosts = BlogPost::published()->with(['author', 'category'])->latest('published_at')->limit(4)->get();
 
-        return view('frontend.pages.index', compact(
+        return view('frontend.pages.index', array_merge($composed, compact(
             'categories',
             'featuredProducts',
             'newArrivals',
             'bestSellers',
             'topRated',
             'onSale',
-            'fashionProducts',
-            'electronicsProducts',
-            'homeProducts',
-            'sectionCategories',
+            'blockProducts',
             'dealProducts',
-            'blogPosts'
-        ));
+            'blogPosts',
+        )));
     }
 
     protected function productsForCategory(?Category $category, int $limit, array $with)
@@ -66,5 +72,10 @@ class HomeController extends Controller
         }
 
         return $query->latest()->limit($limit)->get();
+    }
+
+    protected function productsForBlock(?HomeProductBlock $block, int $limit, array $with)
+    {
+        return $this->productsForCategory($block?->category, $limit, $with);
     }
 }

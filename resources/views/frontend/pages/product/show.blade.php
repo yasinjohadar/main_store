@@ -1,6 +1,5 @@
 ﻿@extends('frontend.layouts.master')
 
-@section('title', ($product->meta_title ?: $product->name) . ' - ' . config('app.name'))
 @section('body-class', 'store-product-page')
 @section('header-class', 'header-border')
 @section('main-class', 'mb-10 pb-1')
@@ -11,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/vendor/photoswipe/default-skin/default-skin.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/style-rtl.min.css') }}">
 @endpush
+
 
 @section('content')
     @include('frontend.partials.product.breadcrumb')

@@ -10,6 +10,13 @@ use App\Http\Controllers\Admin\ReviewSettingsController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogTagController;
+use App\Http\Controllers\Admin\HomeSlideController;
+use App\Http\Controllers\Admin\HomepageController;
+use App\Http\Controllers\Admin\HomeSectionSettingsController;
+use App\Http\Controllers\Admin\HomeFeatureController;
+use App\Http\Controllers\Admin\HomePromoBannerController;
+use App\Http\Controllers\Admin\HomeProductBlockController;
+use App\Http\Controllers\Admin\HomeBrandController;
 use App\Http\Controllers\Admin\AppStorageController;
 use App\Http\Controllers\Admin\AppStorageAnalyticsController;
 use App\Http\Controllers\Admin\BackupController;
@@ -33,6 +40,8 @@ use App\Http\Controllers\Admin\WishlistController;
 use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\OrderReturnController;
 use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\StripeSettingsController;
 use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\ProductCompareController;
 use App\Http\Controllers\Admin\SystemStatusController;
@@ -49,9 +58,7 @@ use App\Http\Controllers\Admin\SystemStatusController;
 */
 
 Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
 
     // System status
     Route::get('system-status', [SystemStatusController::class, 'index'])->name('system-status.index');
@@ -59,6 +66,17 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
     // General site settings
     Route::get('settings/site', [\App\Http\Controllers\Admin\GeneralSiteSettingsController::class, 'index'])->name('site-settings.index');
     Route::put('settings/site', [\App\Http\Controllers\Admin\GeneralSiteSettingsController::class, 'update'])->name('site-settings.update');
+    Route::get('settings/store', [\App\Http\Controllers\Admin\StoreSettingsController::class, 'index'])->name('store-settings.index');
+    Route::put('settings/store', [\App\Http\Controllers\Admin\StoreSettingsController::class, 'update'])->name('store-settings.update');
+    Route::get('settings/integrations', [\App\Http\Controllers\Admin\IntegrationSettingsController::class, 'index'])->name('integration-settings.index');
+    Route::put('settings/integrations', [\App\Http\Controllers\Admin\IntegrationSettingsController::class, 'update'])->name('integration-settings.update');
+    Route::get('settings/stripe', [StripeSettingsController::class, 'index'])->name('stripe-settings.index');
+    Route::put('settings/stripe', [StripeSettingsController::class, 'update'])->name('stripe-settings.update');
+    Route::post('settings/stripe/test', [StripeSettingsController::class, 'testConnection'])->name('stripe-settings.test');
+
+    Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('payments/{payment}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
 
     // Activity / Audit log
     Route::get('activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log.index');
@@ -76,6 +94,7 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
     Route::delete('products/{product}/compare/remove', [ProductCompareController::class, 'remove'])->name('products.compare.remove');
     Route::delete('products/compare/clear', [ProductCompareController::class, 'clear'])->name('products.compare.clear');
     Route::post('products/bulk-update', [ProductController::class, 'bulkUpdate'])->name('products.bulk-update');
+    Route::patch('products/{product}/inline-update', [ProductController::class, 'inlineUpdate'])->name('products.inline-update');
     Route::post('products/{product}/duplicate', [ProductController::class, 'duplicate'])->name('products.duplicate');
     Route::resource('products', ProductController::class);
     Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
@@ -90,7 +109,10 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
     // Orders routes
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::patch('orders/{order}/inline-status', [OrderController::class, 'inlineUpdateStatus'])->name('orders.inline-update-status');
     Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('orders/{order}/notes', [OrderController::class, 'addNote'])->name('orders.notes.store');
+    Route::post('orders/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
 
     // Order returns (RMA)
     Route::get('order-returns', [OrderReturnController::class, 'index'])->name('order-returns.index');
@@ -118,6 +140,7 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
     // Coupons routes (specific routes must be before resource so "usage-report" is not matched as {coupon})
     Route::get('coupons/usage-report', [CouponController::class, 'getUsageReport'])->name('coupons.usage-report');
     Route::post('coupons/mark-expired', [CouponController::class, 'markAsExpired'])->name('coupons.mark-expired');
+    Route::patch('coupons/{coupon}/inline-update', [CouponController::class, 'inlineUpdate'])->name('coupons.inline-update');
     Route::resource('coupons', CouponController::class);
 
     // Shipping zones & methods
@@ -149,6 +172,21 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
 
     // Reports dashboard
     Route::get('reports/dashboard', [ReportController::class, 'dashboard'])->name('reports.dashboard');
+
+    Route::get('products/export', [\App\Http\Controllers\Admin\ProductExportController::class, 'export'])->name('products.export');
+    Route::get('products/import', [\App\Http\Controllers\Admin\ProductImportController::class, 'index'])->name('products.import.index');
+    Route::post('products/import', [\App\Http\Controllers\Admin\ProductImportController::class, 'store'])->name('products.import.store');
+
+    Route::resource('webhooks', \App\Http\Controllers\Admin\WebhookController::class)->except(['show']);
+    Route::get('product-tags', [\App\Http\Controllers\Admin\ProductTagController::class, 'index'])->name('product-tags.index');
+    Route::post('product-tags', [\App\Http\Controllers\Admin\ProductTagController::class, 'store'])->name('product-tags.store');
+    Route::delete('product-tags/{productTag}', [\App\Http\Controllers\Admin\ProductTagController::class, 'destroy'])->name('product-tags.destroy');
+    Route::get('marketing/dashboard', [\App\Http\Controllers\Admin\MarketingDashboardController::class, 'index'])->name('marketing.dashboard');
+    Route::post('seo/score', [\App\Http\Controllers\Admin\SeoScoreController::class, 'score'])->name('seo.score');
+    Route::post('seo/suggest', [\App\Http\Controllers\Admin\SeoScoreController::class, 'suggest'])->name('seo.suggest');
+    Route::get('pages', [\App\Http\Controllers\Admin\PageSeoController::class, 'index'])->name('pages.index');
+    Route::get('pages/{page}/edit', [\App\Http\Controllers\Admin\PageSeoController::class, 'edit'])->name('pages.edit');
+    Route::put('pages/{page}', [\App\Http\Controllers\Admin\PageSeoController::class, 'update'])->name('pages.update');
 
     // Customers routes
     Route::resource('customers', CustomerController::class)->only(['index', 'show']);
@@ -192,6 +230,23 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
         Route::resource('tags', BlogTagController::class);
     });
 
+    // Home slider slides
+    Route::patch('home-slides/{homeSlide}/toggle-active', [HomeSlideController::class, 'toggleActive'])->name('home-slides.toggle-active');
+    Route::resource('home-slides', HomeSlideController::class);
+
+    // Homepage CMS
+    Route::prefix('homepage')->name('homepage.')->group(function () {
+        Route::get('/', [HomepageController::class, 'index'])->name('index');
+        Route::patch('sections/{homeSection}/toggle-visible', [HomepageController::class, 'toggleVisible'])->name('sections.toggle-visible');
+        Route::post('sections/reorder', [HomepageController::class, 'reorder'])->name('sections.reorder');
+        Route::get('sections/{homeSection}/edit', [HomeSectionSettingsController::class, 'edit'])->name('sections.edit');
+        Route::put('sections/{homeSection}', [HomeSectionSettingsController::class, 'update'])->name('sections.update');
+        Route::resource('features', HomeFeatureController::class)->except(['show']);
+        Route::resource('promo-banners', HomePromoBannerController::class)->except(['show']);
+        Route::resource('brands', HomeBrandController::class)->except(['show']);
+        Route::get('product-blocks/{blockKey}/edit', [HomeProductBlockController::class, 'edit'])->name('product-blocks.edit');
+        Route::put('product-blocks/{blockKey}', [HomeProductBlockController::class, 'update'])->name('product-blocks.update');
+    });
 
 
     // ========== Email Settings Routes ==========

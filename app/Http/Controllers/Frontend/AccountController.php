@@ -69,6 +69,7 @@ class AccountController extends Controller
 
         $billingAddress = $user->addresses()->where('type', 'billing')->orderByDesc('is_default')->first();
         $shippingAddress = $user->addresses()->where('type', 'shipping')->orderByDesc('is_default')->first();
+        $savedAddresses = $user->addresses()->orderByDesc('is_default')->get();
 
         $latestOrder = $user->orders()->with('addresses')->latest()->first();
 
@@ -97,6 +98,7 @@ class AccountController extends Controller
             'downloads',
             'billingAddress',
             'shippingAddress',
+            'savedAddresses',
             'latestOrder',
             'dashboardStats',
             'accountStats'

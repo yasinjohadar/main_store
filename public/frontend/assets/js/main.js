@@ -1164,25 +1164,7 @@ window.Wolmart = {};
      */
     Wolmart.initPopup = function (options, preset) {
 
-        // Newsletter popup
-        if (Wolmart.$body.hasClass('home') && Wolmart.getCookie('hideNewsletterPopup') !== 'true') {
-            setTimeout(function () {
-                Wolmart.popup({
-                    items: {
-                        src: ".newsletter-popup"
-                    },
-                    type: 'inline',
-                    tLoading: '',
-                    mainClass: 'mfp-newsletter mfp-fadein-popup',
-                    callbacks: {
-                        beforeClose: function () {
-                            // if "do not show" is checked
-                            $('#hide-newsletter-popup')[0].checked && Wolmart.setCookie('hideNewsletterPopup', true, 7);
-                        }
-                    },
-                });
-            }, 7500);
-        }
+        // Newsletter popup — see custom-newsletter-popup.js (admin-controlled)
 
         // Video popup
         Wolmart.$body.on('click', '.btn-iframe', function (e) {

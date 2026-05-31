@@ -5,15 +5,21 @@
     'icon' => null,
     'breadcrumbItems' => [],
     'variant' => 'default',
+    'embedded' => false,
 ])
 
 @php
     $items = $breadcrumbItems ?? [];
     $heroClass = 'store-page-hero store-page-hero--' . ($variant === 'soft' ? 'soft' : 'default');
+    if ($embedded) {
+        $heroClass .= ' store-page-hero--embedded';
+    }
 @endphp
 
 <section class="{{ $heroClass }}" aria-labelledby="store-page-hero-title">
-    <div class="container">
+    @unless($embedded)
+        <div class="container">
+    @endunless
         <div class="store-page-hero__card">
             <div class="store-page-hero__bg" aria-hidden="true">
                 <span class="store-page-hero__mesh"></span>
@@ -73,5 +79,7 @@
                 @endif
             </div>
         </div>
-    </div>
+    @unless($embedded)
+        </div>
+    @endunless
 </section>

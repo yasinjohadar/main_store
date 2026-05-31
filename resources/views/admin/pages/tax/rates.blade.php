@@ -149,11 +149,13 @@
                                                     <button type="submit" class="btn btn-sm btn-primary">تحديث سريع</button>
                                                 </div>
                                             </form>
-                                            <form method="POST" action="{{ route('admin.tax.classes.rates.destroy', [$taxClass, $rate]) }}" onsubmit="return confirm('حذف هذا المعدل؟');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                            </form>
+                                            <x-admin.delete-trigger
+                                                :action="route('admin.tax.classes.rates.destroy', [$taxClass, $rate])"
+                                                title="حذف معدل الضريبة"
+                                                message="هل تريد حذف هذا المعدل؟"
+                                                button-class="btn-sm btn-danger"
+                                                label="حذف"
+                                            />
                                         </td>
                                     </tr>
                                 @empty

@@ -248,17 +248,10 @@
 
                             <div class="col-12"><hr><h6 class="text-primary mb-2">سمات هذا المنتج</h6></div>
                             <div class="col-12">
-                                <p class="text-muted small">اختر السمات التي تنطبق على هذا المنتج (مثل اللون، المقاس) ثم أنشئ متغيرات لكل تركيبة.</p>
-                                <div class="d-flex flex-wrap gap-3">
-                                    @foreach($attributes as $attr)
-                                        <div class="form-check">
-                                            <input class="form-check-input product-attribute-cb" type="checkbox" name="attribute_ids[]" value="{{ $attr->id }}" id="attr_{{ $attr->id }}"
-                                                {{ in_array($attr->id, old('attribute_ids', $product->attributes->pluck('id')->toArray())) ? 'checked' : '' }}
-                                                data-attribute-id="{{ $attr->id }}" data-values='@json($attr->values->map(fn($v) => ['id' => $v->id, 'value' => $v->value])->values())'>
-                                            <label class="form-check-label" for="attr_{{ $attr->id }}">{{ $attr->name }}</label>
-                                        </div>
-                                    @endforeach
-                                </div>
+                                <p class="text-muted small">اختر السمات التي تنطبق على هذا المنتج — ستظهر قيم كل سمة أسفلها، ثم أنشئ المتغيرات.</p>
+                                @include('admin.pages.products.partials.attributes-picker', [
+                                    'selectedAttributeIds' => old('attribute_ids', $product->attributes->pluck('id')->toArray()),
+                                ])
                             </div>
 
                             <div class="col-12"><hr><h6 class="text-primary mb-2">المتغيرات</h6></div>
@@ -301,6 +294,13 @@
                             </div>
 
                             <div class="col-12">
+                                <x-admin.seo-panel entity-type="product" :values="$product->only([
+                                    'meta_title','meta_description','meta_keywords','canonical_url',
+                                    'focus_keyword','og_title','og_description','og_image','robots_meta','schema_type'
+                                ])" />
+                            </div>
+
+                            <div class="col-12">
                                 <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
                                 <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">إلغاء</a>
                             </div>
@@ -313,6 +313,7 @@
 @stop
 
 @section('script')
+<script src="{{ asset('assets/js/admin-product-attributes.js') }}"></script>
 <!-- TinyMCE Editor (نفس محرر المدونة) -->
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.3/tinymce.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>

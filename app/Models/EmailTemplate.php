@@ -28,7 +28,11 @@ class EmailTemplate extends Model
     {
         return [
             'order_created' => 'إنشاء طلب جديد',
+            'order_confirmation' => 'تأكيد الطلب للعميل',
+            'new_order_admin' => 'طلب جديد للإدارة',
             'order_status_changed' => 'تغيير حالة الطلب',
+            'low_stock_alert' => 'تنبيه مخزون منخفض',
+            'back_in_stock' => 'عودة المنتج للمخزون',
             'order_return_status' => 'تحديث حالة طلب المرتجع',
             'user_registered' => 'تسجيل مستخدم جديد',
             'password_reset' => 'إعادة تعيين كلمة المرور',

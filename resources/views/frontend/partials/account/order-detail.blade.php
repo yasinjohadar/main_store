@@ -98,9 +98,14 @@
                 </div>
             @endif
 
-            <a href="{{ route('frontend.account.orders') }}" class="account-btn account-btn--primary">
-                العودة للطلبات<i class="w-icon-long-arrow-left"></i>
-            </a>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a href="{{ route('frontend.checkout.invoice', $order) }}" class="account-btn account-btn--primary" target="_blank" rel="noopener noreferrer">
+                    عرض الفاتورة / الوصل<i class="w-icon-download"></i>
+                </a>
+                <a href="{{ route('frontend.account.orders') }}" class="account-btn account-btn--outline">
+                    العودة للطلبات<i class="w-icon-long-arrow-left"></i>
+                </a>
+            </div>
         </div>
     </div>
 </div>

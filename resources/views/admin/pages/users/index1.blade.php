@@ -54,14 +54,10 @@
                                 <input style="width: 300px" type="text" name="query" class="form-control"
                                     placeholder="بحث بالاسم أو الإيميل أو الهاتف" value="{{ request('query') }}">
 
-                                <select name="status" class="form-select">
-                                    <option value="">كل الحالات</option>
-                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>فعال</option>
-                                    <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>معلق</option>
-                                    <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>محظور مؤقتاً
-                                    </option>
-                                    <option value="4" {{ request('status') == '4' ? 'selected' : '' }}>محظور نهائياً
-                                    </option>
+                                <select name="is_active" class="form-select">
+                                    <option value="">كل حالات التفعيل</option>
+                                    <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>مفعّل</option>
+                                    <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>موقوف</option>
                                 </select>
 
                                 <button type="submit" class="btn btn-secondary">بحث</button>
@@ -85,7 +81,7 @@
                                         <th scope="col" style="min-width: 120px;">الهاتف</th>
                                         <th scope="col" style="min-width: 130px;">اخر دخول</th>
                                         <th scope="col" style="min-width: 150px;">الأدوار</th>
-                                        <th scope="col" style="min-width: 110px;">الحالة</th>
+                                        <th scope="col" style="min-width: 130px;">التفعيل</th>
                                         <th scope="col" style="min-width: 200px;">العمليات</th>
                                     </tr>
                                 </thead>
@@ -146,15 +142,20 @@
                                             </td>
 
                                             <td>
-                                                @if ($user->status === 'active')
-                                                    <span class="badge bg-success">مفعل</span>
-                                                @elseif($user->status === 'inactive')
-                                                    <span class="badge bg-warning text-dark">موقوف</span>
-                                                @elseif($user->status === 'banned')
-                                                    <span class="badge bg-danger">محظور</span>
-                                                @else
-                                                    <span class="badge bg-secondary">غير معروف</span>
-                                                @endif
+                                                <div class="form-check form-switch admin-table__switch mb-0">
+                                                    <input type="checkbox"
+                                                           class="form-check-input user-active-switch"
+                                                           role="switch"
+                                                           id="user-active-{{ $user->id }}"
+                                                           {{ $user->is_active ? 'checked' : '' }}
+                                                           data-user-id="{{ $user->id }}"
+                                                           data-user-name="{{ e($user->name) }}"
+                                                           data-toggle-url="{{ route('users.toggle-status', $user) }}"
+                                                           @if($user->id === auth()->id()) disabled title="لا يمكنك تغيير تفعيل حسابك" @endif>
+                                                    <label class="form-check-label" for="user-active-{{ $user->id }}">
+                                                        {{ $user->is_active ? 'مفعّل' : 'موقوف' }}
+                                                    </label>
+                                                </div>
                                             </td>
 
                                             <td>
@@ -162,10 +163,14 @@
                                                     href="{{ route('users.edit', $user->id) }}">
                                                     <i class="fa-solid fa-pen-to-square"></i> تعديل
                                                 </a>
-                                                <a class="btn btn-danger btn-sm me-1" data-bs-toggle="modal"
-                                                    data-bs-target="#delete{{ $user->id }}">
-                                                    <i class="fa-solid fa-trash-can"></i> حذف
-                                                </a>
+                                                <x-admin.delete-trigger
+                                                    :action="route('users.destroy', $user)"
+                                                    title="حذف المستخدم"
+                                                    :item="$user->name"
+                                                    message="هل تريد حذف هذا المستخدم نهائياً؟"
+                                                    button-class="btn-danger btn-sm me-1"
+                                                    label="حذف"
+                                                />
                                                 <a href="#" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#change_password{{$user->id}}">
                                                     <i class="fa-solid fa-key"></i> تعديل كلمة السر
@@ -173,7 +178,6 @@
                                             </td>
                                         </tr>
 
-                                        @include('admin.pages.users.delete')
                                         @include('admin.pages.users.change_password')
                                     @empty
                                         <tr>
@@ -209,5 +213,6 @@
 
 
 @section('script')
+    <script src="{{ asset('assets/js/admin-user-toggle.js') }}"></script>
 @stop
 

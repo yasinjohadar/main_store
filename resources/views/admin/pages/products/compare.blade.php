@@ -14,11 +14,14 @@
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{{ route('admin.products.index') }}" class="btn btn-secondary btn-sm">العودة لقائمة المنتجات</a>
-                    <form action="{{ route('admin.products.compare.clear') }}" method="POST" class="d-inline" onsubmit="return confirm('مسح قائمة المقارنة بالكامل؟');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger btn-sm">مسح المقارنة</button>
-                    </form>
+                    <x-admin.delete-trigger
+                        :action="route('admin.products.compare.clear')"
+                        title="مسح المقارنة"
+                        message="مسح قائمة المقارنة بالكامل؟"
+                        confirm-text="مسح المقارنة"
+                        button-class="btn-outline-danger btn-sm"
+                        label="مسح المقارنة"
+                    />
                 </div>
             </div>
 

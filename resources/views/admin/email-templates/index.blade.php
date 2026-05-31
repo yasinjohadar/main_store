@@ -83,11 +83,14 @@
                                         </td>
                                         <td>
                                             <a href="{{ route('admin.email-templates.edit', $template) }}" class="btn btn-sm btn-primary">تعديل</a>
-                                            <form action="{{ route('admin.email-templates.destroy', $template) }}" method="POST" class="d-inline" onsubmit="return confirm('هل تريد حذف هذا القالب؟');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                            </form>
+                                            <x-admin.delete-trigger
+                                                :action="route('admin.email-templates.destroy', $template)"
+                                                title="حذف القالب"
+                                                :item="$template->name ?? $template->subject"
+                                                message="هل تريد حذف هذا القالب؟"
+                                                button-class="btn-sm btn-danger"
+                                                label="حذف"
+                                            />
                                         </td>
                                     </tr>
                                 @empty

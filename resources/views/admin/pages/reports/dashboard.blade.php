@@ -134,6 +134,29 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card mt-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">الضريبة حسب الفترة</h6>
+                    <span class="badge bg-secondary">الإجمالي: {{ $currencyService->format((float) ($taxSummary['total_tax'] ?? 0)) }}</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light"><tr><th>اليوم</th><th>عدد الطلبات</th><th>إجمالي الضريبة</th></tr></thead>
+                        <tbody>
+                            @forelse($taxSummary['rows'] ?? [] as $row)
+                                <tr>
+                                    <td>{{ $row->day ?? $row['day'] ?? '—' }}</td>
+                                    <td>{{ $row->orders_count ?? $row['orders_count'] ?? 0 }}</td>
+                                    <td>{{ $currencyService->format((float) ($row->total_tax ?? $row['total_tax'] ?? 0)) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="text-center text-muted py-3">لا توجد بيانات ضريبة.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 @stop

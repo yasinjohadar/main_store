@@ -125,16 +125,16 @@
                                 </div>
                             </div>
 
-                            <!-- كورسات هذا التصنيف -->
+                            <!-- منتجات هذا التصنيف -->
                             <div class="row mt-4">
                                 <div class="col-12">
-                                    <h6 class="text-primary mb-3">كورسات هذا التصنيف ({{ $category->courses->count() }})</h6>
-                                    @if($category->courses->count() > 0)
+                                    <h6 class="text-primary mb-3">منتجات هذا التصنيف ({{ $category->products->count() }})</h6>
+                                    @if($category->products->count() > 0)
                                         <div class="table-responsive">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <tr>
-                                                        <th>العنوان</th>
+                                                        <th>الاسم</th>
                                                         <th>الرابط</th>
                                                         <th>الحالة</th>
                                                         <th>السعر</th>
@@ -142,27 +142,23 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($category->courses as $course)
+                                                    @foreach($category->products as $product)
                                                         <tr>
-                                                            <td>{{ $course->title }}</td>
-                                                            <td><code>{{ $course->slug ?? '-' }}</code></td>
+                                                            <td>{{ $product->name }}</td>
+                                                            <td><code>{{ $product->slug ?? '-' }}</code></td>
                                                             <td>
-                                                                @if($course->status == 'published')
-                                                                    <span class="badge bg-success">منشور</span>
-                                                                @elseif($course->status == 'draft')
+                                                                @if($product->status == 'active')
+                                                                    <span class="badge bg-success">نشط</span>
+                                                                @elseif($product->status == 'draft')
                                                                     <span class="badge bg-secondary">مسودة</span>
                                                                 @else
                                                                     <span class="badge bg-warning text-dark">أرشيف</span>
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $course->price !== null ? number_format($course->price, 2) . ' ' . $course->currency : '-' }}</td>
+                                                            <td>{{ $product->price !== null ? number_format($product->price, 2) : '-' }}</td>
                                                             <td>
-                                                                @can('course-show')
-                                                                    <a href="{{ route('admin.courses.show', $course->id) }}" class="btn btn-sm btn-info me-1"><i class="bi bi-eye"></i></a>
-                                                                @endcan
-                                                                @can('course-edit')
-                                                                    <a href="{{ route('admin.courses.edit', $course->id) }}" class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i></a>
-                                                                @endcan
+                                                                <a href="{{ route('admin.products.show', $product) }}" class="btn btn-sm btn-info me-1" title="عرض"><i class="bi bi-eye"></i></a>
+                                                                <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-primary" title="تعديل"><i class="bi bi-pencil"></i></a>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -170,7 +166,7 @@
                                             </table>
                                         </div>
                                     @else
-                                        <p class="text-muted mb-0">لا توجد كورسات مرتبطة بهذا التصنيف.</p>
+                                        <p class="text-muted mb-0">لا توجد منتجات مرتبطة بهذا التصنيف.</p>
                                     @endif
                                 </div>
                             </div>

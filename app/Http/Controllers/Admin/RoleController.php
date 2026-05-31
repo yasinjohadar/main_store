@@ -7,6 +7,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Services\ActivityLogger;
+use App\Support\PermissionGrouper;
 
 class RoleController extends Controller
 {
@@ -41,10 +42,12 @@ public function __construct()
      */
     public function create()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::orderBy('name')->get();
         $roles = Role::all();
+        $permissionGroups = app(PermissionGrouper::class)->group($permissions);
+        $selectedPermissions = [];
 
-       return view("admin.pages.roles.create" , compact("roles" , "permissions"));
+        return view('admin.pages.roles.create', compact('roles', 'permissions', 'permissionGroups', 'selectedPermissions'));
     }
 
     /**
@@ -77,10 +80,11 @@ public function __construct()
     public function edit(string $id)
     {
         $role = Role::findOrFail($id);
-         $permissions = Permission::all();
+        $permissions = Permission::orderBy('name')->get();
+        $permissionGroups = app(PermissionGrouper::class)->group($permissions);
+        $selectedPermissions = $role->permissions->pluck('name')->toArray();
 
-
-       return view("admin.pages.roles.edit" , compact("role" , "permissions"));
+        return view('admin.pages.roles.edit', compact('role', 'permissions', 'permissionGroups', 'selectedPermissions'));
     }
 
     /**

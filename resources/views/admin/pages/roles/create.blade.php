@@ -5,6 +5,7 @@
 @stop
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/css/admin-role-permissions.css') }}">
 @stop
 
 @section('content')
@@ -55,40 +56,24 @@
                         </div>
                         <div class="card-body">
 
-                            <form method="POST" action="{{ route('roles.store', 'test') }}">
+                            <form method="POST" action="{{ route('roles.store') }}">
                                 @csrf
 
-                                <div class="row mb-3">
+                                <div class="row mb-4">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">اسم الدور</label>
-                                        <input type="text" class="form-control" name="name" placeholder="مثال: مشرف عام">
+                                        <label class="form-label fw-semibold">اسم الدور</label>
+                                        <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="مثال: مشرف عام" required>
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold d-block mb-2">الصلاحيات:</label>
-                                    <div class="row">
-                                        @foreach ($permissions as $permission)
-                                            <div class="col-md-4 mb-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox"
-                                                           name="permissions[{{ $permission->name }}]"
-                                                           value="{{ $permission->name }}"
-                                                           id="perm_{{ $permission->id }}">
-                                                    <label class="form-check-label" for="perm_{{ $permission->id }}">
-                                                        {{ $permission->name }}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
+                                @include('admin.pages.roles.partials.permissions-accordion', [
+                                    'accordionId' => 'createRolePermissions',
+                                ])
 
-                                <div class="d-flex justify-content-end">
-                                    <a href="{{ route('roles.index') }}" class="btn btn-secondary me-2">إلغاء</a>
+                                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                    <a href="{{ route('roles.index') }}" class="btn btn-light">إلغاء</a>
                                     <button type="submit" class="btn btn-primary">حفظ الدور</button>
                                 </div>
-
                             </form>
 
                         </div>
@@ -100,4 +85,8 @@
         </div>
     </div>
     <!-- End::app-content -->
+@stop
+
+@section('script')
+<script src="{{ asset('assets/js/admin-role-permissions.js') }}"></script>
 @stop

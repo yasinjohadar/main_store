@@ -126,11 +126,13 @@
                                                 <td>{{ $location->city ?? '—' }}</td>
                                                 <td>{{ $location->postal_code_pattern ?? '—' }}</td>
                                                 <td>
-                                                    <form action="{{ route('admin.shipping.zones.locations.destroy', [$zone, $location]) }}" method="POST" onsubmit="return confirm('حذف هذا الموقع من المنطقة؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-xs btn-danger">حذف</button>
-                                                    </form>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.shipping.zones.locations.destroy', [$zone, $location])"
+                                                        title="حذف الموقع"
+                                                        message="هل تريد حذف هذا الموقع من المنطقة؟"
+                                                        button-class="btn-xs btn-danger"
+                                                        label="حذف"
+                                                    />
                                                 </td>
                                             </tr>
                                         @empty
@@ -234,11 +236,14 @@
                                             </div>
                                             <div class="col-md-3 text-end mt-4 pt-2">
                                                 <button type="submit" class="btn btn-sm btn-primary">حفظ</button>
-                                                <form action="{{ route('admin.shipping.zones.methods.destroy', [$zone, $method]) }}" method="POST" class="d-inline" onsubmit="return confirm('حذف طريقة الشحن هذه مع قواعدها؟');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                                </form>
+                                                <x-admin.delete-trigger
+                                                    :action="route('admin.shipping.zones.methods.destroy', [$zone, $method])"
+                                                    title="حذف طريقة الشحن"
+                                                    :item="$method->name"
+                                                    message="حذف طريقة الشحن هذه مع قواعدها؟"
+                                                    button-class="btn-sm btn-danger"
+                                                    label="حذف"
+                                                />
                                             </div>
                                         </div>
                                     </form>
@@ -303,11 +308,13 @@
                                                         <td>{{ $rule->per_unit ?? '—' }}</td>
                                                         <td>{{ $rule->order }}</td>
                                                         <td>
-                                                            <form action="{{ route('admin.shipping.zones.methods.rules.destroy', [$zone, $method, $rule]) }}" method="POST" onsubmit="return confirm('حذف هذه القاعدة؟');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-xs btn-danger">حذف</button>
-                                                            </form>
+                                                            <x-admin.delete-trigger
+                                                                :action="route('admin.shipping.zones.methods.rules.destroy', [$zone, $method, $rule])"
+                                                                title="حذف القاعدة"
+                                                                message="هل تريد حذف هذه القاعدة؟"
+                                                                button-class="btn-xs btn-danger"
+                                                                label="حذف"
+                                                            />
                                                         </td>
                                                     </tr>
                                                 @empty

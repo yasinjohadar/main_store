@@ -29,20 +29,12 @@ Route::middleware(['auth'])->group(function () {
 // مسار بديل للتجربة
 Route::post('toggle-user-status/{id}', [UserController::class, 'toggleStatus'])->name('users.toggle-status-alt');
 
-// Store (public shop) routes
+// Legacy store routes — redirect to unified frontend
 Route::prefix('store')->name('store.')->group(function () {
-    Route::get('products', [\App\Http\Controllers\Store\StoreProductController::class, 'index'])->name('products.index');
-    Route::get('products/{product}', [\App\Http\Controllers\Store\StoreProductController::class, 'show'])->name('products.show');
-    Route::get('cart', [\App\Http\Controllers\Store\CartController::class, 'index'])->name('cart.index');
-    Route::post('cart', [\App\Http\Controllers\Store\CartController::class, 'store'])->name('cart.store');
-    Route::patch('cart/{itemId}', [\App\Http\Controllers\Store\CartController::class, 'update'])->name('cart.update');
-    Route::delete('cart/{itemId}', [\App\Http\Controllers\Store\CartController::class, 'destroy'])->name('cart.destroy');
-    Route::post('cart/apply-coupon', [\App\Http\Controllers\Store\CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
-    Route::post('cart/remove-coupon', [\App\Http\Controllers\Store\CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
-    Route::get('checkout', [\App\Http\Controllers\Store\CheckoutController::class, 'index'])->name('checkout.index')->middleware('auth');
-    Route::post('checkout', [\App\Http\Controllers\Store\CheckoutController::class, 'store'])->name('checkout.store')->middleware('auth');
-    Route::get('checkout/success/{order}', [\App\Http\Controllers\Store\CheckoutController::class, 'success'])->name('checkout.success')->middleware('auth');
-    Route::get('downloads/{token}', [\App\Http\Controllers\Store\DownloadController::class, 'download'])->name('downloads.show')->middleware('auth');
+    Route::get('cart', fn () => redirect()->route('frontend.cart.index', [], 301))->name('cart.index');
+    Route::get('checkout', fn () => redirect()->route('frontend.checkout.index', [], 301))->name('checkout.index');
+    Route::get('checkout/success/{order}', fn ($order) => redirect()->route('frontend.checkout.success', $order, 301))->name('checkout.success');
+    Route::get('downloads/{token}', fn ($token) => redirect()->route('frontend.downloads.show', $token, 301))->name('downloads.show');
 });
 
 require __DIR__.'/auth.php';

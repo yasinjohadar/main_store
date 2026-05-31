@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\RespondsWithAdminTable;
 use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    use RespondsWithAdminTable;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -53,10 +56,23 @@ class CategoryController extends Controller
             }
         }
 
-        $categories = $categoriesQuery->paginate(15);
+        $perPageOptions = [10, 15, 25, 50, 100];
+        $perPage = (int) $request->input('per_page', 15);
+        if (! in_array($perPage, $perPageOptions)) {
+            $perPage = 15;
+        }
+
+        $categories = $categoriesQuery->paginate($perPage)->withQueryString();
         $parentCategories = Category::whereNull('parent_id')->orderBy('name')->get();
 
-        return view('admin.pages.categories.index', compact('categories', 'parentCategories'));
+        $data = compact('categories', 'parentCategories');
+
+        return $this->adminTableView(
+            $request,
+            'admin.pages.categories.index',
+            'admin.pages.categories.partials.table-body',
+            $data
+        );
     }
 
     /**
@@ -105,7 +121,7 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        $category = Category::with(['parent', 'children', 'courses'])->findOrFail($id);
+        $category = Category::with(['parent', 'children', 'products'])->findOrFail($id);
         return view('admin.pages.categories.show', compact('category'));
     }
 

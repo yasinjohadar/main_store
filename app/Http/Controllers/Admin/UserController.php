@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\RespondsWithAdminTable;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    use RespondsWithAdminTable;
     // public function __construct()
     // {
     //     // يمكنه فقط رؤية قائمة المستخدمين (index)
@@ -69,12 +71,7 @@ public function index(Request $request)
             });
         }
 
-        // فلترة حسب الحالة
-        if ($request->filled('status')) {
-            $usersQuery->where('status', $request->input('status'));
-        }
-
-        // فلترة حسب الحالة النشطة
+        // فلترة حسب التفعيل
         if ($request->filled('is_active')) {
             $usersQuery->where('is_active', $request->input('is_active'));
         }
@@ -87,9 +84,16 @@ public function index(Request $request)
         }
 
         // تنفيذ الاستعلام
-        $users = $usersQuery->paginate($perPage);
+        $users = $usersQuery->paginate($perPage)->withQueryString();
 
-        return view("admin.pages.users.index", compact("users", "roles", "sessions"));
+        $data = compact('users', 'roles', 'sessions');
+
+        return $this->adminTableView(
+            $request,
+            'admin.pages.users.index',
+            'admin.pages.users.partials.table-body',
+            $data
+        );
     }
 
 
@@ -117,7 +121,6 @@ public function index(Request $request)
             'email' => 'required|string|email|max:255|unique:users,email',
             'phone' => 'nullable|string|max:20|unique:users,phone',
             'password' => 'required|string|min:8|confirmed',
-            'status' => 'required|in:active,inactive,banned',
             'is_active' => 'boolean',
             'roles' => 'array',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -131,7 +134,6 @@ public function index(Request $request)
             'password.required' => 'كلمة المرور مطلوبة',
             'password.min' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق',
-            'status.required' => 'حالة المستخدم مطلوبة',
             'photo.image' => 'يجب أن يكون الملف صورة',
             'photo.mimes' => 'نوع الصورة غير مدعوم',
             'photo.max' => 'حجم الصورة يجب أن يكون أقل من 2 ميجابايت',
@@ -152,8 +154,7 @@ public function index(Request $request)
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'status' => $request->status,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->boolean('is_active', true),
             'photo' => $photoPath,
             'created_by' => auth()->id(), // المستخدم الذي أنشأ هذا الحساب
         ]);
@@ -201,7 +202,6 @@ public function index(Request $request)
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'phone' => 'nullable|string|max:20|unique:users,phone,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
-            'status' => 'required|in:active,inactive,banned',
             'is_active' => 'boolean',
             'roles' => 'array',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -214,7 +214,6 @@ public function index(Request $request)
             'phone.unique' => 'رقم الهاتف مستخدم بالفعل',
             'password.min' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق',
-            'status.required' => 'حالة المستخدم مطلوبة',
             'photo.image' => 'يجب أن يكون الملف صورة',
             'photo.mimes' => 'نوع الصورة غير مدعوم',
             'photo.max' => 'حجم الصورة يجب أن يكون أقل من 2 ميجابايت',
@@ -226,8 +225,7 @@ public function index(Request $request)
             'username' => $request->username,
             'email' => $request->email,
             'phone' => $request->phone,
-            'status' => $request->status,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->boolean('is_active'),
         ];
 
         // تحديث كلمة المرور فقط إذا تم إدخالها
@@ -307,45 +305,18 @@ public function index(Request $request)
 public function toggleStatus(Request $request, $id)
 {
     try {
-        \Log::info('Toggle status request received', [
-            'user_id' => $id,
-            'request_data' => $request->all(),
-            'request_method' => $request->method(),
-            'request_url' => $request->url(),
-            'request_headers' => $request->headers->all(),
-            'auth_user' => auth()->id()
-        ]);
-
         $user = User::findOrFail($id);
 
-        \Log::info('User found', [
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'current_is_active' => $user->is_active
-        ]);
-
-        // التحقق من أن المستخدم لا يحاول إلغاء تفعيل نفسه
         if ($user->id === auth()->id()) {
-            \Log::warning('User tried to deactivate themselves', [
-                'user_id' => $user->id
-            ]);
-
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'لا يمكنك إلغاء تفعيل حسابك'
-                ], 400);
-            }
-            return redirect()->back()->with('error', 'لا يمكنك إلغاء تفعيل حسابك');
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكنك إلغاء تفعيل حسابك',
+            ], 400);
         }
 
-        // حفظ الحالة القديمة
         $oldStatus = $user->is_active;
+        $newStatus = ! $user->is_active;
 
-        // تبديل الحالة
-        $newStatus = !$user->is_active;
-
-        // تحديث الحالة باستخدام update للتأكد من التحديث
         $user->update(['is_active' => $newStatus]);
 
         app(ActivityLogger::class)->userAction('status_toggled', $user->refresh(), [
@@ -353,50 +324,19 @@ public function toggleStatus(Request $request, $id)
             'new_is_active' => $newStatus,
         ]);
 
-        // إعادة تحميل المستخدم للتأكد من الحصول على القيمة المحدثة
-        $user->refresh();
+        $label = $user->is_active ? 'مفعّل' : 'موقوف';
 
-        \Log::info('User status updated', [
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'old_status' => $oldStatus,
-            'new_status' => $user->is_active,
-            'toggled_by' => auth()->id()
-        ]);
-
-        $status = $user->is_active ? 'مفعل' : 'غير مفعل';
-
-        $response = [
+        return response()->json([
             'success' => true,
-            'message' => "تم تحديث حالة المستخدم إلى: {$status}",
-            'is_active' => (bool) $user->is_active
-        ];
-
-        \Log::info('Toggle status response', [
-            'user_id' => $user->id,
-            'response' => $response
+            'message' => "تم تحديث التفعيل إلى: {$label}",
+            'is_active' => (bool) $user->is_active,
         ]);
-
-        if ($request->wantsJson()) {
-            return response()->json($response);
-        }
-        return redirect()->back()->with('success', $response['message']);
 
     } catch (\Exception $e) {
-        \Log::error('Error toggling user status', [
-            'user_id' => $id,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'toggled_by' => auth()->id()
-        ]);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'حدث خطأ أثناء تحديث حالة المستخدم: ' . $e->getMessage()
-            ], 500);
-        }
-        return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث حالة المستخدم: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'حدث خطأ أثناء تحديث التفعيل.',
+        ], 500);
     }
 }
 

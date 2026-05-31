@@ -1,37 +1,37 @@
+@php
+    $sectionTitle = $section->resolvedTitle($sectionDefaults['title'] ?? 'الأقسام الشائعة');
+    $sectionSubtitle = $section->resolvedSubtitle($sectionDefaults['subtitle'] ?? 'اختر ما يناسبك من مجموعات منتقاة بعناية');
+    $tabSettings = $section->getSetting('tabs', $sectionDefaults['settings']['tabs'] ?? []);
+    $productMap = [
+        'new_arrivals' => $newArrivals,
+        'best_seller' => $bestSellers,
+        'top_rated' => $topRated,
+        'featured' => $featuredProducts,
+    ];
+    $tabs = [];
+    foreach ($tabSettings as $tab) {
+        $key = $tab['key'] ?? '';
+        $tabId = 'tab-' . str_replace('_', '-', $key);
+        $tabs[$tabId] = [
+            'label' => $tab['label'] ?? $key,
+            'icon' => $tab['icon'] ?? 'w-icon-star',
+            'products' => $productMap[$key] ?? collect(),
+            'active' => ! empty($tab['active']),
+        ];
+    }
+    if ($tabs && ! collect($tabs)->contains(fn ($t) => $t['active'])) {
+        $firstKey = array_key_first($tabs);
+        $tabs[$firstKey]['active'] = true;
+    }
+@endphp
+
 <section class="home-product-tabs-section appear-animate mt-10 pt-1 mb-2">
     <div class="home-product-tabs-section__head text-center mb-5">
-        <h2 class="title justify-content-center ls-normal mb-2">الأقسام الشائعة</h2>
-        <p class="home-product-tabs-section__subtitle mb-0">اختر ما يناسبك من مجموعات منتقاة بعناية</p>
+        <h2 class="title justify-content-center ls-normal mb-2">{{ $sectionTitle }}</h2>
+        @if($sectionSubtitle)
+            <p class="home-product-tabs-section__subtitle mb-0">{{ $sectionSubtitle }}</p>
+        @endif
     </div>
-
-    @php
-        $tabs = [
-            'tab-new-arrivals' => [
-                'label' => 'وصل حديثاً',
-                'icon' => 'w-icon-star',
-                'products' => $newArrivals,
-                'active' => true,
-            ],
-            'tab-best-seller' => [
-                'label' => 'الأكثر مبيعاً',
-                'icon' => 'w-icon-sale',
-                'products' => $bestSellers,
-                'active' => false,
-            ],
-            'tab-top-rated' => [
-                'label' => 'الأعلى تقييماً',
-                'icon' => 'w-icon-star-full',
-                'products' => $topRated,
-                'active' => false,
-            ],
-            'tab-featured' => [
-                'label' => 'مميز',
-                'icon' => 'w-icon-heart-full',
-                'products' => $featuredProducts,
-                'active' => false,
-            ],
-        ];
-    @endphp
 
     <div class="tab home-product-tabs appear-animate text-center">
         <ul class="nav nav-tabs home-product-tabs__nav justify-content-center" role="tablist">

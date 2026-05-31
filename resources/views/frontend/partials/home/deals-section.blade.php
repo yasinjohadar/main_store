@@ -1,5 +1,10 @@
 @php
     use Illuminate\Support\Facades\Storage;
+
+    $dealsEyebrow = $section->resolvedEyebrow($sectionDefaults['eyebrow'] ?? 'عروض محدودة');
+    $dealsTitle = $section->resolvedTitle($sectionDefaults['title'] ?? 'عروض اليوم الساخنة');
+    $bestsellersEyebrow = $section->getSetting('bestsellers_eyebrow', $sectionDefaults['settings']['bestsellers_eyebrow'] ?? 'الأكثر طلباً');
+    $bestsellersTitle = $section->getSetting('bestsellers_title', $sectionDefaults['settings']['bestsellers_title'] ?? 'الأكثر مبيعاً');
 @endphp
 
 <div class="row home-deals appear-animate mb-8">
@@ -7,8 +12,10 @@
         <div class="home-deals-card h-100">
             <div class="home-deals-card__header">
                 <div class="home-deals-card__heading">
-                    <span class="home-deals-card__eyebrow">عروض محدودة</span>
-                    <h4 class="home-deals-card__title">عروض اليوم الساخنة</h4>
+                    @if($dealsEyebrow)
+                        <span class="home-deals-card__eyebrow">{{ $dealsEyebrow }}</span>
+                    @endif
+                    <h4 class="home-deals-card__title">{{ $dealsTitle }}</h4>
                 </div>
                 @if($dealProducts->count() > 1)
                     <div class="home-deals-card__nav">
@@ -149,8 +156,10 @@
     <div class="col-lg-3">
         <aside class="home-bestsellers-card h-100">
             <div class="home-bestsellers-card__header">
-                <span class="home-bestsellers-card__eyebrow">الأكثر طلباً</span>
-                <h4 class="home-bestsellers-card__title">الأكثر مبيعاً</h4>
+                @if($bestsellersEyebrow)
+                    <span class="home-bestsellers-card__eyebrow">{{ $bestsellersEyebrow }}</span>
+                @endif
+                <h4 class="home-bestsellers-card__title">{{ $bestsellersTitle }}</h4>
             </div>
 
             @if($bestSellers->isNotEmpty())

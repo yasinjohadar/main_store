@@ -3,22 +3,56 @@
 @section('title', config('app.name') . ' - الرئيسية')
 
 @section('content')
-    @include('frontend.partials.home.hero-slider')
+    @php
+        $inContainer = false;
+        $defaults = app(\App\Services\HomePageService::class);
+    @endphp
 
-    <div class="container">
-        @include('frontend.partials.home.icon-boxes')
-        @include('frontend.partials.home.category-banners')
-        @include('frontend.partials.home.deals-section')
-    </div>
+    @foreach($homeSections as $section)
+        @php
+            $entry = \App\Services\HomePageService::registryEntry($section->key);
+            if (! $entry) {
+                continue;
+            }
 
-    @include('frontend.partials.home.top-categories')
+            $needsContainer = ($entry['container'] ?? null) === 'container';
+            $partial = 'frontend.partials.home.' . $entry['partial'];
+            $sectionDefaults = $defaults->defaultSectionData($section->key);
 
-    <div class="container">
-        @include('frontend.partials.home.popular-departments')
-        @include('frontend.partials.home.product-wrapper-1')
-        @include('frontend.partials.home.product-wrapper-2')
-        @include('frontend.partials.home.product-wrapper-3')
-        @include('frontend.partials.home.brands')
-        @include('frontend.partials.home.blog-section')
-    </div>
+            if ($section->key === 'icon_boxes' && ($homeFeatures ?? collect())->isEmpty()) {
+                continue;
+            }
+            if ($section->key === 'category_banners' && ($homePromoBanners ?? collect())->isEmpty()) {
+                continue;
+            }
+            if ($section->key === 'brands' && ($homeBrands ?? collect())->isEmpty()) {
+                continue;
+            }
+
+            $blockKey = $entry['block_key'] ?? null;
+            if ($blockKey) {
+                $block = ($homeProductBlocks ?? collect())->get($blockKey);
+                if (! $block?->is_active) {
+                    continue;
+                }
+            }
+        @endphp
+
+        @if($needsContainer && ! $inContainer)
+            <div class="container">
+            @php $inContainer = true; @endphp
+        @elseif(! $needsContainer && $inContainer)
+            </div>
+            @php $inContainer = false; @endphp
+        @endif
+
+        @includeIf($partial, [
+            'section' => $section,
+            'sectionDefaults' => $sectionDefaults,
+        ])
+    @endforeach
+
+    @if($inContainer)
+        </div>
+    @endif
 @endsection

@@ -9,10 +9,13 @@
         $siteName = site_setting(SiteSettings::KEY_SITE_NAME, config('app.name'));
     @endphp
     <title>{{ $siteName }} - تسجيل الدخول</title>
+    @php($authFavicon = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_FAVICON) ?: asset('frontend/assets/images/icons/favicon.png'))
+    <link rel="icon" href="{{ $authFavicon }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendor/fontawesome-free/css/all.min.css') }}">
+    @include('frontend.partials.store-theme')
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/auth-login.css') }}">
 </head>
 <body class="auth-login-page">

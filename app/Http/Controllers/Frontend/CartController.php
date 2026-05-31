@@ -4,69 +4,77 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Services\CartPresenter;
+use App\Services\CartService;
+use App\Services\OrderTotalsService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function index()
-    {
-        $cartItems = $this->getCartItems();
-        $cartTotal = $this->getCartTotal();
+    public function __construct(
+        protected CartService $cartService,
+        protected CartPresenter $cartPresenter,
+        protected OrderTotalsService $orderTotalsService,
+    ) {}
 
-        return view('frontend.pages.cart.index', compact('cartItems', 'cartTotal'));
+    public function index(Request $request)
+    {
+        $cart = $this->cartService->getCart();
+        $viewData = $this->cartPresenter->toViewData($cart);
+        $totals = $this->orderTotalsService->calculate($cart);
+        $crossSellProducts = Product::crossSellsForCartItems(
+            $cart->items->pluck('product_id'),
+        );
+
+        return view('frontend.pages.cart.index', array_merge($viewData, [
+            'totals' => $totals,
+            'crossSellProducts' => $crossSellProducts,
+        ]));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
+            'product_variant_id' => 'nullable|exists:product_variants,id',
             'quantity' => 'integer|min:1',
         ]);
 
         $product = Product::active()->findOrFail($request->product_id);
-        $quantity = $request->quantity ?? 1;
+        $variantId = $request->product_variant_id ? (int) $request->product_variant_id : null;
+        $quantity = (int) ($request->quantity ?? 1);
 
-        if ($product->track_quantity && !$product->allow_backorder && $quantity > $product->stock_quantity) {
-            return back()->withErrors(['quantity' => 'الكمية المطلوبة غير متوفرة في المخزون']);
+        if ($product->variants()->exists()) {
+            if (! $variantId) {
+                return $this->cartError($request, 'يرجى اختيار جميع خيارات المنتج');
+            }
+            ProductVariant::where('id', $variantId)->where('product_id', $product->id)->firstOrFail();
         }
 
-        $cart = $this->getCart();
-        $rowId = $this->generateRowId($product->id, $request->product_variant_id ?? null);
-
-        if (isset($cart[$rowId])) {
-            $cart[$rowId]['quantity'] += $quantity;
-            $cart[$rowId]['price'] = $product->effective_price;
-            $cart[$rowId]['image_url'] = $product->primary_image_url;
-        } else {
-            $cart[$rowId] = [
-                'product_id' => $product->id,
-                'variant_id' => $request->product_variant_id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => $product->effective_price,
-                'quantity' => $quantity,
-                'image' => $product->primary_image?->path,
-                'image_url' => $product->primary_image_url,
-                'stock' => $product->stock_quantity,
-            ];
+        if ($variantId) {
+            $variant = ProductVariant::where('id', $variantId)->where('product_id', $product->id)->firstOrFail();
+            if ($product->track_quantity && ! $product->allow_backorder && $quantity > $variant->stock_quantity) {
+                return $this->cartError($request, 'الكمية المطلوبة غير متوفرة في المخزون');
+            }
+        } elseif ($product->track_quantity && ! $product->allow_backorder && $quantity > $product->stock_quantity) {
+            return $this->cartError($request, 'الكمية المطلوبة غير متوفرة في المخزون');
         }
 
-        session(['cart' => $cart]);
+        $this->cartService->add($product->id, $quantity, $variantId);
 
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'تمت الإضافة إلى السلة',
-                'product' => [
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'url' => route('frontend.product.show', $product->slug),
-                    'image' => $product->primary_image_url,
-                ],
-                'cart_count' => count($cart),
-                'cart_total' => $this->getCartTotal(),
-                'dropdown_html' => $this->renderDropdown(),
-            ]);
+            return response()->json(array_merge(
+                $this->cartPayload('تمت الإضافة إلى السلة'),
+                [
+                    'product' => [
+                        'name' => $product->name,
+                        'slug' => $product->slug,
+                        'url' => route('frontend.product.show', $product->slug),
+                        'image' => $product->primary_image_url,
+                    ],
+                ]
+            ));
         }
 
         return back()->with('success', 'تمت إضافة المنتج إلى السلة');
@@ -74,37 +82,23 @@ class CartController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $request->validate(['quantity' => 'required|integer|min:1']);
 
-        $cart = $this->getCart();
-
-        if (!isset($cart[$id])) {
-            if ($request->wantsJson() || $request->ajax()) {
-                return response()->json(['message' => 'المنتج غير موجود في السلة'], 404);
-            }
-
-            return back()->withErrors(['cart' => 'المنتج غير موجود في السلة']);
+        $cart = $this->cartService->getCart();
+        $item = $cart->items()->find($id);
+        if (! $item) {
+            return $this->cartError($request, 'المنتج غير موجود في السلة', 404);
         }
 
-        $product = Product::find($cart[$id]['product_id']);
+        $product = $item->product;
+        $variant = $item->variant;
+        $stock = $variant ? $variant->stock_quantity : $product->stock_quantity;
 
-        if ($product && $product->track_quantity && !$product->allow_backorder && $request->quantity > $product->stock_quantity) {
-            if ($request->wantsJson() || $request->ajax()) {
-                return response()->json(['message' => 'الكمية المطلوبة غير متوفرة في المخزون'], 422);
-            }
-
-            return back()->withErrors(['quantity' => 'الكمية المطلوبة غير متوفرة في المخزون']);
+        if ($product->track_quantity && ! $product->allow_backorder && $request->quantity > $stock) {
+            return $this->cartError($request, 'الكمية المطلوبة غير متوفرة في المخزون', 422);
         }
 
-        $cart[$id]['quantity'] = $request->quantity;
-
-        if ($cart[$id]['quantity'] <= 0) {
-            unset($cart[$id]);
-        }
-
-        session(['cart' => $cart]);
+        $this->cartService->update((int) $id, (int) $request->quantity);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json($this->cartPayload('تم تحديث السلة'));
@@ -115,12 +109,7 @@ class CartController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $cart = $this->getCart();
-
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session(['cart' => $cart]);
-        }
+        $this->cartService->remove((int) $id);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json($this->cartPayload('تم إزالة المنتج من السلة'));
@@ -136,75 +125,34 @@ class CartController extends Controller
 
     public function applyCoupon(Request $request)
     {
-        $request->validate([
-            'coupon' => 'required|string',
-        ]);
+        $request->validate(['coupon' => 'required|string']);
 
-        // TODO: Implement coupon validation logic
-        return back()->withErrors(['coupon' => 'كود الخصم غير صالح']);
+        $result = $this->cartService->applyCoupon($request->coupon);
+        if (! $result['success']) {
+            return back()->withErrors(['coupon' => $result['message'] ?? 'كود الخصم غير صالح']);
+        }
+
+        return back()->with('success', 'تم تطبيق كود الخصم بنجاح');
     }
 
     public function removeCoupon(Request $request)
     {
-        session()->forget(['discount', 'coupon_code']);
+        $this->cartService->removeCoupon();
+
         return back()->with('success', 'تم إزالة كود الخصم');
-    }
-
-    protected function getCart()
-    {
-        return session('cart', []);
-    }
-
-    protected function getCartItems()
-    {
-        $cart = $this->getCart();
-        $items = [];
-
-        foreach ($cart as $rowId => $item) {
-            $items[] = array_merge($item, [
-                'row_id' => $rowId,
-                'subtotal' => $item['price'] * $item['quantity'],
-            ]);
-        }
-
-        return $items;
-    }
-
-    protected function getCartTotal()
-    {
-        $cart = $this->getCart();
-        $total = 0;
-
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
-
-        return $total;
-    }
-
-    protected function generateRowId($productId, $variantId = null)
-    {
-        return md5($productId . '_' . ($variantId ?? 'null'));
-    }
-
-    protected function renderDropdown(): string
-    {
-        return view('components.frontend.cart-dropdown-content', [
-            'cartItems' => $this->getCartItems(),
-            'cartTotal' => $this->getCartTotal(),
-        ])->render();
     }
 
     protected function cartPayload(?string $message = null): array
     {
-        $items = $this->getCartItems();
-        $count = count($items);
+        $cart = $this->cartService->getCart();
+        $viewData = $this->cartPresenter->toViewData($cart);
+        $count = $viewData['cartCount'];
 
         $payload = [
             'success' => true,
             'cart_count' => $count,
-            'cart_total' => $this->getCartTotal(),
-            'dropdown_html' => $this->renderDropdown(),
+            'cart_total' => $viewData['cartTotal'],
+            'dropdown_html' => $this->renderDropdown($viewData),
             'count_label' => $count . ' ' . ($count === 1 ? 'منتج' : 'منتجات'),
         ];
 
@@ -213,5 +161,19 @@ class CartController extends Controller
         }
 
         return $payload;
+    }
+
+    protected function renderDropdown(array $viewData): string
+    {
+        return view('components.frontend.cart-dropdown-content', $viewData)->render();
+    }
+
+    protected function cartError(Request $request, string $message, int $status = 422)
+    {
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['message' => $message], $status);
+        }
+
+        return back()->withErrors(['quantity' => $message]);
     }
 }

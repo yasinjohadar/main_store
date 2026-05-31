@@ -195,28 +195,13 @@
                                 @enderror
                             </div>
 
-                            <!-- حالة المستخدم -->
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select @error('status') is-invalid @enderror" name="status" aria-label="حالة المستخدم">
-                                        <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>نشط</option>
-                                        <option value="inactive" {{ old('status', $user->status) == 'inactive' ? 'selected' : '' }}>غير نشط</option>
-                                        <option value="banned" {{ old('status', $user->status) == 'banned' ? 'selected' : '' }}>محظور</option>
-                                    </select>
-                                    <label>حالة المستخدم</label>
-                                    @error('status')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
                             <!-- تفعيل الحساب -->
                             <div class="col-md-6">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="is_active" value="1" 
+                                    <input class="form-check-input" type="checkbox" name="is_active" value="1"
                                            id="is_active" {{ old('is_active', $user->is_active) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_active">
-                                        تفعيل الحساب
+                                        تفعيل الحساب (يسمح بتسجيل الدخول)
                                     </label>
                                 </div>
                             </div>

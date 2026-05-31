@@ -8,13 +8,17 @@
         'frontend/assets/images/demos/demo-rtl/categories/2-6.jpg',
     ];
     $fallbackNames = ['أزياء', 'أثاث', 'أحذية', 'رياضة', 'ألعاب', 'حواسيب'];
+    $sectionTitle = $section->resolvedTitle($sectionDefaults['title'] ?? 'أهم التصنيفات هذا الشهر');
+    $sectionSubtitle = $section->resolvedSubtitle($sectionDefaults['subtitle'] ?? 'اكتشف مجموعات مختارة من أفضل التصنيفات');
 @endphp
 
 <section class="home-categories-section category-section top-category bg-grey pt-10 pb-10 appear-animate">
     <div class="container pb-2">
         <div class="home-categories-section__head">
-            <h2 class="title justify-content-center pt-1 ls-normal mb-2">أهم التصنيفات هذا الشهر</h2>
-            <p class="home-categories-section__subtitle text-center mb-5">اكتشف مجموعات مختارة من أفضل التصنيفات</p>
+            <h2 class="title justify-content-center pt-1 ls-normal mb-2">{{ $sectionTitle }}</h2>
+            @if($sectionSubtitle)
+                <p class="home-categories-section__subtitle text-center mb-5">{{ $sectionSubtitle }}</p>
+            @endif
         </div>
         <div class="swiper">
             <div class="swiper-container swiper-theme shadow-swiper pg-show home-categories-swiper" data-swiper-options="{

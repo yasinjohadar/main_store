@@ -53,13 +53,13 @@
                                                     <a href="{{ route('admin.storage-disk-mappings.edit', $mapping->id) }}" class="btn btn-sm btn-info">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <form action="{{ route('admin.storage-disk-mappings.destroy', $mapping->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الـ Mapping؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.storage-disk-mappings.destroy', $mapping->id)"
+                                                        title="حذف Mapping"
+                                                        message="هل أنت متأكد من حذف هذا الـ Mapping؟"
+                                                        button-class="btn-sm btn-danger"
+                                                        icon="fas fa-trash"
+                                                    />
                                                 </div>
                                             </td>
                                         </tr>

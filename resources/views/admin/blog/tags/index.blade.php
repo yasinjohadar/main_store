@@ -97,15 +97,14 @@
                                            class="btn btn-sm btn-primary-light">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('admin.blog.tags.destroy', $tag->id) }}"
-                                              method="POST"
-                                              onsubmit="return confirm('هل أنت متأكد؟')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger-light">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <x-admin.delete-trigger
+                                            :action="route('admin.blog.tags.destroy', $tag->id)"
+                                            title="حذف الوسم"
+                                            :item="$tag->name"
+                                            message="هل أنت متأكد من حذف هذا الوسم؟"
+                                            button-class="btn-sm btn-danger-light"
+                                            icon="bi bi-trash"
+                                        />
                                     </div>
                                 </td>
                             </tr>

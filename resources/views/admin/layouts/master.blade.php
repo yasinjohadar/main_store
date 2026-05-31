@@ -52,6 +52,10 @@
         @include('admin.layouts.footer')
 
     </div>
+
+    <x-admin.confirm-delete-modal />
+    <x-admin.confirm-action-modal />
+
     @include('admin.layouts.footer-scripts')
 
 

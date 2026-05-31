@@ -39,6 +39,9 @@
 
 <!-- Custom JS -->
 <script src="{{ asset('assets/js/custom.js') }}"></script>
+<script src="{{ asset('assets/js/admin-confirm-delete.js') }}"></script>
+<script src="{{ asset('assets/js/admin-confirm-action.js') }}"></script>
+<script src="{{ asset('assets/js/admin-data-table.js') }}"></script>
 
 <!-- Page Specific Scripts -->
 @yield('script')

@@ -115,11 +115,13 @@
                                                 </td>
                                                 <td>{{ $item->created_at->format('Y-m-d H:i') }}</td>
                                                 <td>
-                                                    <form action="{{ route('admin.wishlists.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('هل تريد حذف هذا العنصر من المفضلة؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">حذف</button>
-                                                    </form>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.wishlists.destroy', $item)"
+                                                        title="حذف من المفضلة"
+                                                        message="هل تريد حذف هذا العنصر من المفضلة؟"
+                                                        button-class="btn-sm btn-outline-danger"
+                                                        label="حذف"
+                                                    />
                                                 </td>
                                             </tr>
                                         @empty

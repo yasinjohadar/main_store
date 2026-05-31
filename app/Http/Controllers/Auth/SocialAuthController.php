@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ class SocialAuthController extends Controller
         return Socialite::driver($provider)->redirect();
     }
 
-    public function callback(string $provider): RedirectResponse
+    public function callback(string $provider, CartService $cartService): RedirectResponse
     {
         $this->ensureProvider($provider);
 
@@ -62,7 +63,10 @@ class SocialAuthController extends Controller
                 ->withErrors(['email' => 'تم إلغاء تفعيل حسابك. يرجى التواصل مع الإدارة.']);
         }
 
+        $guestSessionId = request()->session()->getId();
+
         Auth::login($user, true);
+        $cartService->mergeGuestCartIntoUser($user->id, $guestSessionId);
         request()->session()->regenerate();
 
         return redirect()->intended(auth_home_route());

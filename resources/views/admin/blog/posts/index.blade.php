@@ -197,12 +197,15 @@
                                                             </button>
                                                         </form>
 
-                                                        <button type="button"
-                                                                class="btn btn-sm btn-danger-light"
-                                                                title="حذف"
-                                                                onclick="deletePost({{ $post->id }}, '{{ e(Str::limit($post->title, 40)) }}')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
+                                                        <x-admin.delete-trigger
+                                                            :action="route('admin.blog.posts.destroy', $post)"
+                                                            title="حذف المقال"
+                                                            :item="Str::limit($post->title, 40)"
+                                                            message="هل أنت متأكد من حذف هذا المقال؟"
+                                                            button-class="btn-sm btn-danger-light"
+                                                            icon="bi bi-trash"
+                                                            title-attr="حذف"
+                                                        />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -233,159 +236,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Delete Post Modal -->
-    <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center py-4">
-                    <div class="mb-4">
-                        <div class="avatar avatar-xl bg-danger-transparent mx-auto mb-3">
-                            <i class="fas fa-trash-alt fs-24 text-danger"></i>
-                        </div>
-                        <h5 class="mb-2" id="deletePostModalLabel">حذف المقال</h5>
-                        <p class="text-muted mb-0" id="deletePostMessage">هل أنت متأكد من حذف هذا المقال؟</p>
-                        <p class="text-danger small mt-2 mb-0">لن يمكن التراجع عن هذا الإجراء.</p>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 justify-content-center">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>إلغاء
-                    </button>
-                    <button type="button" class="btn btn-danger" id="confirmDeletePost">
-                        <i class="fas fa-trash me-2"></i>حذف
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success/Error Alert Modal -->
-    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center py-4">
-                    <div class="mb-3">
-                        <div class="avatar avatar-xl bg-success-transparent mx-auto mb-3" id="alertIconContainer">
-                            <i class="fas fa-check-circle fs-24 text-success" id="alertIcon"></i>
-                        </div>
-                        <h5 class="mb-2" id="alertModalLabel">نجح</h5>
-                        <p class="text-muted mb-0" id="alertMessage">تمت العملية بنجاح</p>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 justify-content-center">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                        <i class="fas fa-check me-2"></i>حسناً
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-@stop
-
-@section('script')
-<script>
-    let currentPostId = null;
-
-    function deletePost(postId, postTitle) {
-        currentPostId = postId;
-        
-        const messageEl = document.getElementById('deletePostMessage');
-        if (messageEl) {
-            messageEl.innerHTML = `هل أنت متأكد من حذف المقال<br><strong>${postTitle}</strong>؟`;
-        }
-        
-        const modalElement = document.getElementById('deletePostModal');
-        if (!modalElement) {
-            alert('خطأ: لم يتم العثور على نافذة التأكيد');
-            return;
-        }
-        
-        try {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } catch (error) {
-            console.error('Error showing modal:', error);
-            alert('خطأ في فتح نافذة التأكيد: ' + error.message);
-        }
-    }
-
-    function showAlert(type, message) {
-        const modal = new bootstrap.Modal(document.getElementById('alertModal'));
-        const iconContainer = document.getElementById('alertIconContainer');
-        const icon = document.getElementById('alertIcon');
-        const label = document.getElementById('alertModalLabel');
-        const messageEl = document.getElementById('alertMessage');
-        
-        if (type === 'success') {
-            iconContainer.className = 'avatar avatar-xl bg-success-transparent mx-auto mb-3';
-            icon.className = 'fas fa-check-circle fs-24 text-success';
-            label.textContent = 'نجح';
-        } else {
-            iconContainer.className = 'avatar avatar-xl bg-danger-transparent mx-auto mb-3';
-            icon.className = 'fas fa-exclamation-circle fs-24 text-danger';
-            label.textContent = 'خطأ';
-        }
-        
-        messageEl.textContent = message;
-        modal.show();
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const confirmBtn = document.getElementById('confirmDeletePost');
-        if (!confirmBtn) {
-            return;
-        }
-        
-        confirmBtn.addEventListener('click', function() {
-            if (!currentPostId) {
-                return;
-            }
-            
-            const modalElement = document.getElementById('deletePostModal');
-            if (modalElement) {
-                const modal = bootstrap.Modal.getInstance(modalElement);
-                if (modal) {
-                    modal.hide();
-                }
-            }
-            
-            fetch(`{{ url('/admin/blog/posts') }}/${currentPostId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    return response.json();
-                } else {
-                    location.reload();
-                    return null;
-                }
-            })
-            .then(data => {
-                if (data) {
-                    if (data.success) {
-                        showAlert('success', data.message || 'تم حذف المقال بنجاح');
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        showAlert('error', data.message || 'حدث خطأ أثناء الحذف');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('error', 'حدث خطأ أثناء الحذف: ' + error.message);
-            });
-        });
-    });
-</script>
 @stop

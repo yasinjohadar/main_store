@@ -5,16 +5,21 @@
         'frontend/assets/images/demos/demo-rtl/blogs/3.jpg',
         'frontend/assets/images/demos/demo-rtl/blogs/4.jpg',
     ];
+    $blogEyebrow = $section->resolvedEyebrow($sectionDefaults['eyebrow'] ?? 'المدونة');
+    $blogTitle = $section->resolvedTitle($sectionDefaults['title'] ?? 'من مدونتنا');
+    $viewAllLabel = $section->getSetting('view_all_label', $sectionDefaults['settings']['view_all_label'] ?? 'عرض جميع المقالات');
 @endphp
 
 <section class="home-blog appear-animate mb-4">
     <div class="home-blog__header">
         <div class="home-blog__heading">
-            <span class="home-blog__eyebrow">المدونة</span>
-            <h2 class="home-blog__title">من مدونتنا</h2>
+            @if($blogEyebrow)
+                <span class="home-blog__eyebrow">{{ $blogEyebrow }}</span>
+            @endif
+            <h2 class="home-blog__title">{{ $blogTitle }}</h2>
         </div>
         <a href="{{ route('frontend.blog.index') }}" class="home-blog__view-all">
-            عرض جميع المقالات
+            {{ $viewAllLabel }}
             <i class="w-icon-long-arrow-left"></i>
         </a>
     </div>

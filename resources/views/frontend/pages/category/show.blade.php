@@ -12,6 +12,9 @@
     @include('frontend.partials.page.page-header', [
         'title' => $category->name,
         'eyebrow' => 'التصنيف',
+        'subtitle' => $category->description
+            ? \Illuminate\Support\Str::limit(strip_tags($category->description), 120)
+            : 'منتجات مختارة من هذا التصنيف',
         'icon' => 'w-icon-category',
         'breadcrumbItems' => [
             ['label' => 'المتجر', 'url' => route('frontend.shop.index')],
@@ -20,36 +23,14 @@
     ])
 
     <div class="page-content store-shop-page">
-        @if(($layout['banner'] ?? 'sidebar') === 'fullwidth')
-            @include('frontend.partials.shop.banner', [
-                'variant' => 'fullwidth',
-                'title' => $category->name,
-                'subtitle' => 'تصفح المجموعة',
-                'description' => $category->description
-                    ? \Illuminate\Support\Str::limit(strip_tags($category->description), 80)
-                    : 'منتجات مختارة من هذا التصنيف',
-                'badge' => $category->products_count . ' منتج',
-                'image' => $category->cover_image_url ?? $category->image_url,
-                'link' => route('frontend.category.show', $category->slug),
-            ])
-        @endif
-
-        <div class="container{{ ($layout['banner'] ?? 'sidebar') === 'fullwidth' ? '-fluid' : '' }}">
-            @if(($layout['banner'] ?? 'sidebar') !== 'fullwidth')
-                @include('frontend.partials.shop.banner', [
-                    'variant' => $layout['banner'] ?? 'sidebar',
-                    'title' => $category->name,
-                    'subtitle' => 'تصفح المجموعة',
-                    'description' => $category->description
-                        ? \Illuminate\Support\Str::limit(strip_tags($category->description), 80)
-                        : 'منتجات مختارة من هذا التصنيف',
-                    'badge' => $category->products_count . ' منتج',
-                    'image' => $category->cover_image_url ?? $category->image_url,
-                    'link' => route('frontend.category.show', $category->slug),
+        <div class="container">
+            @if($category->children()->active()->exists())
+                @include('frontend.partials.shop.category-slider', [
+                    'categories' => $category->children()->active()->ordered()->get(),
+                    'sectionTitle' => 'تصنيفات فرعية',
+                    'sectionSubtitle' => 'تصفّح الأقسام داخل «' . $category->name . '»',
                 ])
             @endif
-
-            @include('frontend.partials.shop.category-slider')
 
             @include('frontend.partials.shop.catalog', [
                 'filterRoute' => route('frontend.category.show', $category->slug),

@@ -77,6 +77,51 @@ class CartService
         $cart->update(['coupon_code' => null, 'discount_amount' => 0]);
     }
 
+    public function mergeGuestCartIntoUser(int $userId, string $guestSessionId): void
+    {
+        $guestCart = ShoppingCart::query()
+            ->where('session_id', $guestSessionId)
+            ->whereNull('user_id')
+            ->with('items')
+            ->first();
+
+        if (! $guestCart || $guestCart->items->isEmpty()) {
+            return;
+        }
+
+        $userCart = ShoppingCart::firstOrCreate(
+            ['user_id' => $userId],
+            ['user_id' => $userId]
+        );
+
+        foreach ($guestCart->items as $item) {
+            $existing = $userCart->items()
+                ->where('product_id', $item->product_id)
+                ->where('product_variant_id', $item->product_variant_id)
+                ->first();
+
+            if ($existing) {
+                $existing->increment('quantity', $item->quantity);
+            } else {
+                $userCart->items()->create([
+                    'product_id' => $item->product_id,
+                    'product_variant_id' => $item->product_variant_id,
+                    'quantity' => $item->quantity,
+                ]);
+            }
+        }
+
+        if (! $userCart->coupon_code && $guestCart->coupon_code) {
+            $userCart->update([
+                'coupon_code' => $guestCart->coupon_code,
+                'discount_amount' => $guestCart->discount_amount,
+            ]);
+        }
+
+        $guestCart->items()->delete();
+        $guestCart->delete();
+    }
+
     /**
      * Apply a coupon to the cart. Returns ['success' => true] or ['success' => false, 'message' => '...'].
      */

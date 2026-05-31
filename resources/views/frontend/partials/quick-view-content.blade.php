@@ -116,33 +116,23 @@
                     <p class="product-short-desc quick-view-modal__desc text-muted mb-0">وصف مختصر غير متوفر حالياً.</p>
                 @endif
 
-                @if($product->attributes->isNotEmpty())
-                    @foreach($product->attributes as $attribute)
-                        @if($attribute->values->isNotEmpty())
-                            <div class="product-form product-variation-form product-{{ $attribute->type === 'color' ? 'color' : 'size' }}-swatch mb-3 quick-view-modal__variations">
-                                <label class="mb-1">{{ $attribute->name }}:</label>
-                                <div class="flex-wrap d-flex align-items-center product-variations">
-                                    @foreach($attribute->values as $value)
-                                        @if($attribute->type === 'color' && $value->color_hex)
-                                            <a href="#" class="color" style="background-color: {{ $value->color_hex }};" title="{{ $value->value }}"></a>
-                                        @else
-                                            <a href="#" class="size">{{ $value->value }}</a>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                    @endforeach
-                @endif
+                @php
+                    $variantOptions = $variantOptions ?? $product->variantOptions();
+                    $variantsJson = $variantsJson ?? app(\App\Services\ProductVariantOptionService::class)->variantsPayload($product);
+                @endphp
+
+                @include('frontend.partials.product.attribute-options', compact('variantOptions'))
 
                 <div class="quick-view-modal__actions">
                     <form method="POST" action="{{ route('frontend.cart.store') }}"
                         class="product-form cart-add-form quick-view-modal__form"
                         data-product-name="{{ $product->name }}"
                         data-product-url="{{ $productUrl }}"
-                        data-product-image="{{ $product->primary_image_url }}">
+                        data-product-image="{{ $product->primary_image_url }}"
+                        @if(! empty($variantsJson)) data-variants='@json($variantsJson)' @endif>
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="product_variant_id" value="">
                         <button type="submit" class="btn btn-primary btn-add-cart quick-view-modal__cart-btn" {{ $product->in_stock ? '' : 'disabled' }}>
                             <i class="w-icon-cart"></i>
                             <span>{{ $product->in_stock ? 'أضف للسلة' : 'غير متوفر' }}</span>

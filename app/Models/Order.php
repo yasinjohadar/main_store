@@ -14,6 +14,7 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'guest_email',
         'order_status_id',
         'shipping_method_id',
         'subtotal',
@@ -98,6 +99,11 @@ class Order extends Model
     public function returns()
     {
         return $this->hasMany(OrderReturn::class)->orderByDesc('created_at');
+    }
+
+    public function notes()
+    {
+        return $this->hasMany(OrderNote::class)->orderByDesc('created_at');
     }
 
     public function loyaltyPointTransactions()

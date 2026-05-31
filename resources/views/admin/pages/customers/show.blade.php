@@ -335,11 +335,13 @@
                                                 @endif
                                             </form>
 
-                                            <form action="{{ route('admin.customers.addresses.destroy', [$customer, $address]) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('هل أنت متأكد من حذف هذا العنوان؟');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">حذف</button>
-                                            </form>
+                                            <x-admin.delete-trigger
+                                                :action="route('admin.customers.addresses.destroy', [$customer, $address])"
+                                                title="حذف العنوان"
+                                                message="هل أنت متأكد من حذف هذا العنوان؟"
+                                                button-class="btn-sm btn-outline-danger ms-1"
+                                                label="حذف"
+                                            />
                                         </td>
                                     </tr>
                                 @empty

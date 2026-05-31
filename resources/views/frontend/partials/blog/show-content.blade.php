@@ -52,11 +52,39 @@
         @if($post->excerpt)
             <p class="store-blog-show__excerpt">{{ $post->excerpt }}</p>
         @endif
+
+        @if($post->tldr)
+            <div class="store-blog-show__tldr alert alert-light border">
+                <strong>ملخص سريع:</strong> {{ $post->tldr }}
+            </div>
+        @endif
+
+        @if(is_array($post->key_takeaways) && count($post->key_takeaways))
+            <div class="store-blog-show__takeaways">
+                <h2 class="h5">النقاط الرئيسية</h2>
+                <ul>
+                    @foreach($post->key_takeaways as $point)
+                        <li>{{ $point }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </header>
 
     <div class="store-blog-show__content">
         {!! $post->content !!}
     </div>
+
+    @if($post->category)
+        <div class="store-blog-show__cta mt-4 mb-4">
+            <a href="{{ route('frontend.shop.index') }}?category={{ $post->category->slug }}"
+               class="btn btn-primary"
+               data-analytics-cta="shop_from_blog"
+               data-content-type="article">
+                تصفّح منتجات {{ $post->category->name }}
+            </a>
+        </div>
+    @endif
 
     @if($post->tags->isNotEmpty())
         <div class="store-blog-show__tags">
@@ -73,15 +101,18 @@
         <span class="store-blog-show__share-label">شارك المقال:</span>
         <div class="store-blog-show__share-links">
             <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}&text={{ $shareTitle }}"
-                class="store-blog-show__share-btn" target="_blank" rel="noopener noreferrer" aria-label="مشاركة على X">
+                class="store-blog-show__share-btn" target="_blank" rel="noopener noreferrer" aria-label="مشاركة على X"
+                data-analytics-share="twitter" data-content-type="article">
                 <i class="w-icon-twitter"></i>
             </a>
             <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}"
-                class="store-blog-show__share-btn" target="_blank" rel="noopener noreferrer" aria-label="مشاركة على فيسبوك">
+                class="store-blog-show__share-btn" target="_blank" rel="noopener noreferrer" aria-label="مشاركة على فيسبوك"
+                data-analytics-share="facebook" data-content-type="article">
                 <i class="w-icon-facebook"></i>
             </a>
             <a href="https://wa.me/?text={{ $shareTitle }}%20{{ $shareUrl }}"
-                class="store-blog-show__share-btn" target="_blank" rel="noopener noreferrer" aria-label="مشاركة على واتساب">
+                class="store-blog-show__share-btn" target="_blank" rel="noopener noreferrer" aria-label="مشاركة على واتساب"
+                data-analytics-share="whatsapp" data-content-type="article">
                 <i class="fab fa-whatsapp"></i>
             </a>
             <button type="button" class="store-blog-show__share-btn store-blog-show__share-copy"

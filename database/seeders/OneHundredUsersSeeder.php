@@ -28,7 +28,6 @@ class OneHundredUsersSeeder extends Seeder
                 'email' => $email,
                 'phone' => null,
                 'password' => $password,
-                'status' => 'active',
                 'is_active' => true,
                 'email_verified_at' => now(),
             ]);

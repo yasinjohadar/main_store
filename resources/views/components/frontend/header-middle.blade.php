@@ -4,8 +4,14 @@
                     <div class="header-left mr-md-4">
                         <a href="#" class="mobile-menu-toggle  w-icon-hamburger" aria-label="menu-toggle">
                         </a>
-                        <a href="{{ route('frontend.home') }}" class="logo ml-lg-0">
-                            <img src="{{ asset('frontend/assets/images/logo.png') }}" alt="logo" width="144" height="45" />
+                        @php($siteName = site_setting(\App\Services\SiteSettingsService::KEY_SITE_NAME, config('app.name')))
+                        @php($siteLogoUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_LOGO))
+                        <a href="{{ route('frontend.home') }}" class="logo ml-lg-0" title="{{ $siteName }}">
+                            @if($siteLogoUrl)
+                                <img src="{{ $siteLogoUrl }}" alt="{{ $siteName }}" width="144" height="45" />
+                            @else
+                                <span class="store-site-logo">{{ $siteName }}</span>
+                            @endif
                         </a>
                         <form method="get" action="{{ route('frontend.shop.index') }}"
                             class="header-search hs-expanded hs-round d-none d-md-flex input-wrapper store-header-search">

@@ -2,16 +2,23 @@
 
 namespace App\Models;
 
+use App\Contracts\Seoable;
+use App\Traits\HasSeoFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-class Brand extends Model
+class Brand extends Model implements Seoable
 {
-    use HasFactory;
+    use HasFactory, HasSeoFields;
 
-    protected $fillable = ['name', 'slug', 'image', 'order'];
+    protected $fillable = [
+        'name', 'slug', 'image', 'order',
+        'meta_title', 'meta_description', 'meta_keywords',
+        'canonical_url', 'focus_keyword', 'focus_keyword_synonyms',
+        'og_title', 'og_description', 'og_image', 'robots_meta', 'schema_type',
+    ];
 
     protected $casts = ['order' => 'integer'];
 

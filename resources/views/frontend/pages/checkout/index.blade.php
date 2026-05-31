@@ -35,6 +35,12 @@
 
         <div class="container">
 
+            @if(request()->boolean('cancelled'))
+                <div class="store-cart-alert store-cart-alert--warning mb-4" role="alert">
+                    <p class="mb-0">تم إلغاء عملية الدفع. يمكنك اختيار وسيلة دفع أخرى أو المحاولة مرة أخرى.</p>
+                </div>
+            @endif
+
             @include('frontend.partials.checkout.form')
 
         </div>
@@ -95,6 +101,15 @@
 
             });
 
+            var checkoutForm = document.querySelector('.store-checkout-form');
+            var submitBtn = document.querySelector('[data-checkout-submit]');
+            if (checkoutForm && submitBtn) {
+                checkoutForm.addEventListener('submit', function () {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('is-loading');
+                    submitBtn.querySelector('span').textContent = 'جاري تأكيد الطلب...';
+                });
+            }
         });
 
     </script>

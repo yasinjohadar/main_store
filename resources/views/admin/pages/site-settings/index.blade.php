@@ -27,7 +27,7 @@
             <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
                 <div>
                     <h5 class="page-title fs-21 mb-1">إعدادات الموقع العامة</h5>
-                    <p class="text-muted mb-0 small">اسم الموقع، الشعار، التواصل، وضع الصيانة، اللغة والمنطقة، ومحركات البحث.</p>
+                    <p class="text-muted mb-0 small">اسم الموقع، الشعار، التواصل، وضع الصيانة، SEO، والتحليلات (GA4/Pixel). لإعدادات المتجر والدفع راجع «إعدادات المتجر» و«التكاملات».</p>
                 </div>
             </div>
 
@@ -83,30 +83,112 @@
                                                     @error($key)<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                                                 </div>
                                             @elseif ($key === \App\Services\SiteSettingsService::KEY_SITE_LOGO)
+                                                @php($logoPreviewUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_LOGO))
                                                 <label class="form-label">{{ $def['label'] }}</label>
-                                                @if ($value && \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->exists($value))
-                                                    <div class="mb-2">
-                                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->url($value) }}" alt="الشعار" class="img-thumbnail" style="max-height: 60px;">
+                                                @if ($logoPreviewUrl)
+                                                    <div class="mb-3 p-3 border rounded bg-light d-flex flex-wrap align-items-center gap-3">
+                                                        <img src="{{ $logoPreviewUrl }}" alt="معاينة الشعار" class="img-thumbnail bg-white" style="max-height: 72px; max-width: 220px; object-fit: contain;">
+                                                        <div>
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" name="remove_site_logo" value="0">
+                                                                <input class="form-check-input" type="checkbox" name="remove_site_logo" value="1" id="remove_site_logo">
+                                                                <label class="form-check-label text-danger" for="remove_site_logo">حذف الشعار الحالي</label>
+                                                            </div>
+                                                            <small class="text-muted d-block mt-1">ارفع ملفاً جديداً لاستبداله دون حذف.</small>
+                                                        </div>
                                                     </div>
                                                 @endif
-                                                <input type="file" class="form-control @error('site_logo_file') is-invalid @enderror" name="site_logo_file" accept="image/*">
+                                                <input type="file" class="form-control @error('site_logo_file') is-invalid @enderror" name="site_logo_file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
                                                 @if (!empty($def['hint']))
-                                                    <small class="text-muted">{{ $def['hint'] }}</small>
+                                                    <small class="text-muted d-block mt-1">{{ $def['hint'] }}</small>
                                                 @endif
-                                                @error('site_logo_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                                @error('site_logo_file')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                            @elseif ($key === \App\Services\SiteSettingsService::KEY_SITE_PRIMARY_COLOR)
+                                                <label class="form-label" for="input-{{ $key }}">{{ $def['label'] }}</label>
+                                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                                    <input type="color"
+                                                           class="form-control form-control-color @error($key) is-invalid @enderror"
+                                                           id="picker-{{ $key }}"
+                                                           value="{{ $value ?: \App\Support\SiteTheme::DEFAULT_PRIMARY }}"
+                                                           title="اختر اللون الأساسي">
+                                                    <input type="text"
+                                                           class="form-control @error($key) is-invalid @enderror"
+                                                           name="{{ $key }}"
+                                                           id="input-{{ $key }}"
+                                                           value="{{ $value ?: \App\Support\SiteTheme::DEFAULT_PRIMARY }}"
+                                                           maxlength="7"
+                                                           pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                                                           dir="ltr"
+                                                           style="max-width: 8rem;">
+                                                    <span class="rounded-circle border"
+                                                          id="preview-{{ $key }}"
+                                                          style="width: 2.25rem; height: 2.25rem; background: {{ $value ?: \App\Support\SiteTheme::DEFAULT_PRIMARY }};"></span>
+                                                </div>
+                                                @if (!empty($def['hint']))
+                                                    <small class="text-muted d-block mt-1">{{ $def['hint'] }}</small>
+                                                @endif
+                                                @error($key)<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                            @elseif ($key === \App\Services\SiteSettingsService::KEY_SITE_BORDER_RADIUS)
+                                                <label class="form-label" for="input-{{ $key }}">{{ $def['label'] }}</label>
+                                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                                    <input type="number"
+                                                           class="form-control @error($key) is-invalid @enderror"
+                                                           name="{{ $key }}"
+                                                           id="input-{{ $key }}"
+                                                           value="{{ old($key, $value ?? \App\Support\SiteTheme::DEFAULT_BORDER_RADIUS) }}"
+                                                           min="0"
+                                                           max="50"
+                                                           step="1"
+                                                           style="max-width: 8rem;">
+                                                    <span class="text-muted">px</span>
+                                                    <span class="border bg-light d-inline-flex align-items-center justify-content-center"
+                                                          id="preview-{{ $key }}"
+                                                          style="width: 4.5rem; height: 3rem; border-radius: {{ (int) ($value ?? \App\Support\SiteTheme::DEFAULT_BORDER_RADIUS) }}px; border-color: #dee2e6 !important;"></span>
+                                                </div>
+                                                @if (!empty($def['hint']))
+                                                    <small class="text-muted d-block mt-1">{{ $def['hint'] }}</small>
+                                                @endif
+                                                @error($key)<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                                             @elseif ($key === \App\Services\SiteSettingsService::KEY_SITE_FAVICON)
+                                                @php($faviconPreviewUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_FAVICON))
                                                 <label class="form-label">{{ $def['label'] }}</label>
-                                                @if ($value && \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->exists($value))
-                                                    <div class="mb-2">
-                                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->url($value) }}" alt="Favicon" class="img-thumbnail" style="max-height: 32px;">
+                                                @if ($faviconPreviewUrl)
+                                                    <div class="mb-3 p-3 border rounded bg-light d-flex flex-wrap align-items-center gap-3">
+                                                        <img src="{{ $faviconPreviewUrl }}" alt="معاينة الأيقونة" class="img-thumbnail bg-white" style="width: 48px; height: 48px; object-fit: contain;">
+                                                        <div>
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" name="remove_site_favicon" value="0">
+                                                                <input class="form-check-input" type="checkbox" name="remove_site_favicon" value="1" id="remove_site_favicon">
+                                                                <label class="form-check-label text-danger" for="remove_site_favicon">حذف الأيقونة الحالية</label>
+                                                            </div>
+                                                            <small class="text-muted d-block mt-1">ارفع ملفاً جديداً لاستبدالها دون حذف.</small>
+                                                        </div>
                                                     </div>
                                                 @endif
-                                                <input type="file" class="form-control @error('site_favicon_file') is-invalid @enderror" name="site_favicon_file" accept="image/*">
+                                                <input type="file" class="form-control @error('site_favicon_file') is-invalid @enderror" name="site_favicon_file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,.ico">
                                                 @if (!empty($def['hint']))
-                                                    <small class="text-muted">{{ $def['hint'] }}</small>
+                                                    <small class="text-muted d-block mt-1">{{ $def['hint'] }}</small>
                                                 @endif
-                                                @error('site_favicon_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                            @elseif (in_array($key, [\App\Services\SiteSettingsService::KEY_SITE_DESCRIPTION, \App\Services\SiteSettingsService::KEY_SITE_MAINTENANCE_MESSAGE, \App\Services\SiteSettingsService::KEY_SITE_ADDRESS, \App\Services\SiteSettingsService::KEY_SITE_META_DESCRIPTION, \App\Services\SiteSettingsService::KEY_SITE_FOOTER_TEXT], true))
+                                                @error('site_favicon_file')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                            @elseif ($key === \App\Services\SiteSettingsService::KEY_NEWSLETTER_POPUP_IMAGE)
+                                                @php($popupImageUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_NEWSLETTER_POPUP_IMAGE) ?: asset(\App\Services\SiteSettingsService::DEFAULT_NEWSLETTER_POPUP_IMAGE))
+                                                <label class="form-label">{{ $def['label'] }}</label>
+                                                @if ($popupImageUrl)
+                                                    <div class="mb-3 p-3 border rounded bg-light">
+                                                        <img src="{{ $popupImageUrl }}" alt="معاينة نافذة الاشتراك" class="img-thumbnail bg-white" style="max-height: 120px; max-width: 100%; object-fit: cover;">
+                                                        <div class="form-check mt-2 mb-0">
+                                                            <input type="hidden" name="remove_newsletter_popup_image" value="0">
+                                                            <input class="form-check-input" type="checkbox" name="remove_newsletter_popup_image" value="1" id="remove_newsletter_popup_image">
+                                                            <label class="form-check-label text-danger" for="remove_newsletter_popup_image">استعادة الصورة الافتراضية</label>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                <input type="file" class="form-control @error('newsletter_popup_image_file') is-invalid @enderror" name="newsletter_popup_image_file" accept="image/png,image/jpeg,image/webp">
+                                                @if (!empty($def['hint']))
+                                                    <small class="text-muted d-block mt-1">{{ $def['hint'] }}</small>
+                                                @endif
+                                                @error('newsletter_popup_image_file')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                            @elseif (in_array($key, [\App\Services\SiteSettingsService::KEY_SITE_DESCRIPTION, \App\Services\SiteSettingsService::KEY_SITE_MAINTENANCE_MESSAGE, \App\Services\SiteSettingsService::KEY_SITE_ADDRESS, \App\Services\SiteSettingsService::KEY_SITE_META_DESCRIPTION, \App\Services\SiteSettingsService::KEY_SITE_FOOTER_TEXT, \App\Services\SiteSettingsService::KEY_NEWSLETTER_POPUP_DESCRIPTION], true))
                                                 <label class="form-label" for="input-{{ $key }}">{{ $def['label'] }}</label>
                                                 <textarea class="form-control @error($key) is-invalid @enderror" name="{{ $key }}" id="input-{{ $key }}" rows="3">{{ $value }}</textarea>
                                                 @if (!empty($def['hint']))
@@ -145,4 +227,50 @@
             </form>
         </div>
     </div>
+@stop
+
+@section('script')
+<script>
+(function () {
+    var picker = document.getElementById('picker-{{ \App\Services\SiteSettingsService::KEY_SITE_PRIMARY_COLOR }}');
+    var input = document.getElementById('input-{{ \App\Services\SiteSettingsService::KEY_SITE_PRIMARY_COLOR }}');
+    var preview = document.getElementById('preview-{{ \App\Services\SiteSettingsService::KEY_SITE_PRIMARY_COLOR }}');
+    if (!picker || !input) return;
+
+    function syncFromPicker() {
+        input.value = picker.value;
+        if (preview) preview.style.background = picker.value;
+    }
+
+    function syncFromInput() {
+        var val = input.value.trim();
+        if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(val)) {
+            if (val.length === 4) {
+                val = '#' + val.slice(1).split('').map(function (c) { return c + c; }).join('');
+            }
+            picker.value = val;
+            input.value = val;
+            if (preview) preview.style.background = val;
+        }
+    }
+
+    picker.addEventListener('input', syncFromPicker);
+    input.addEventListener('change', syncFromInput);
+    input.addEventListener('blur', syncFromInput);
+})();
+
+(function () {
+    var radiusInput = document.getElementById('input-{{ \App\Services\SiteSettingsService::KEY_SITE_BORDER_RADIUS }}');
+    var radiusPreview = document.getElementById('preview-{{ \App\Services\SiteSettingsService::KEY_SITE_BORDER_RADIUS }}');
+    if (!radiusInput || !radiusPreview) return;
+
+    function syncRadiusPreview() {
+        var val = Math.max(0, Math.min(50, parseInt(radiusInput.value, 10) || 0));
+        radiusPreview.style.borderRadius = val + 'px';
+    }
+
+    radiusInput.addEventListener('input', syncRadiusPreview);
+    radiusInput.addEventListener('change', syncRadiusPreview);
+})();
+</script>
 @stop

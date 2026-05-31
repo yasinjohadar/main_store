@@ -58,6 +58,12 @@ class UpdatePaymentMethodRequest extends FormRequest
                 'secret_key' => ['nullable', 'string', 'max:500'],
                 'sandbox' => ['sometimes', 'boolean'],
             ],
+            'stripe' => [
+                'use_global_keys' => ['sometimes', 'boolean'],
+                'public_key' => ['nullable', 'string', 'max:500'],
+                'secret_key' => ['nullable', 'string', 'max:500'],
+                'sandbox' => ['sometimes', 'boolean'],
+            ],
         ];
         return $rules[$driver] ?? [];
     }

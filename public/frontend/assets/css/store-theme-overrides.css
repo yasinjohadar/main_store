@@ -1,0 +1,279 @@
+/* Dynamic store primary — overrides Wolmart/Bootstrap defaults (#336699) */
+
+.text-primary,
+.font-primary,
+a.text-primary:hover,
+a.text-primary:focus {
+    color: var(--store-primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--store-primary) !important;
+}
+
+.border-primary {
+    border-color: var(--store-primary) !important;
+}
+
+.btn-primary,
+.btn-primary:disabled,
+.btn-primary.disabled {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active {
+    background-color: var(--store-primary-dark) !important;
+    border-color: var(--store-primary-dark) !important;
+}
+
+.btn-primary.btn-solid {
+    color: var(--store-primary) !important;
+}
+
+.btn-primary.btn-solid:hover,
+.btn-primary.btn-solid:focus,
+.btn-primary.btn-solid:active {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+    color: #fff !important;
+}
+
+.btn-primary.btn-outline,
+.btn-outline-primary {
+    color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+    background-color: transparent !important;
+}
+
+.btn-primary.btn-outline:hover,
+.btn-primary.btn-outline:focus,
+.btn-primary.btn-outline:active,
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+    color: #fff !important;
+}
+
+.btn-primary.btn-link,
+.btn-link.text-primary {
+    color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+}
+
+.btn-primary.btn-underline:hover,
+.btn-primary.btn-underline:focus {
+    color: var(--store-primary) !important;
+}
+
+.alert-primary {
+    color: var(--store-primary-dark) !important;
+    background-color: rgba(var(--store-primary-rgb), 0.12) !important;
+    border-color: rgba(var(--store-primary-rgb), 0.25) !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: rgba(var(--store-primary-rgb), 0.55) !important;
+    box-shadow: 0 0 0 0.2rem rgba(var(--store-primary-rgb), 0.18) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--store-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(var(--store-primary-rgb), 0.2) !important;
+}
+
+.page-link.active,
+.page-item.active .page-link {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+}
+
+.page-link:hover {
+    color: var(--store-primary) !important;
+}
+
+.nav-filters .nav-filter.active,
+.nav-filters .nav-filter:hover,
+.filter-items a:hover,
+.filter-items .active > a {
+    color: var(--store-primary) !important;
+}
+
+.product-nav-prev:hover,
+.product-nav-next:hover,
+.swiper-button-next:not(.swiper-button-disabled):hover,
+.swiper-button-prev:not(.swiper-button-disabled):hover {
+    color: var(--store-primary) !important;
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--store-primary) !important;
+}
+
+.swiper-scrollbar-drag,
+.noUi-connect {
+    background: var(--store-primary) !important;
+}
+
+.rating-active,
+.ratings-full::before,
+.star-rating span::before {
+    color: var(--store-primary) !important;
+}
+
+.icon-box-primary .icon-box-icon i {
+    color: var(--store-primary) !important;
+}
+
+.social-icon:hover,
+.social-link:hover {
+    color: var(--store-primary) !important;
+}
+
+.footer-newsletter.bg-primary,
+.newsletter-popup.bg-primary {
+    background-color: var(--store-primary) !important;
+}
+
+.breadcrumb-item.active,
+.breadcrumb-item a:hover {
+    color: var(--store-primary) !important;
+}
+
+.product-label.label-new,
+.product-label.label-sale {
+    background-color: var(--store-primary) !important;
+}
+
+.minipopup-box .btn:not(.btn-close):hover {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+}
+
+.compare-popup .btn-primary,
+.quickview-popup .btn-primary,
+.cart-dropdown .btn-primary {
+    background-color: var(--store-primary) !important;
+    border-color: var(--store-primary) !important;
+}
+
+.compare-popup .btn-primary:hover,
+.quickview-popup .btn-primary:hover,
+.cart-dropdown .btn-primary:hover {
+    background-color: var(--store-primary-dark) !important;
+    border-color: var(--store-primary-dark) !important;
+}
+
+.theme-cat-1 {
+    --cat-accent: var(--store-primary);
+}
+
+.theme-cat-2,
+.theme-cat-3,
+.theme-cat-4,
+.theme-cat-5,
+.theme-cat-6,
+.theme-cat-7,
+.theme-cat-8 {
+    --cat-accent: var(--store-primary);
+}
+
+.store-site-logo {
+    display: inline-block;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--store-primary, #336699);
+    max-width: 10rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.store-site-logo--footer {
+    font-size: 1.2rem;
+    max-width: 12rem;
+    color: #fff;
+}
+
+/* Dynamic border radius — --store-radius from site settings (default 5px) */
+
+.store-product-card__inner,
+.product-wrap .product:not(.product-single),
+.home-deal-product,
+.home-promo-card,
+.home-brand-card,
+.home-feature-card,
+.home-blog-card,
+.home-category-card,
+.home-bestsellers-item,
+.home-deals-card,
+.home-bestsellers-card,
+.home-bestsellers-item__thumb,
+.store-shop-sidebar__widget,
+.store-shop-sidebar__header,
+.store-shop-sidebar__clear,
+.minipopup-box,
+.quickview-popup .product,
+.newsletter-popup,
+.product.product-single .product-gallery,
+.product.product-single .product-thumb,
+.product.product-single .product-image-full {
+    border-radius: var(--store-radius, 5px) !important;
+}
+
+.store-product-card__media,
+.home-deal-product__gallery,
+.home-promo-card__media,
+.home-blog-card__media,
+.home-category-card__media,
+.product-wrap .product-media {
+    border-radius: var(--store-radius, 5px) var(--store-radius, 5px) 0 0 !important;
+}
+
+.store-product-card__discount,
+.store-product-card__cat a,
+.store-product-card__cart-btn,
+.product-label,
+.label-discount,
+.label-sale,
+.home-promo-card__badge,
+.home-deals-card__eyebrow,
+.home-bestsellers-card__eyebrow,
+.home-brands__eyebrow,
+.home-blog__eyebrow,
+.product-wrap .btn-add-cart,
+.product-single .btn-cart,
+.product-single .btn-add-cart,
+.store-newsletter-popup-form .form-control,
+.store-newsletter-popup-form .btn,
+.store-shop-sidebar .filter-items a,
+.home-product-tabs__nav,
+.home-product-tabs__link {
+    border-radius: var(--store-radius, 5px) !important;
+}
+
+.store-product-card__actions .btn-product-icon,
+.home-product-tabs__icon,
+.home-deals-card__nav-btn,
+.home-bestsellers-card__nav-btn,
+.btn-rounded,
+.btn-circle,
+.rounded-circle {
+    border-radius: 50% !important;
+}

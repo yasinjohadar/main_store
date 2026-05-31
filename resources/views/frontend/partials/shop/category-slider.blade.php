@@ -14,8 +14,8 @@
 
 <section class="store-shop-categories appear-animate mb-6">
     <div class="store-shop-categories__head">
-        <h2 class="store-shop-categories__title">تصفح التصنيفات</h2>
-        <p class="store-shop-categories__subtitle">اختر التصنيف المناسب واكتشف منتجاتنا</p>
+        <h2 class="store-shop-categories__title">{{ $sectionTitle ?? 'تصفح التصنيفات' }}</h2>
+        <p class="store-shop-categories__subtitle">{{ $sectionSubtitle ?? 'اختر التصنيف المناسب واكتشف منتجاتنا' }}</p>
     </div>
 
     <div class="swiper-container swiper-theme store-shop-categories__swiper" data-swiper-options="{

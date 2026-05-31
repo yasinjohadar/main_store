@@ -52,11 +52,14 @@
                                         <td>
                                             <a href="{{ route('admin.attributes.values.index', $attr) }}" class="btn btn-sm btn-info">القيم</a>
                                             <a href="{{ route('admin.attributes.edit', $attr) }}" class="btn btn-sm btn-primary">تعديل</a>
-                                            <form action="{{ route('admin.attributes.destroy', $attr) }}" method="POST" class="d-inline" onsubmit="return confirm('حذف السمة وجميع قيمها؟');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                            </form>
+                                            <x-admin.delete-trigger
+                                                :action="route('admin.attributes.destroy', $attr)"
+                                                title="حذف السمة"
+                                                :item="$attr->name"
+                                                message="حذف السمة وجميع قيمها؟"
+                                                button-class="btn-sm btn-danger"
+                                                label="حذف"
+                                            />
                                         </td>
                                     </tr>
                                 @empty

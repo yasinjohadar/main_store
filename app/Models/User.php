@@ -8,11 +8,12 @@ use Illuminate\Notifications\Notifiable;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
       use HasRoles;
 
     /**
@@ -28,7 +29,6 @@ class User extends Authenticatable
         'facebook_id',
         'phone',
         'password',
-        'status',
         'is_active',
         'photo',
         'created_by',

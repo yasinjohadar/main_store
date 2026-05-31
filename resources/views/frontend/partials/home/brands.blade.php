@@ -1,7 +1,15 @@
+@php
+    $brandsEyebrow = $section->resolvedEyebrow($sectionDefaults['eyebrow'] ?? 'شركاء النجاح');
+    $brandsTitle = $section->resolvedTitle($sectionDefaults['title'] ?? 'عملاؤنا');
+@endphp
+
+@if(($homeBrands ?? collect())->isNotEmpty())
 <section class="home-brands appear-animate mb-9">
     <div class="home-brands__header">
-        <span class="home-brands__eyebrow">شركاء النجاح</span>
-        <h2 class="home-brands__title">عملاؤنا</h2>
+        @if($brandsEyebrow)
+            <span class="home-brands__eyebrow">{{ $brandsEyebrow }}</span>
+        @endif
+        <h2 class="home-brands__title">{{ $brandsTitle }}</h2>
     </div>
 
     <div class="swiper home-brands__swiper">
@@ -12,16 +20,20 @@
             'breakpoints': {
                 '576': { 'slidesPerView': 3, 'spaceBetween': 18 },
                 '768': { 'slidesPerView': 4, 'spaceBetween': 20 },
-                '992': { 'slidesPerView': 5, 'spaceBetween': 22 },
-                '1200': { 'slidesPerView': 6, 'spaceBetween': 24 }
+                '992': { 'slidesPerView': 5, 'spaceBetween': 24 }
             }
         }">
             <div class="swiper-wrapper">
-                @foreach(range(1, 12) as $i)
+                @foreach($homeBrands as $brand)
                     <div class="swiper-slide">
                         <div class="home-brand-card">
-                            <img src="{{ asset('frontend/assets/images/demos/demo1/brands/' . $i . '.png') }}"
-                                alt="Brand {{ $i }}" width="410" height="186" loading="lazy">
+                            @if($brand->url)
+                                <a href="{{ $brand->url }}">
+                                    <img src="{{ $brand->logo_url }}" alt="{{ $brand->name }}" width="410" height="186" loading="lazy">
+                                </a>
+                            @else
+                                <img src="{{ $brand->logo_url }}" alt="{{ $brand->name }}" width="410" height="186" loading="lazy">
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -29,3 +41,4 @@
         </div>
     </div>
 </section>
+@endif

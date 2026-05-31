@@ -126,6 +126,30 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="config-stripe" class="config-section card custom-card mb-4" style="display: {{ old('driver', $paymentMethod->driver) === 'stripe' ? 'block' : 'none' }};">
+                            <div class="card-header"><div class="card-title">إعدادات Stripe</div></div>
+                            <div class="card-body">
+                                <p class="small text-muted">يمكن استخدام <a href="{{ route('admin.stripe-settings.index') }}">المفاتيح العامة</a> من إعدادات Stripe أو مفاتيح خاصة بهذه الوسيلة.</p>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input type="hidden" name="config[use_global_keys]" value="0">
+                                            @php $useGlobal = old('config.use_global_keys', $config['use_global_keys'] ?? true); @endphp
+                                            <input class="form-check-input" type="checkbox" name="config[use_global_keys]" value="1" id="stripe_use_global" {{ $useGlobal ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="stripe_use_global">استخدام المفاتيح من إعدادات Stripe العامة</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Publishable Key (اختياري)</label>
+                                        <input type="text" class="form-control font-monospace" dir="ltr" name="config[public_key]" value="{{ old('config.public_key', $config['public_key'] ?? '') }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Secret Key (اختياري)</label>
+                                        <input type="password" class="form-control font-monospace" dir="ltr" name="config[secret_key]" placeholder="اتركه فارغاً للإبقاء على القيمة الحالية">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div id="config-card" class="config-section card custom-card mb-4" style="display: {{ old('driver', $paymentMethod->driver) === 'card' ? 'block' : 'none' }};">
                             <div class="card-header"><div class="card-title">إعدادات فيزا / ماستركارد</div></div>
                             <div class="card-body">

@@ -74,11 +74,15 @@
                                                 <td>
                                                     <div class="d-flex gap-2 flex-wrap">
                                                         <a href="{{ route('admin.currencies.edit', $c) }}" class="btn btn-sm btn-primary">تعديل</a>
-                                                        <form action="{{ route('admin.currencies.destroy', $c) }}" method="POST" class="d-inline" onsubmit="return confirm('حذف هذه العملة؟');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-danger" {{ $c->is_default ? 'disabled' : '' }}>حذف</button>
-                                                        </form>
+                                                        <x-admin.delete-trigger
+                                                            :action="route('admin.currencies.destroy', $c)"
+                                                            title="حذف العملة"
+                                                            :item="$c->name"
+                                                            message="هل تريد حذف هذه العملة؟"
+                                                            button-class="btn-sm btn-danger"
+                                                            label="حذف"
+                                                            :disabled="$c->is_default"
+                                                        />
                                                     </div>
                                                 </td>
                                             </tr>

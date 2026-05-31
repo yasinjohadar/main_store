@@ -28,19 +28,19 @@
                 <h3 class="title tab-pane-title font-weight-bold mb-1">أضف تقييمك</h3>
                 <p class="mb-3">لن يُنشر بريدك الإلكتروني. الحقول المطلوبة مُعلّمة بـ *</p>
                 @auth
-                    <form action="#" method="POST" class="review-form">
+                    <form action="{{ route('frontend.product.reviews.store', $product->slug) }}" method="POST" class="review-form">
                         @csrf
-                        <div class="rating-form">
-                            <label for="rating">تقييمك لهذا المنتج:</label>
-                            <span class="rating-stars">
+                        <div class="rating-form mb-3">
+                            <label for="rating">تقييمك لهذا المنتج: *</label>
+                            <select name="rating" id="rating" class="form-select" style="max-width:120px" required>
                                 @for($i = 5; $i >= 1; $i--)
-                                    <a class="star-{{ $i }}" href="#">{{ $i }}</a>
+                                    <option value="{{ $i }}">{{ $i }} نجوم</option>
                                 @endfor
-                            </span>
+                            </select>
                         </div>
-                        <textarea cols="30" rows="6" placeholder="اكتب تقييمك هنا..." class="form-control" id="review" name="comment" required></textarea>
-                        <p class="text-muted small mt-2 mb-3">* إرسال التقييمات سيتم تفعيله لاحقاً</p>
-                        <button type="submit" class="btn btn-dark btn-rounded" disabled>إرسال التقييم</button>
+                        <input type="text" name="title" class="form-control mb-2" placeholder="عنوان التقييم (اختياري)">
+                        <textarea cols="30" rows="6" placeholder="اكتب تقييمك هنا..." class="form-control" name="content" required></textarea>
+                        <button type="submit" class="btn btn-dark btn-rounded mt-3">إرسال التقييم</button>
                     </form>
                 @else
                     <p class="mb-0">

@@ -28,9 +28,14 @@
                     <div class="row gutter-lg">
                         <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                             <div class="store-footer__brand">
-                                <a href="{{ route('frontend.home') }}" class="store-footer__logo">
-                                    <img src="{{ asset('frontend/assets/images/logo_footer.png') }}"
-                                        alt="{{ config('app.name') }}" width="130" height="40" loading="lazy">
+                                @php($footerSiteName = site_setting(\App\Services\SiteSettingsService::KEY_SITE_NAME, config('app.name')))
+                                @php($footerLogoUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_LOGO))
+                                <a href="{{ route('frontend.home') }}" class="store-footer__logo" title="{{ $footerSiteName }}">
+                                    @if($footerLogoUrl)
+                                        <img src="{{ $footerLogoUrl }}" alt="{{ $footerSiteName }}" width="130" height="40" loading="lazy" style="object-fit: contain; max-height: 40px;">
+                                    @else
+                                        <span class="store-site-logo store-site-logo--footer">{{ $footerSiteName }}</span>
+                                    @endif
                                 </a>
                                 <p class="store-footer__about">
                                     متجرك الإلكتروني الموثوق — منتجات مختارة بعناية، شحن سريع، ودعم عملاء على مدار الساعة.

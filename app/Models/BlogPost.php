@@ -17,6 +17,8 @@ class BlogPost extends Model
         'title',
         'slug',
         'excerpt',
+        'tldr',
+        'key_takeaways',
         'content',
         'featured_image',
         'featured_image_alt',
@@ -103,6 +105,7 @@ class BlogPost extends Model
     ];
 
     protected $casts = [
+        'key_takeaways' => 'array',
         'breadcrumb_schema' => 'array',
         'related_posts' => 'array',
         'custom_meta' => 'array',

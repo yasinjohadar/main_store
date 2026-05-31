@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+use Illuminate\Support\Facades\Storage;
+
 class ProductAttributeValue extends Model
 {
     use HasFactory;
@@ -45,5 +47,10 @@ class ProductAttributeValue extends Model
             'product_attribute_value_id',
             'product_variant_id'
         );
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image ? Storage::url($this->image) : null;
     }
 }

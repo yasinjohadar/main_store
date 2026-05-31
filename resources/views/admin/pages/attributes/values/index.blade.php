@@ -88,11 +88,14 @@
                                                 <td>{{ $val->order }}</td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editValueModal" data-id="{{ $val->id }}" data-value="{{ $val->value }}" data-color="{{ $val->color_hex }}" data-order="{{ $val->order }}">تعديل</button>
-                                                    <form action="{{ route('admin.attributes.values.destroy', [$attribute, $val]) }}" method="POST" class="d-inline" onsubmit="return confirm('حذف هذه القيمة؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">حذف</button>
-                                                    </form>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.attributes.values.destroy', [$attribute, $val])"
+                                                        title="حذف القيمة"
+                                                        :item="$val->value"
+                                                        message="هل تريد حذف هذه القيمة؟"
+                                                        button-class="btn-sm btn-danger"
+                                                        label="حذف"
+                                                    />
                                                 </td>
                                             </tr>
                                         @empty

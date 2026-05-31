@@ -25,7 +25,7 @@
                             </div>
                             <div class="account-list-item__action">
                                 @if($download->canDownload())
-                                    <a href="#" class="account-btn account-btn--sm account-btn--outline">تحميل</a>
+                                    <a href="{{ route('frontend.downloads.show', $download->download_token) }}" class="account-btn account-btn--sm account-btn--outline">تحميل</a>
                                 @else
                                     <span class="account-status-badge account-status-badge--muted">غير متاح</span>
                                 @endif

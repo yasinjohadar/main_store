@@ -108,9 +108,15 @@
                                                             <i class="fas fa-download"></i>
                                                         </a>
                                                     @endif
-                                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBackupModal{{ $backup->id }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
+                                                    <x-admin.delete-trigger
+                                                        :action="route('admin.backups.destroy', $backup->id)"
+                                                        title="حذف النسخة الاحتياطية"
+                                                        :item="$backup->name"
+                                                        message="هل أنت متأكد من حذف هذه النسخة الاحتياطية؟"
+                                                        confirm-text="حذف النسخة"
+                                                        button-class="btn-sm btn-danger"
+                                                        icon="fas fa-trash"
+                                                    />
                                                 </div>
                                             </td>
                                         </tr>
@@ -132,53 +138,6 @@
         </div>
     </div>
 </div>
-
-<!-- Delete Confirmation Modals -->
-@foreach($backups as $backup)
-<div class="modal fade" id="deleteBackupModal{{ $backup->id }}" tabindex="-1" aria-labelledby="deleteBackupModalLabel{{ $backup->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteBackupModalLabel{{ $backup->id }}">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    تأكيد الحذف
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-3">
-                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
-                    <h5>هل أنت متأكد من حذف هذه النسخة الاحتياطية؟</h5>
-                </div>
-                <div class="alert alert-warning">
-                    <strong>اسم النسخة:</strong> {{ $backup->name }}<br>
-                    <strong>النوع:</strong> {{ \App\Models\Backup::BACKUP_TYPES[$backup->backup_type] }}<br>
-                    <strong>الحجم:</strong> {{ $backup->getFileSize() }}<br>
-                    <strong>التاريخ:</strong> {{ $backup->created_at->format('Y-m-d H:i') }}
-                </div>
-                <p class="text-muted text-center mb-0">
-                    <i class="fas fa-info-circle me-1"></i>
-                    لا يمكن التراجع عن هذا الإجراء بعد التنفيذ.
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-1"></i>
-                    إلغاء
-                </button>
-                <form action="{{ route('admin.backups.destroy', $backup->id) }}" method="POST" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash me-1"></i>
-                        حذف النسخة
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-@endforeach
 
 @stop
 
