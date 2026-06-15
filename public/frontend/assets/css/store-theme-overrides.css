@@ -64,7 +64,17 @@ a.text-primary:focus {
 .btn-primary.btn-link,
 .btn-link.text-primary {
     color: var(--store-primary) !important;
-    border-color: var(--store-primary) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+
+.btn-primary.btn-link:hover,
+.btn-primary.btn-link:focus,
+.btn-primary.btn-link:active,
+.btn-primary.btn-link.active {
+    color: var(--store-primary-dark) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
 }
 
 .btn-primary.btn-underline:hover,
@@ -219,6 +229,7 @@ select:focus {
 .home-promo-card,
 .home-brand-card,
 .home-feature-card,
+.home-product-side-banner,
 .home-blog-card,
 .home-category-card,
 .home-bestsellers-item,
@@ -257,6 +268,7 @@ select:focus {
 .home-bestsellers-card__eyebrow,
 .home-brands__eyebrow,
 .home-blog__eyebrow,
+.home-categories-section__eyebrow,
 .product-wrap .btn-add-cart,
 .product-single .btn-cart,
 .product-single .btn-add-cart,
@@ -276,4 +288,44 @@ select:focus {
 .btn-circle,
 .rounded-circle {
     border-radius: 50% !important;
+}
+
+.store-product-info__actions .social-icon,
+.store-product-info__actions .btn-product-icon {
+    border-radius: 0.45rem !important;
+}
+
+.store-header-tools .header-call:hover .w-icon-call,
+.store-header-tools .header-call:hover .phone-number {
+    color: inherit !important;
+}
+
+.store-header-tools__item:hover .store-header-tools__icon,
+.store-header-tools__item:focus-visible .store-header-tools__icon,
+.store-header-tools__item:hover .store-header-tools__icon > i,
+.store-header-tools__item:focus-visible .store-header-tools__icon > i,
+.store-header-tools__item:hover .store-header-tools__icon .w-icon-call,
+.store-header-tools__item:focus-visible .store-header-tools__icon .w-icon-call {
+    color: #fff !important;
+}
+
+.store-header-search .store-header-search__btn,
+.store-header-search .btn-search {
+    border-radius: var(--store-search-inner-radius, 0.85rem) 0 0 var(--store-search-inner-radius, 0.85rem) !important;
+}
+
+.home-hero.swiper-nav-lg > .home-hero__nav.swiper-button-next,
+.home-hero.swiper-nav-lg > .home-hero__nav.swiper-button-prev,
+.home-hero .swiper-nav-lg > .home-hero__nav.swiper-button-next,
+.home-hero .swiper-nav-lg > .home-hero__nav.swiper-button-prev {
+    border-radius: 5px !important;
+    font-size: 1.6rem !important;
+}
+
+.store-faq-accordion .card-header > a::before,
+.store-faq-accordion .card-header > a::after,
+.store-faq-accordion .store-faq-accordion__trigger::before,
+.store-faq-accordion .store-faq-accordion__trigger::after {
+    display: none !important;
+    content: none !important;
 }

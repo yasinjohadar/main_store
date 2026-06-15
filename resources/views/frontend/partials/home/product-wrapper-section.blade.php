@@ -22,19 +22,27 @@
     </div>
     <div class="row">
         <div class="col-lg-3 col-sm-4 mb-4">
-            <div class="banner overlay-light h-100 br-sm"
-                style="background-image: url({{ $bannerImage }}); background-color: {{ $bannerBg }};">
-                <div class="banner-content content-top">
+            <a href="{{ $shopUrl }}" class="home-product-side-banner h-100"
+                style="--banner-bg: {{ $bannerBg }};"
+                aria-label="{{ strip_tags($bannerTitle ?: $title) }}">
+                <span class="home-product-side-banner__media" aria-hidden="true">
+                    <img src="{{ $bannerImage }}" alt="" loading="lazy">
+                </span>
+                <span class="home-product-side-banner__content">
                     @if($bannerSubtitle)
-                        <h5 class="banner-subtitle font-weight-normal mb-2">{{ $bannerSubtitle }}</h5>
-                        <hr class="banner-divider bg-dark mb-2">
+                        <span class="home-product-side-banner__subtitle">{{ $bannerSubtitle }}</span>
+                        <span class="home-product-side-banner__divider" aria-hidden="true"></span>
                     @endif
                     @if($bannerTitle)
-                        <h3 class="banner-title font-weight-bolder ls-25 text-uppercase">{!! $bannerTitle !!}</h3>
+                        <span class="home-product-side-banner__title">{!! $bannerTitle !!}</span>
                     @endif
-                    <a href="{{ $shopUrl }}" class="btn btn-dark btn-outline btn-rounded btn-sm">تسوق الآن</a>
-                </div>
-            </div>
+                    <span class="home-product-side-banner__cta">
+                        تسوق الآن
+                        <i class="w-icon-long-arrow-left"></i>
+                    </span>
+                </span>
+                <span class="home-product-side-banner__shine" aria-hidden="true"></span>
+            </a>
         </div>
         <div class="col-lg-9 col-sm-8">
             @if($products->isNotEmpty())

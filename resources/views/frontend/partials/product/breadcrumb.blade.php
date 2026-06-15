@@ -13,8 +13,8 @@
     $breadcrumbItems[] = ['label' => $product->name];
 @endphp
 
-<x-frontend.page-hero
+<x-frontend.page-head
     :title="$product->name"
-    variant="soft"
     :breadcrumb-items="$breadcrumbItems"
+    :embedded="true"
 />

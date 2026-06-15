@@ -19,7 +19,7 @@ class ShopCatalogService
         'cols' => 4,
         'sidebar' => 'left',
         'filters' => 'vertical',
-        'banner' => 'sidebar',
+        'banner' => 'none',
         'load' => 'pagination',
     ];
 
@@ -103,7 +103,7 @@ class ShopCatalogService
     public function gridClasses(array $layout): string
     {
         if (($layout['view'] ?? 'grid') === 'list') {
-            return 'cols-xl-2 cols-md-1 cols-xs-2 cols-1';
+            return 'cols-1';
         }
 
         $colsMap = [
@@ -221,7 +221,7 @@ class ShopCatalogService
             'cols' => in_array((int) $value, [3, 4, 5, 6], true),
             'sidebar' => in_array($value, ['left', 'right', 'offcanvas', 'none'], true),
             'filters' => in_array($value, ['vertical', 'horizontal'], true),
-            'banner' => in_array($value, ['sidebar', 'boxed', 'fullwidth'], true),
+            'banner' => in_array($value, ['none', 'sidebar', 'boxed', 'fullwidth'], true),
             'load' => in_array($value, ['pagination', 'infinite'], true),
             default => false,
         };

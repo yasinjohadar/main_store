@@ -5,13 +5,12 @@
     'icon' => null,
     'breadcrumbItems' => [],
     'variant' => 'default',
+    'embedded' => false,
 ])
 
-<x-frontend.page-hero
+<x-frontend.page-head
     :title="$title"
-    :subtitle="$subtitle"
-    :eyebrow="$eyebrow"
-    :icon="$icon"
+    :subtitle="$subtitle ?? $eyebrow"
     :breadcrumb-items="$breadcrumbItems"
-    :variant="$variant"
+    :embedded="$embedded"
 />

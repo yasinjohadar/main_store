@@ -64,7 +64,7 @@ class ProductController extends Controller
             ->when($product->category_id, fn ($q) => $q->where('category_id', $product->category_id))
             ->with('images')
             ->inRandomOrder()
-            ->limit(3)
+            ->limit(2)
             ->get();
 
         $sidebarProducts = $relatedProducts->count() >= 3

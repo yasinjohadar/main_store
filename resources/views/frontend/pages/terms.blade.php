@@ -25,4 +25,5 @@
 
 @push('scripts')
     <script src="{{ asset('frontend/assets/vendor/sticky/sticky.js') }}"></script>
+    @include('frontend.partials.pages.legal-scripts')
 @endpush

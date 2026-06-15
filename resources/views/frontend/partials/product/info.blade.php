@@ -103,7 +103,7 @@
                     <div class="store-product-purchase__qty">
                         <label>الكمية:</label>
                         <div class="product-qty-form">
-                            <div class="input-group qty-input-group">
+                            <div class="input-group qty-input-group store-cart-item__qty-group">
                                 <button type="button" class="quantity-minus w-icon-minus"></button>
                                 <input class="quantity form-control" type="number" name="quantity" min="1"
                                     max="{{ $maxQty }}" value="1">

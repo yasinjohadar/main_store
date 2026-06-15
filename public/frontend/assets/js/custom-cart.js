@@ -95,8 +95,8 @@
             imageLink: product.url,
             message: '<p class="store-minipopup__message">' + (message || 'تمت الإضافة إلى السلة') + '</p>',
             actionTemplate:
-                '<a href="' + (cfg.cartUrl || '/cart') + '" class="btn btn-rounded btn-sm store-minipopup__btn">عرض السلة</a>' +
-                '<a href="' + (cfg.checkoutUrl || '/checkout') + '" class="btn btn-dark btn-rounded btn-sm store-minipopup__btn store-minipopup__btn--dark">إتمام الشراء</a>'
+                '<a href="' + (cfg.cartUrl || '/cart') + '" class="btn btn-sm store-minipopup__btn">عرض السلة</a>' +
+                '<a href="' + (cfg.checkoutUrl || '/checkout') + '" class="btn btn-dark btn-sm store-minipopup__btn store-minipopup__btn--dark">إتمام الشراء</a>'
         });
     }
 

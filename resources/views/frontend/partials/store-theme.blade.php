@@ -14,5 +14,6 @@
     --card-accent: var(--store-primary);
     --cat-accent: var(--store-primary);
     --hero-accent: var(--store-primary);
+    --store-container-max: 1400px;
 }
 </style>

@@ -9,20 +9,18 @@
 @endpush
 
 @section('content')
-    @include('frontend.partials.page.page-header', [
-        'title' => $category->name,
-        'eyebrow' => 'التصنيف',
-        'subtitle' => $category->description
-            ? \Illuminate\Support\Str::limit(strip_tags($category->description), 120)
-            : 'منتجات مختارة من هذا التصنيف',
-        'icon' => 'w-icon-category',
-        'breadcrumbItems' => [
-            ['label' => 'المتجر', 'url' => route('frontend.shop.index')],
-            ['label' => $category->name],
-        ],
-    ])
-
     <div class="page-content store-shop-page">
+        <x-frontend.page-head
+            :title="$category->name"
+            :subtitle="$category->description
+                ? \Illuminate\Support\Str::limit(strip_tags($category->description), 120)
+                : 'منتجات مختارة من هذا التصنيف'"
+            :breadcrumb-items="[
+                ['label' => 'المتجر', 'url' => route('frontend.shop.index')],
+                ['label' => $category->name],
+            ]"
+        />
+
         <div class="container">
             @if($category->children()->active()->exists())
                 @include('frontend.partials.shop.category-slider', [

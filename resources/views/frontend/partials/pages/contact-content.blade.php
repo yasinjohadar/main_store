@@ -5,7 +5,6 @@
     $contactPhone = site_setting(SiteSettings::KEY_SITE_CONTACT_PHONE, '920000000');
     $contactAddress = site_setting(SiteSettings::KEY_SITE_ADDRESS, 'المملكة العربية السعودية');
     $whatsapp = site_setting(SiteSettings::KEY_SITE_WHATSAPP_NUMBER);
-    $siteName = site_setting(SiteSettings::KEY_SITE_NAME, config('app.name'));
 
     $infoCards = [
         [
@@ -13,28 +12,24 @@
             'title' => 'البريد الإلكتروني',
             'value' => $contactEmail,
             'link' => 'mailto:' . $contactEmail,
-            'accent' => '#336699',
         ],
         [
             'icon' => 'w-icon-headphone',
             'title' => 'الهاتف',
             'value' => $contactPhone,
             'link' => 'tel:' . preg_replace('/\s+/', '', $contactPhone),
-            'accent' => '#0d9488',
         ],
         [
             'icon' => 'w-icon-map-marker',
             'title' => 'العنوان',
             'value' => $contactAddress,
             'link' => null,
-            'accent' => '#7c3aed',
         ],
         [
             'icon' => 'w-icon-fax',
             'title' => 'ساعات الدعم',
             'value' => 'السبت - الخميس، 9 ص - 6 م',
             'link' => null,
-            'accent' => '#ea580c',
         ],
     ];
 
@@ -66,30 +61,33 @@
     ];
 @endphp
 
-<div class="page-content store-contact-page__content mb-10 pb-2">
+<div class="page-content store-contact-page__content">
     <div class="container">
-        <section class="store-contact-intro">
-            <p class="store-contact-intro__eyebrow">نحن هنا لمساعدتك</p>
-            <h2 class="store-contact-intro__title">تواصل مع {{ $siteName }}</h2>
-            <p class="store-contact-intro__text">
-                لديك سؤال عن منتج، طلب، أو استفسار عام؟ فريقنا جاهز للرد عليك بأسرع وقت.
-            </p>
-        </section>
-
         <section class="store-contact-info" aria-label="معلومات التواصل">
             <div class="store-contact-info__grid">
                 @foreach($infoCards as $card)
-                    <article class="store-contact-info__card">
-                        <span class="store-contact-info__icon" style="--card-accent: {{ $card['accent'] }}">
+                    @if($card['link'])
+                        <a href="{{ $card['link'] }}" class="store-contact-info__card store-contact-info__card--link">
+                    @else
+                        <article class="store-contact-info__card">
+                    @endif
+                        <span class="store-contact-info__icon">
                             <i class="{{ $card['icon'] }}"></i>
                         </span>
-                        <h3 class="store-contact-info__card-title">{{ $card['title'] }}</h3>
-                        @if($card['link'])
-                            <a href="{{ $card['link'] }}" class="store-contact-info__card-value">{{ $card['value'] }}</a>
-                        @else
+                        <div class="store-contact-info__card-body">
+                            <h2 class="store-contact-info__card-title">{{ $card['title'] }}</h2>
                             <p class="store-contact-info__card-value">{{ $card['value'] }}</p>
+                        </div>
+                        @if($card['link'])
+                            <span class="store-contact-info__arrow" aria-hidden="true">
+                                <i class="w-icon-long-arrow-left"></i>
+                            </span>
                         @endif
-                    </article>
+                    @if($card['link'])
+                        </a>
+                    @else
+                        </article>
+                    @endif
                 @endforeach
             </div>
         </section>

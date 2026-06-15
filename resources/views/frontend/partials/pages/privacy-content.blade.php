@@ -53,12 +53,16 @@
 <div class="page-content store-legal-page__content mb-10 pb-2">
     <div class="container">
         <section class="store-legal-intro">
-            <p class="store-legal-intro__eyebrow">حماية بياناتك</p>
-            <h2 class="store-legal-intro__title">سياسة الخصوصية</h2>
-            <p class="store-legal-intro__text">
-                نلتزم باحترام خصوصيتك وشرح كيفية التعامل مع معلوماتك في {{ $siteName }}.
-            </p>
-            <p class="store-legal-intro__updated">آخر تحديث: {{ now()->translatedFormat('F Y') }}</p>
+            <div class="store-legal-intro__inner">
+                <p class="store-legal-intro__eyebrow">حماية بياناتك</p>
+                <p class="store-legal-intro__text">
+                    نلتزم باحترام خصوصيتك وشرح كيفية التعامل مع معلوماتك في {{ $siteName }}.
+                </p>
+                <p class="store-legal-intro__updated">
+                    <i class="w-icon-calendar" aria-hidden="true"></i>
+                    آخر تحديث: {{ now()->translatedFormat('F Y') }}
+                </p>
+            </div>
         </section>
 
         <div class="row gutter-lg store-legal-layout">

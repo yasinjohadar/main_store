@@ -41,7 +41,10 @@
                 </h4>
                 <div class="post-content store-blog-grid__excerpt">
                     <p>{{ $excerpt }}</p>
-                    <a href="{{ route('frontend.blog.show', $post->slug) }}" class="btn btn-link btn-primary store-blog-grid__read-more">اقرأ المزيد</a>
+                    <a href="{{ route('frontend.blog.show', $post->slug) }}" class="store-blog-grid__read-more">
+                        اقرأ المزيد
+                        <i class="w-icon-long-arrow-left" aria-hidden="true"></i>
+                    </a>
                 </div>
                 <div class="post-meta store-blog-grid__meta">
                     <span class="store-blog-grid__meta-by">بواسطة</span>

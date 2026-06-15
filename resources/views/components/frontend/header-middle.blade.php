@@ -58,17 +58,15 @@
                         </a>
                         <a class="wishlist link store-header-tools__item d-xs-show" href="{{ route('frontend.wishlist') }}">
                             <span class="store-header-tools__icon">
-                                <i class="w-icon-heart">
-                                    <span class="wishlist-count">{{ $wishlistCount ?? 0 }}</span>
-                                </i>
+                                <i class="w-icon-heart"></i>
+                                <span class="wishlist-count">{{ $wishlistCount ?? 0 }}</span>
                             </span>
                             <span class="wishlist-label store-header-tools__label d-none d-lg-block">المفضلة</span>
                         </a>
                         <a class="compare link store-header-tools__item d-xs-show" href="{{ route('frontend.compare') }}">
                             <span class="store-header-tools__icon">
-                                <i class="w-icon-compare">
-                                    <span class="compare-count">{{ $compareCount ?? 0 }}</span>
-                                </i>
+                                <i class="w-icon-compare"></i>
+                                <span class="compare-count">{{ $compareCount ?? 0 }}</span>
                             </span>
                             <span class="compare-label store-header-tools__label d-none d-lg-block">المقارنة</span>
                         </a>
@@ -76,9 +74,8 @@
                             <div class="cart-overlay"></div>
                             <a href="#" class="cart-toggle link store-header-tools__item">
                                 <span class="store-header-tools__icon">
-                                    <i class="w-icon-cart">
-                                        <span class="cart-count">{{ $cartCount ?? 0 }}</span>
-                                    </i>
+                                    <i class="w-icon-cart"></i>
+                                    <span class="cart-count">{{ $cartCount ?? 0 }}</span>
                                 </span>
                                 <span class="cart-label store-header-tools__label d-none d-lg-block">السلة</span>
                             </a>

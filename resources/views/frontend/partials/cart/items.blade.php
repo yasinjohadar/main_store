@@ -62,6 +62,7 @@
                     </div>
 
                     <div class="store-cart-item__qty">
+                        <span class="store-cart-item__qty-label d-md-none">الكمية</span>
                         <form method="POST" action="{{ route('frontend.cart.update', $item['row_id']) }}">
                             @csrf
                             @method('PATCH')

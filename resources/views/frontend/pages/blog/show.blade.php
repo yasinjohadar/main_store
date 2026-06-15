@@ -11,10 +11,9 @@
 @section('content')
     <div class="page-content store-blog-show-page">
         <div class="container store-blog-show-page__container">
-            <x-frontend.page-hero
+            <x-frontend.page-head
                 :title="$post->title"
-                eyebrow="المدونة"
-                icon="w-icon-comments"
+                subtitle="المدونة"
                 :embedded="true"
                 :breadcrumb-items="[
                     ['label' => 'المدونة', 'url' => route('frontend.blog.index')],

@@ -1,5 +1,5 @@
 @php
-    $bundleProducts = ($frequentlyBoughtProducts ?? collect())->take(3);
+    $bundleProducts = ($frequentlyBoughtProducts ?? collect())->take(2);
     $bundleTotal = $product->effective_price + $bundleProducts->sum('effective_price');
     $bundleCount = 1 + $bundleProducts->count();
 @endphp
@@ -13,7 +13,7 @@
         {{-- المنتج الحالي --}}
         <div class="product product-wrap text-center">
             <figure class="product-media">
-                <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" width="138" height="138" />
+                <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" width="220" height="220" />
                 <div class="product-checkbox">
                     <input type="checkbox" class="custom-checkbox" id="product_check_current" checked disabled>
                     <label></label>
@@ -30,7 +30,7 @@
         @forelse($bundleProducts as $index => $bundleProduct)
             <div class="product product-wrap text-center">
                 <figure class="product-media">
-                    <img src="{{ $bundleProduct->primary_image_url }}" alt="{{ $bundleProduct->name }}" width="138" height="138" />
+                    <img src="{{ $bundleProduct->primary_image_url }}" alt="{{ $bundleProduct->name }}" width="220" height="220" />
                     <div class="product-checkbox">
                         <input type="checkbox" class="custom-checkbox" id="product_check{{ $index + 1 }}"
                             name="product_check{{ $index + 1 }}" checked>
@@ -49,7 +49,7 @@
                 <div class="product product-wrap text-center">
                     <figure class="product-media">
                         <img src="{{ asset('frontend/assets/images/products/default/bought-' . $i . '.jpg') }}"
-                            alt="منتج تجريبي" width="138" height="138" />
+                            alt="منتج تجريبي" width="220" height="220" />
                         <div class="product-checkbox">
                             <input type="checkbox" class="custom-checkbox" id="product_check{{ $i }}" disabled>
                             <label></label>
@@ -70,7 +70,7 @@
                 {{ number_format($bundleTotal, 2) }} ر.س
             </div>
             <div class="bought-count">لـ {{ $bundleCount }} {{ $bundleCount === 1 ? 'منتج' : 'منتجات' }}</div>
-            <a href="{{ route('frontend.cart.index') }}" class="btn btn-dark btn-rounded">أضف الكل للسلة</a>
+            <a href="{{ route('frontend.cart.index') }}" class="btn btn-primary store-bundle-add-all">أضف الكل للسلة</a>
             @if($bundleProducts->isEmpty())
                 <p class="text-muted small mt-2 mb-0">* اقتراحات تجريبية — سيتم الربط لاحقاً</p>
             @endif

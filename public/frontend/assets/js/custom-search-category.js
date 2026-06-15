@@ -4,14 +4,25 @@
 (function ($) {
     'use strict';
 
+    function syncHeaderLayer() {
+        var $headerMiddle = $('.header-middle');
+        if ($('[data-search-category-picker].is-open').length) {
+            $headerMiddle.addClass('search-category-open');
+        } else {
+            $headerMiddle.removeClass('search-category-open');
+        }
+    }
+
     function closePicker($picker) {
         $picker.removeClass('is-open');
         $picker.find('[data-search-category-toggle]').attr('aria-expanded', 'false');
+        syncHeaderLayer();
     }
 
     function openPicker($picker) {
         $picker.addClass('is-open');
         $picker.find('[data-search-category-toggle]').attr('aria-expanded', 'true');
+        syncHeaderLayer();
     }
 
     $(function () {

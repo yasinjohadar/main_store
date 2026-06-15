@@ -19,9 +19,8 @@
     );
 @endphp
 
-<x-frontend.page-hero
+<x-frontend.page-head
     :title="$displayTitle"
-    eyebrow="حسابي"
-    icon="w-icon-user"
+    subtitle="حسابي"
     :breadcrumb-items="$accountBreadcrumb"
 />

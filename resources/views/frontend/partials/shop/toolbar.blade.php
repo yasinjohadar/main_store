@@ -89,12 +89,6 @@
                     <a href="{{ shop_query(['sidebar' => 'none', 'filters' => 'horizontal']) }}" class="{{ shop_layout_active('sidebar', 'none', $layout) ? 'is-active' : '' }}">بدون</a>
                 </div>
                 <div class="store-shop-toolbar__options-group">
-                    <span>البانر</span>
-                    <a href="{{ shop_query(['banner' => 'sidebar']) }}" class="{{ shop_layout_active('banner', 'sidebar', $layout) ? 'is-active' : '' }}">مع الشريط</a>
-                    <a href="{{ shop_query(['banner' => 'boxed']) }}" class="{{ shop_layout_active('banner', 'boxed', $layout) ? 'is-active' : '' }}">مربّع</a>
-                    <a href="{{ shop_query(['banner' => 'fullwidth']) }}" class="{{ shop_layout_active('banner', 'fullwidth', $layout) ? 'is-active' : '' }}">كامل</a>
-                </div>
-                <div class="store-shop-toolbar__options-group">
                     <span>التحميل</span>
                     <a href="{{ shop_query(['load' => 'pagination']) }}" class="{{ shop_layout_active('load', 'pagination', $layout) ? 'is-active' : '' }}">صفحات</a>
                     <a href="{{ shop_query(['load' => 'infinite']) }}" class="{{ shop_layout_active('load', 'infinite', $layout) ? 'is-active' : '' }}">لا نهائي</a>

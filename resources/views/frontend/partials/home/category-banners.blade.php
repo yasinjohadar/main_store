@@ -5,7 +5,7 @@
             style="--promo-delay: {{ $index * 0.12 }}s;">
             <span class="home-promo-card__media">
                 <img src="{{ $promo->image_url }}" alt="{{ $promo->title }}"
-                    width="610" height="280" loading="lazy" style="background-color: {{ $promo->background_color ?? '#dfe3e0' }};">
+                    width="610" height="280" loading="lazy">
             </span>
             <span class="home-promo-card__overlay"></span>
             <span class="home-promo-card__content">

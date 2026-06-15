@@ -43,7 +43,7 @@
                             </a>
                             <form method="POST" action="{{ route('logout') }}" class="d-inline">
                                 @csrf
-                                <a href="#" class="header-top-link d-lg-show login sign-in"
+                                <a href="#" class="header-top-link d-lg-show"
                                     onclick="event.preventDefault(); this.closest('form').submit();">
                                     <i class="w-icon-logout" aria-hidden="true"></i>تسجيل الخروج
                                 </a>
@@ -52,11 +52,11 @@
                             <a href="{{ route('login') }}" class="header-top-link d-lg-show">
                                 <i class="w-icon-account" aria-hidden="true"></i>حسابي
                             </a>
-                            <a href="{{ route('login') }}" class="header-top-link d-lg-show login sign-in">
+                            <a href="{{ route('login') }}" class="header-top-link d-lg-show">
                                 <i class="w-icon-account" aria-hidden="true"></i>تسجيل الدخول
                             </a>
                             <span class="delimiter d-lg-show">/</span>
-                            <a href="{{ route('register') }}" class="header-top-link ml-0 d-lg-show login register">
+                            <a href="{{ route('register') }}" class="header-top-link ml-0 d-lg-show">
                                 <i class="w-icon-user" aria-hidden="true"></i>إنشاء حساب
                             </a>
                         @endauth

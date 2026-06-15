@@ -147,13 +147,23 @@
                                 $imageUrl = $item['image_url'] ?? asset('frontend/assets/images/cart/product-1.jpg');
                             @endphp
                             <li class="store-checkout-order__item">
-                                <div class="store-checkout-order__item-product">
+                                <a href="{{ route('frontend.product.show', $item['slug']) }}"
+                                    class="store-checkout-order__item-card"
+                                    title="عرض {{ $item['name'] }}">
                                     <span class="store-checkout-order__item-thumb">
-                                        <img src="{{ $imageUrl }}" alt="{{ $item['name'] }}" width="56" height="56" loading="lazy">
+                                        <img src="{{ $imageUrl }}" alt="{{ $item['name'] }}" width="64" height="64" loading="lazy">
                                     </span>
-                                    <span class="store-checkout-order__item-name">{{ $item['name'] }} <small>× {{ $item['quantity'] }}</small></span>
-                                </div>
-                                <strong>{{ number_format($item['subtotal'], 2) }} ر.س</strong>
+                                    <span class="store-checkout-order__item-body">
+                                        <span class="store-checkout-order__item-name">{{ $item['name'] }}</span>
+                                        <span class="store-checkout-order__item-meta">
+                                            <span class="store-checkout-order__item-qty">× {{ $item['quantity'] }}</span>
+                                            <span class="store-checkout-order__item-price">{{ number_format($item['subtotal'], 2) }} ر.س</span>
+                                        </span>
+                                    </span>
+                                    <span class="store-checkout-order__item-arrow" aria-hidden="true">
+                                        <i class="w-icon-long-arrow-left"></i>
+                                    </span>
+                                </a>
                             </li>
                         @endforeach
                     </ul>

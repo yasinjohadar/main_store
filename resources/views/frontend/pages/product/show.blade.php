@@ -13,10 +13,10 @@
 
 
 @section('content')
-    @include('frontend.partials.product.breadcrumb')
-
     <div class="page-content store-product-page__content">
         <div class="container">
+            @include('frontend.partials.product.breadcrumb')
+
             <div class="store-product-layout-switcher mb-4">
                 <span class="store-product-layout-switcher__icon"><i class="w-icon-category"></i></span>
                 <span class="store-product-layout-switcher__label">تخطيط الصفحة:</span>

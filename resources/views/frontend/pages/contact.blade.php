@@ -9,13 +9,11 @@
 @endpush
 
 @section('content')
-    @include('frontend.partials.page.page-header', [
-        'title' => 'اتصل بنا',
-        'eyebrow' => 'تواصل معنا',
-        'subtitle' => 'نحن هنا لمساعدتك',
-        'icon' => 'w-icon-envelop',
-        'breadcrumbItems' => [['label' => 'اتصل بنا']],
-    ])
+    <x-frontend.page-head
+        title="اتصل بنا"
+        subtitle="نحن هنا لمساعدتك — تواصل معنا عبر النموذج أو قنوات الدعم أدناه"
+        :breadcrumb-items="[['label' => 'اتصل بنا']]"
+    />
 
     @include('frontend.partials.pages.contact-content')
 @endsection
