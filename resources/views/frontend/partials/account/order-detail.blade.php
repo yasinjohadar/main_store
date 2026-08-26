@@ -8,6 +8,16 @@
         ])
 
         <div class="account-panel__body">
+            @if($order->tracking_number)
+                <div class="account-alert account-alert--info mb-4">
+                    <i class="w-icon-truck"></i>
+                    رقم التتبع: <strong>{{ $order->tracking_number }}</strong>
+                    @if($order->tracking_carrier)
+                        ({{ $order->tracking_carrier }})
+                    @endif
+                </div>
+            @endif
+
             <div class="account-table-wrap mb-5">
                 <table class="account-table account-order-detail-table">
                     <thead>

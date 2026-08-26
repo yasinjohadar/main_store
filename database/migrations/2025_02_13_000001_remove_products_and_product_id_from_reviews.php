@@ -20,6 +20,12 @@ return new class extends Migration
             
             // Check if the foreign key exists before dropping it
             if (Schema::hasColumn('reviews', 'product_id')) {
+                // Drop the index first: on SQLite, dropping a column does not clean up
+                // indexes that reference it, which corrupts later schema rebuilds.
+                if (Schema::hasIndex('reviews', 'reviews_product_id_index')) {
+                    $table->dropIndex('reviews_product_id_index');
+                }
+
                 $table->dropColumn('product_id');
             }
         });

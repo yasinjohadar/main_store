@@ -29,6 +29,7 @@ class ProductController extends Controller
             'attributes.values',
             'variants.attributeValues.attribute',
             'reviews',
+            'bundleItems.itemProduct',
         ])
             ->withAvg('reviews', 'rating')
             ->where('slug', $slug)

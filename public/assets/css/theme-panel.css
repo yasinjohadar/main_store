@@ -1,0 +1,316 @@
+/*
+ * لوحة إعدادات العرض (theme-panel)
+ *
+ * كل الألوان مبنية على متغيّرات قالب Ynex (--custom-white, --default-border,
+ * --default-text-color, --text-muted, --primary-rgb, --light-rgb) لذلك تتبع
+ * اللوحة الوضع الفاتح والداكن تلقائياً دون قواعد منفصلة لكل وضع.
+ */
+
+.theme-panel {
+    width: 22rem;
+    max-width: 88vw;
+    border: 0;
+    background-color: var(--custom-white);
+    color: var(--default-text-color);
+}
+
+/* —— الرأس —— */
+.theme-panel .tp-header {
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--default-border);
+}
+
+.theme-panel .tp-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--default-text-color);
+}
+
+.theme-panel .tp-subtitle {
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.theme-panel .tp-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-panel .tp-close svg {
+    width: 1.05rem;
+    height: 1.05rem;
+}
+
+.theme-panel .tp-close:hover {
+    border-color: var(--default-border);
+    background-color: rgba(var(--light-rgb), 0.6);
+    color: var(--default-text-color);
+}
+
+/* —— الجسم —— */
+.theme-panel .tp-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1.125rem 1.25rem 1.5rem;
+}
+
+/* —— بطاقة إعداد —— */
+/*
+ * البطاقة تستخدم --default-background لا --custom-white: في الوضع الداكن
+ * تصبح --custom-white هي لون خلفية الصفحة نفسها فتذوب البطاقة في اللوحة،
+ * أما --default-background فترتفع درجة واحدة في كلا الوضعين
+ * (‎#f8fafd فاتحاً، rgba(255,255,255,.05) داكناً).
+ */
+.theme-panel .tp-card {
+    padding: 0.9375rem;
+    border: 1px solid var(--default-border);
+    border-radius: 0.75rem;
+    background-color: var(--default-background);
+}
+
+.theme-panel .tp-card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.875rem;
+}
+
+.theme-panel .tp-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 0.625rem;
+    background-color: rgba(var(--primary-rgb), 0.1);
+    color: rgb(var(--primary-rgb));
+}
+
+.theme-panel .tp-card-icon svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+.theme-panel .tp-card-titles {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+    min-width: 0;
+}
+
+.theme-panel .tp-card-titles strong {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--default-text-color);
+}
+
+.theme-panel .tp-card-titles small {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+}
+
+/* —— أزرار الخيارات —— */
+.theme-panel .tp-options {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.theme-panel .tp-options-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.theme-panel .tp-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.75rem 0.5rem;
+    border: 1px solid var(--default-border);
+    border-radius: 0.625rem;
+    background-color: var(--custom-white);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-panel .tp-option svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+.theme-panel .tp-option:hover {
+    border-color: rgba(var(--primary-rgb), 0.45);
+    color: var(--default-text-color);
+}
+
+.theme-panel .tp-option.is-active {
+    border-color: rgb(var(--primary-rgb));
+    background-color: rgba(var(--primary-rgb), 0.08);
+    color: rgb(var(--primary-rgb));
+    box-shadow: 0 0 0 1px rgba(var(--primary-rgb), 0.35) inset;
+}
+
+.theme-panel .tp-option:focus-visible {
+    outline: 2px solid rgba(var(--primary-rgb), 0.5);
+    outline-offset: 2px;
+}
+
+/* —— عيّنات اللون —— */
+.theme-panel .tp-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-panel .tp-swatch {
+    position: relative;
+    width: 2.125rem;
+    height: 2.125rem;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 0.625rem;
+    background-color: rgb(var(--tp-swatch));
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-panel .tp-swatch:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(var(--tp-swatch), 0.45);
+}
+
+.theme-panel .tp-swatch.is-active {
+    border-color: var(--custom-white);
+    box-shadow: 0 0 0 2px rgb(var(--tp-swatch));
+}
+
+/* علامة الاختيار داخل العيّنة النشطة */
+.theme-panel .tp-swatch.is-active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 0.375rem;
+    height: 0.6875rem;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: translateY(-1px) rotate(45deg);
+}
+
+.theme-panel .tp-swatch:focus-visible {
+    outline: 2px solid rgba(var(--primary-rgb), 0.6);
+    outline-offset: 2px;
+}
+
+/*
+ * منتقي اللون المخصّص: custom.js يبني زراً داخل .theme-container-primary
+ * وحاوية Pickr داخل .pickr-container-primary. نُخفي الزر المُولَّد ونُظهر
+ * زر Pickr نفسه بحجم بقية العيّنات.
+ */
+.theme-panel .tp-swatch-custom {
+    position: relative;
+    width: 2.125rem;
+    height: 2.125rem;
+}
+
+.theme-panel .tp-swatch-custom .theme-container-primary {
+    display: none;
+}
+
+.theme-panel .tp-swatch-custom .pickr-container-primary p {
+    margin: 0;
+}
+
+.theme-panel .tp-swatch-custom .pickr {
+    width: 100%;
+    height: 100%;
+}
+
+.theme-panel .tp-swatch-custom .pcr-button {
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 0.625rem;
+    transition: transform 0.2s ease;
+}
+
+.theme-panel .tp-swatch-custom .pcr-button:hover {
+    transform: translateY(-2px);
+}
+
+/* لوحة Pickr المنسدلة تُقطع داخل الـ offcanvas بدون هذا */
+.theme-panel .pcr-app {
+    z-index: 1060;
+}
+
+/* —— زر إعادة الضبط —— */
+.theme-panel .tp-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.125rem;
+    padding: 0.6875rem 1rem;
+    border: 1px solid rgba(var(--danger-rgb), 0.35);
+    border-radius: 0.625rem;
+    background-color: transparent;
+    color: rgb(var(--danger-rgb));
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-panel .tp-reset svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.theme-panel .tp-reset:hover {
+    border-color: rgb(var(--danger-rgb));
+    background-color: rgba(var(--danger-rgb), 0.08);
+}
+
+.theme-panel .tp-reset:focus-visible {
+    outline: 2px solid rgba(var(--danger-rgb), 0.5);
+    outline-offset: 2px;
+}
+
+/*
+ * عناصر Ynex الأصلية: مخفية بصرياً لكن باقية في الـ DOM لأن
+ * custom-switcher.min.js و custom.js يربطان الأحداث عليها بدون فحص null.
+ * لا تستخدم display:none على الحاوية وحدها فقط — نُبقيها خارج التدفّق
+ * أيضاً حتى لا تؤثّر على تمرير اللوحة.
+ */
+.theme-panel .tp-legacy {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    pointer-events: none;
+    visibility: hidden;
+}

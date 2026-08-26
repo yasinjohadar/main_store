@@ -22,6 +22,7 @@ class Coupon extends Model
         'starts_at',
         'expires_at',
         'applicable_to',
+        'referrer_user_id',
     ];
 
     protected $casts = [
@@ -140,6 +141,11 @@ class Coupon extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'coupon_category');
+    }
+
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referrer_user_id');
     }
 
     /**

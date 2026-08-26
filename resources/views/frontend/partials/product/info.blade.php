@@ -53,13 +53,35 @@
             <hr class="product-divider">
 
             <div class="product-price store-product-info__price">
-                @if($product->has_discount)
+                @if(auth()->user()?->is_wholesale_customer && $product->wholesale_price !== null)
+                    <ins class="new-price">{{ number_format($product->priceFor(auth()->user()), 2) }} ر.س</ins>
+                    <span class="store-product-info__chip store-product-info__chip--success">سعر الجملة</span>
+                @elseif($product->has_discount)
                     <ins class="new-price">{{ number_format($product->effective_price, 2) }} ر.س</ins>
                     <del class="old-price">{{ number_format($product->compare_at_price, 2) }} ر.س</del>
                 @else
                     <ins class="new-price">{{ number_format($product->effective_price, 2) }} ر.س</ins>
                 @endif
             </div>
+
+            @if($product->is_bundle && $product->bundleItems->isNotEmpty())
+                <div class="store-product-info__bundle-items mb-3">
+                    <h6 class="mb-2">هذه الحزمة تشمل:</h6>
+                    <ul class="list-unstyled mb-2">
+                        @foreach($product->bundleItems as $bundleItem)
+                            @if($bundleItem->itemProduct)
+                                <li>
+                                    <a href="{{ route('frontend.product.show', $bundleItem->itemProduct->slug) }}">{{ $bundleItem->itemProduct->name }}</a>
+                                    × {{ $bundleItem->quantity }}
+                                </li>
+                            @endif
+                        @endforeach
+                    </ul>
+                    @if($product->bundle_savings_percent)
+                        <span class="store-product-info__chip store-product-info__chip--sale">وفّر {{ $product->bundle_savings_percent }}%</span>
+                    @endif
+                </div>
+            @endif
 
             <div class="store-product-info__rating">
                 <div class="ratings-container">

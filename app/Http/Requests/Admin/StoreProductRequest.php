@@ -24,6 +24,7 @@ class StoreProductRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
             'compare_at_price' => ['nullable', 'numeric', 'min:0'],
+            'wholesale_price' => ['nullable', 'numeric', 'min:0'],
             'cost' => ['nullable', 'numeric', 'min:0'],
             'stock_quantity' => ['nullable', 'integer', 'min:0'],
             'track_quantity' => ['boolean'],
@@ -36,6 +37,7 @@ class StoreProductRequest extends FormRequest
             'allow_reviews' => ['boolean'],
             'reviews_require_approval' => ['nullable', 'boolean'],
             'is_digital' => ['boolean'],
+            'is_bundle' => ['boolean'],
             'digital_download_limit' => ['nullable', 'integer', 'min:1'],
             'digital_download_expiry_days' => ['nullable', 'integer', 'min:1'],
             'digital_files' => ['nullable', 'array'],
@@ -79,6 +81,7 @@ class StoreProductRequest extends FormRequest
             'is_featured' => $this->boolean('is_featured'),
             'is_visible' => $this->boolean('is_visible'),
             'is_digital' => $this->boolean('is_digital'),
+            'is_bundle' => $this->boolean('is_bundle'),
             'allow_reviews' => $this->boolean('allow_reviews'),
             'reviews_require_approval' => $reviewsRequireApproval,
         ]);

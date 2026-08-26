@@ -19,43 +19,55 @@
     @endif
 
     <div class="main-content app-content">
-        <div class="container-fluid">
-            <div class="page-header d-flex justify-content-between align-items-center my-4">
-                <h5 class="page-title mb-0">طلب مرتجع #{{ $orderReturn->id }}</h5>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('admin.orders.show', $orderReturn->order) }}" class="btn btn-secondary">عرض الطلب الأصلي</a>
-                    <a href="{{ route('admin.order-returns.index') }}" class="btn btn-outline-secondary">قائمة طلبات المرتجع</a>
+        <div class="container-fluid admin-page-shell">
+
+            <div class="admin-page-banner">
+                <div class="admin-page-banner-main">
+                    <span class="admin-page-banner-icon"><i class="las la-undo-alt"></i></span>
+                    <div class="admin-page-banner-text">
+                        <h1>طلب مرتجع #{{ $orderReturn->id }}</h1>
+                        <p>
+                            @if($orderReturn->status === 'pending')
+                                <span class="admin-badge admin-badge-warning">قيد الانتظار</span>
+                            @elseif($orderReturn->status === 'approved')
+                                <span class="admin-badge admin-badge-success">معتمد</span>
+                            @else
+                                <span class="admin-badge admin-badge-danger">مرفوض</span>
+                            @endif
+                        </p>
+                    </div>
+                </div>
+                <div class="admin-page-banner-actions">
+                    <a href="{{ route('admin.orders.show', $orderReturn->order) }}" class="admin-btn admin-btn-secondary">
+                        <i class="las la-shopping-bag"></i>
+                        عرض الطلب الأصلي
+                    </a>
+                    <a href="{{ route('admin.order-returns.index') }}" class="admin-btn admin-btn-light">
+                        <i class="las la-arrow-right"></i>
+                        قائمة طلبات المرتجع
+                    </a>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-lg-8">
-                    <div class="card mb-3">
+                    <div class="admin-page-card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">الطلب الأصلي</h6>
-                            <a href="{{ route('admin.orders.show', $orderReturn->order) }}">{{ $orderReturn->order->order_number }}</a>
+                            <div class="card-title mb-0">الطلب الأصلي</div>
+                            <a href="{{ route('admin.orders.show', $orderReturn->order) }}" class="admin-user-link">{{ $orderReturn->order->order_number }}</a>
                         </div>
                         <div class="card-body">
-                            <p class="mb-1"><strong>الحالة:</strong>
-                                @if($orderReturn->status === 'pending')
-                                    <span class="badge bg-warning text-dark">قيد الانتظار</span>
-                                @elseif($orderReturn->status === 'approved')
-                                    <span class="badge bg-success">معتمد</span>
-                                @else
-                                    <span class="badge bg-danger">مرفوض</span>
-                                @endif
-                            </p>
                             <p class="mb-1"><strong>السبب:</strong> {{ $orderReturn->reason ?: '—' }}</p>
                             <p class="mb-1"><strong>طالب المرتجع:</strong> {{ $orderReturn->requestedByUser->name ?? '—' }}</p>
                             <p class="mb-0"><strong>تاريخ الطلب:</strong> {{ $orderReturn->requested_at ? $orderReturn->requested_at->format('Y-m-d H:i') : $orderReturn->created_at->format('Y-m-d H:i') }}</p>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header"><h6 class="mb-0">بنود المرتجع</h6></div>
-                        <div class="card-body p-0">
-                            <table class="table table-striped mb-0">
-                                <thead class="table-light">
+                    <div class="admin-page-card">
+                        <div class="card-header"><div class="card-title">بنود المرتجع</div></div>
+                        <div class="admin-table-wrap">
+                            <table class="admin-data-table">
+                                <thead>
                                     <tr>
                                         <th>المنتج</th>
                                         <th>الكمية المرتجعة</th>
@@ -80,30 +92,30 @@
                 </div>
                 <div class="col-lg-4">
                     @if($orderReturn->status === 'pending')
-                        <div class="card mb-3">
-                            <div class="card-header"><h6 class="mb-0">اعتماد / رفض</h6></div>
+                        <div class="admin-page-card mb-3">
+                            <div class="card-header"><div class="card-title">اعتماد / رفض</div></div>
                             <div class="card-body">
                                 <form action="{{ route('admin.order-returns.approve', $orderReturn) }}" method="POST" class="mb-3">
                                     @csrf
                                     <div class="mb-2">
-                                        <label class="form-label">ملاحظة إدارية (اختياري)</label>
+                                        <label class="admin-form-label">ملاحظة إدارية (اختياري)</label>
                                         <textarea name="admin_note" rows="2" class="form-control" placeholder="ملاحظة عند الاعتماد">{{ old('admin_note', $orderReturn->admin_note) }}</textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-success w-100">اعتماد طلب المرتجع واسترجاع المخزون</button>
+                                    <button type="submit" class="admin-btn admin-btn-primary w-100">اعتماد طلب المرتجع واسترجاع المخزون</button>
                                 </form>
                                 <form action="{{ route('admin.order-returns.reject', $orderReturn) }}" method="POST">
                                     @csrf
                                     <div class="mb-2">
-                                        <label class="form-label">ملاحظة (اختياري)</label>
+                                        <label class="admin-form-label">ملاحظة (اختياري)</label>
                                         <textarea name="admin_note" rows="2" class="form-control" placeholder="سبب الرفض">{{ old('admin_note') }}</textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-danger w-100">رفض طلب المرتجع</button>
+                                    <button type="submit" class="admin-btn admin-btn-danger w-100">رفض طلب المرتجع</button>
                                 </form>
                             </div>
                         </div>
                     @else
-                        <div class="card mb-3">
-                            <div class="card-header"><h6 class="mb-0">معالجة الطلب</h6></div>
+                        <div class="admin-page-card mb-3">
+                            <div class="card-header"><div class="card-title">معالجة الطلب</div></div>
                             <div class="card-body">
                                 @if($orderReturn->processed_at)
                                     <p class="mb-1"><strong>تاريخ المعالجة:</strong> {{ $orderReturn->processed_at->format('Y-m-d H:i') }}</p>

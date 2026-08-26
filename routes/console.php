@@ -29,4 +29,8 @@ Schedule::job(new \App\Jobs\SeoAuditJob())
     ->at('03:00')
     ->withoutOverlapping();
 
+Schedule::job(new \App\Jobs\AbandonedCartRecoveryJob())
+    ->hourly()
+    ->withoutOverlapping();
+
 // Zoom sync command removed

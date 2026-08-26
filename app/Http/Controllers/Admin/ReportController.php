@@ -39,6 +39,8 @@ class ReportController extends Controller
             'total_discounts' => $totalDiscounts,
         ];
 
+        $comparison = $this->buildPeriodComparison($startDate, $endDate, $kpis);
+
         $salesSeries = $this->buildSalesSeries($orders, $startDate, $endDate);
 
         $topProducts = $this->buildTopProducts($startDate, $endDate);
@@ -54,11 +56,60 @@ class ReportController extends Controller
         return view('admin.pages.reports.dashboard', [
             'filters' => $filters,
             'kpis' => $kpis,
+            'comparison' => $comparison,
             'salesSeries' => $salesSeries,
             'topProducts' => $topProducts,
             'couponSummary' => $couponSummary,
             'taxSummary' => $taxSummary,
         ]);
+    }
+
+    /**
+     * Compare each KPI against the immediately preceding period of equal length.
+     *
+     * @return array<string, array{previous: float, change_percent: ?float}>
+     */
+    private function buildPeriodComparison(Carbon $start, Carbon $end, array $kpis): array
+    {
+        $periodDays = $start->diffInDays($end) + 1;
+        $prevEnd = $start->copy()->subSecond();
+        $prevStart = $prevEnd->copy()->subDays($periodDays - 1)->startOfDay();
+
+        $prevOrders = Order::with('status')
+            ->whereBetween('created_at', [$prevStart, $prevEnd])
+            ->whereHas('status', fn ($q) => $q->whereIn('slug', ['processing', 'completed']))
+            ->get();
+
+        $prevTotalSales = (float) $prevOrders->sum('total');
+        $prevOrdersCount = $prevOrders->count();
+        $prevAverageOrderValue = $prevOrdersCount > 0 ? $prevTotalSales / $prevOrdersCount : 0.0;
+        $prevTotalDiscounts = (float) $prevOrders->sum('discount_amount');
+
+        $previous = [
+            'total_sales' => $prevTotalSales,
+            'orders_count' => $prevOrdersCount,
+            'average_order_value' => $prevAverageOrderValue,
+            'total_discounts' => $prevTotalDiscounts,
+        ];
+
+        $comparison = [];
+        foreach ($kpis as $key => $currentValue) {
+            $comparison[$key] = [
+                'previous' => $previous[$key],
+                'change_percent' => $this->percentChange((float) $currentValue, (float) $previous[$key]),
+            ];
+        }
+
+        return $comparison;
+    }
+
+    private function percentChange(float $current, float $previous): ?float
+    {
+        if ($previous == 0.0) {
+            return $current > 0 ? null : 0.0;
+        }
+
+        return round((($current - $previous) / $previous) * 100, 1);
     }
 
     private function resolveDateRange(Request $request): array

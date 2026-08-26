@@ -98,6 +98,8 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
     Route::post('products/{product}/duplicate', [ProductController::class, 'duplicate'])->name('products.duplicate');
     Route::resource('products', ProductController::class);
     Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
+    Route::post('products/{product}/bundle-items', [ProductController::class, 'addBundleItem'])->name('products.bundle-items.store');
+    Route::delete('products/{product}/bundle-items/{bundleItem}', [ProductController::class, 'removeBundleItem'])->name('products.bundle-items.destroy');
 
     // Product attributes (for variants: color, size, etc.)
     Route::resource('attributes', ProductAttributeController::class)->except(['show']);
@@ -195,6 +197,7 @@ Route::middleware(['auth', 'check.user.active'])->prefix('admin')->name('admin.'
     Route::delete('customers/{customer}/addresses/{address}', [CustomerController::class, 'destroyAddress'])->name('customers.addresses.destroy');
     Route::post('customers/{customer}/notes', [CustomerController::class, 'storeNote'])->name('customers.notes.store');
     Route::post('customers/{customer}/loyalty/adjust', [CustomerController::class, 'adjustLoyaltyPoints'])->name('customers.loyalty.adjust');
+    Route::post('customers/{customer}/toggle-wholesale', [CustomerController::class, 'toggleWholesale'])->name('customers.toggle-wholesale');
 
     // Loyalty (points) settings
     Route::get('loyalty/settings', [\App\Http\Controllers\Admin\LoyaltySettingsController::class, 'index'])->name('loyalty.settings.index');

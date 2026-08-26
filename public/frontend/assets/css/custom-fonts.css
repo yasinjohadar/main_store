@@ -3529,62 +3529,48 @@ h6,
     min-height: 11.5rem;
     padding: 1.85rem 1.5rem 1.65rem;
     text-align: center;
-    background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-    border: 1px solid #e2e8f0;
+    background:
+        linear-gradient(180deg, #fff 0%, #f8fafc 100%) padding-box,
+        linear-gradient(140deg,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.4) 0%,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.05) 38%,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.05) 62%,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.4) 100%) border-box;
+    border: 1.5px solid transparent;
     border-radius: 1.15rem;
     overflow: hidden;
     box-shadow: 0 6px 22px rgba(15, 23, 42, 0.05);
     transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         box-shadow 0.4s ease,
-        border-color 0.4s ease;
+        background 0.4s ease;
     animation: homeFeatureIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--feature-delay, 0s);
 }
 
-.home-feature-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 1.35rem;
-    left: 1.35rem;
-    height: 3px;
-    border-radius: 0 0 0.35rem 0.35rem;
-    background: linear-gradient(90deg, transparent 0%, var(--feature-accent, var(--store-primary, #336699)) 50%, transparent 100%);
-    opacity: 0.9;
-    pointer-events: none;
-}
-
-.home-feature-card::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    right: 1.35rem;
-    left: 1.35rem;
-    height: 3px;
-    border-radius: 0.35rem 0.35rem 0 0;
-    background: linear-gradient(90deg, transparent 0%, var(--feature-accent, var(--store-primary, #336699)) 50%, transparent 100%);
-    opacity: 0.9;
-    pointer-events: none;
-}
-
+/*
+ * الأربعة ألوان مشتقّة من نفس اللون الأساسي للمتجر (--store-primary) بدرجات
+ * متتالية (0%، 12%، 18%، 25% أسود) بدل أربعة ألوان عشوائية غير مرتبطة
+ * بهوية المتجر. النتيجة: عائلة ألوان واحدة متجانسة "رسمية" مع تمايز كافٍ
+ * بين البطاقات. القيم من نفس المتغيرات التي تحسبها SiteTheme::variants().
+ */
 .home-feature-card--blue {
     --feature-accent: var(--store-primary, #336699);
     --feature-accent-rgb: var(--store-primary-rgb, 51, 102, 153);
 }
 
 .home-feature-card--teal {
-    --feature-accent: #0f766e;
-    --feature-accent-rgb: 15, 118, 110;
+    --feature-accent: var(--store-primary-mid, var(--store-primary, #336699));
+    --feature-accent-rgb: var(--store-primary-rgb, 51, 102, 153);
 }
 
 .home-feature-card--amber {
-    --feature-accent: #d97706;
-    --feature-accent-rgb: 217, 119, 6;
+    --feature-accent: var(--store-primary-dark, var(--store-primary, #336699));
+    --feature-accent-rgb: var(--store-primary-rgb, 51, 102, 153);
 }
 
 .home-feature-card--violet {
-    --feature-accent: #7c3aed;
-    --feature-accent-rgb: 124, 58, 237;
+    --feature-accent: var(--store-primary-deep, var(--store-primary, #336699));
+    --feature-accent-rgb: var(--store-primary-rgb, 51, 102, 153);
 }
 
 .home-feature-card__icon-wrap {
@@ -3628,24 +3614,9 @@ h6,
     width: 100%;
 }
 
-.home-feature-card--blue .home-feature-card__icon-wrap {
-    color: var(--store-primary, #336699);
-    background: rgba(var(--store-primary-rgb, 51, 102, 153), 0.08);
-}
-
-.home-feature-card--teal .home-feature-card__icon-wrap {
-    color: #0f766e;
-    background: rgba(15, 118, 110, 0.08);
-}
-
-.home-feature-card--amber .home-feature-card__icon-wrap {
-    color: #d97706;
-    background: rgba(217, 119, 6, 0.08);
-}
-
-.home-feature-card--violet .home-feature-card__icon-wrap {
-    color: #7c3aed;
-    background: rgba(124, 58, 237, 0.08);
+.home-feature-card__icon-wrap {
+    color: var(--feature-accent, var(--store-primary, #336699));
+    background: rgba(var(--feature-accent-rgb, var(--store-primary-rgb, 51, 102, 153)), 0.08);
 }
 
 .home-feature-card__title {
@@ -3675,17 +3646,16 @@ h6,
 .home-feature-card:hover,
 .home-feature-card:focus-within {
     transform: translateY(-5px);
-    border-color: rgba(var(--feature-accent-rgb, 51, 102, 153), 0.28);
+    background:
+        linear-gradient(180deg, #fff 0%, #f8fafc 100%) padding-box,
+        linear-gradient(140deg,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.9) 0%,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.3) 38%,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.3) 62%,
+            rgba(var(--feature-accent-rgb, 51, 102, 153), 0.9) 100%) border-box;
     box-shadow:
         0 14px 32px rgba(15, 23, 42, 0.08),
-        0 0 0 1px rgba(var(--feature-accent-rgb, 51, 102, 153), 0.06);
-}
-
-.home-feature-card:hover::before,
-.home-feature-card:focus-within::before,
-.home-feature-card:hover::after,
-.home-feature-card:focus-within::after {
-    opacity: 1;
+        0 0 0 4px rgba(var(--feature-accent-rgb, 51, 102, 153), 0.08);
 }
 
 .home-feature-card:hover .home-feature-card__icon-wrap,
@@ -3703,28 +3673,10 @@ h6,
     transform: scale(1.08);
 }
 
-.home-feature-card--blue:hover .home-feature-card__icon-wrap,
-.home-feature-card--blue:focus-within .home-feature-card__icon-wrap {
+.home-feature-card:hover .home-feature-card__icon-wrap,
+.home-feature-card:focus-within .home-feature-card__icon-wrap {
     color: #fff;
-    background: var(--store-primary, #336699);
-}
-
-.home-feature-card--teal:hover .home-feature-card__icon-wrap,
-.home-feature-card--teal:focus-within .home-feature-card__icon-wrap {
-    color: #fff;
-    background: #0f766e;
-}
-
-.home-feature-card--amber:hover .home-feature-card__icon-wrap,
-.home-feature-card--amber:focus-within .home-feature-card__icon-wrap {
-    color: #fff;
-    background: #d97706;
-}
-
-.home-feature-card--violet:hover .home-feature-card__icon-wrap,
-.home-feature-card--violet:focus-within .home-feature-card__icon-wrap {
-    color: #fff;
-    background: #7c3aed;
+    background: var(--feature-accent, var(--store-primary, #336699));
 }
 
 .home-feature-card:hover .home-feature-card__shine {
@@ -4349,13 +4301,6 @@ h6,
 /* ── Home deals + bestsellers ── */
 .home-deals {
     position: relative;
-    padding: 1.75rem;
-    background: linear-gradient(165deg, #eef2f7 0%, #f8fafc 52%, #f1f5f9 100%);
-    border: 1px solid #cbd5e1;
-    border-radius: 2rem;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.85),
-        0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
 .home-deals-card,
@@ -4874,11 +4819,6 @@ h6,
 }
 
 @media (max-width: 767px) {
-    .home-deals {
-        padding: 1.1rem;
-        border-radius: 1.35rem;
-    }
-
     .home-deals-card__header,
     .home-bestsellers-card__header {
         padding: 1.2rem 1.4rem;

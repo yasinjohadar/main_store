@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\OrderPlaced;
 use App\Jobs\SendOrderEmailJob;
+use App\Services\SiteSettingsService;
 
 class SendAdminNewOrderEmail
 {

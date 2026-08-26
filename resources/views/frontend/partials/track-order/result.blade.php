@@ -34,6 +34,17 @@
                 <strong class="store-track-order-summary__value">{{ $paymentMethodLabel }}</strong>
             </div>
         @endif
+        @if($order->tracking_number)
+            <div class="store-track-order-summary__item">
+                <span class="store-track-order-summary__label">رقم التتبع</span>
+                <strong class="store-track-order-summary__value">
+                    {{ $order->tracking_number }}
+                    @if($order->tracking_carrier)
+                        <span class="text-muted">({{ $order->tracking_carrier }})</span>
+                    @endif
+                </strong>
+            </div>
+        @endif
     </div>
 
     @if(! $isCancelled && $statusTimeline->isNotEmpty())

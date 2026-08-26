@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             HomeSlideSeeder::class,
             HomePageSeeder::class,
+            OrderEmailTemplateSeeder::class,
+            MarketingEmailTemplateSeeder::class,
         ]);
 
         User::factory()->create([

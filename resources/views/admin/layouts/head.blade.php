@@ -35,3 +35,8 @@
 <link rel="stylesheet" href="{{ asset('assets/css/admin-data-table.css') }}" media="all">
 <link rel="stylesheet" href="{{ asset('assets/css/admin-record-detail.css') }}" media="all">
 <link rel="stylesheet" href="{{ asset('assets/css/admin-sidebar.css') }}" media="all">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-header.css') }}" media="all">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-pages.css') }}" media="all">
+
+<!-- Theme Panel (إعدادات العرض) Css -->
+<link rel="stylesheet" href="{{ asset('assets/css/theme-panel.css') }}" media="all">

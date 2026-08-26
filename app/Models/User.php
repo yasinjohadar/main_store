@@ -36,6 +36,8 @@ class User extends Authenticatable
         'last_login_ip',
         'last_login_user_agent',
         'loyalty_points_balance',
+        'stripe_customer_id',
+        'is_wholesale_customer',
     ];
 
     /**
@@ -60,6 +62,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'loyalty_points_balance' => 'integer',
+            'is_wholesale_customer' => 'boolean',
         ];
     }
 
@@ -95,11 +98,6 @@ class User extends Authenticatable
     public function reviewReplies()
     {
         return $this->hasMany(ReviewReply::class);
-    }
-
-    public function courseEnrollments()
-    {
-        return $this->hasMany(CourseEnrollment::class);
     }
 
     public function addresses()

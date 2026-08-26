@@ -1,0 +1,442 @@
+/* ==========================================================================
+   هيدر الإدارة — شريط البحث، أيقونات الأدوات، وزرّ طيّ الشريط الجانبي
+
+   يبني فوق قالب Ynex ولا يستبدله (نفس styles.min.css المستخدم في القالب).
+   كل شيء هنا بنطاق .admin-portal فقط.
+
+   الوضع الليلي/النهاري: الألوان من رموز القالب (--header-prime-color،
+   --default-border، --default-text-color، --primary-rgb) فتقلب تلقائياً،
+   مع تجاوزات صريحة لحالات الهيدر الملوّن/الداكن حيث لا تكفي الرموز.
+   ========================================================================== */
+
+/* ==========================================================================
+   1) شريط البحث
+   ========================================================================== */
+
+.admin-portal .hr-search {
+    position: relative;
+}
+
+.admin-portal .hr-search .hr-search__input {
+    border-radius: 3px !important;
+    height: 40px;
+    padding-inline: 1.15rem 2.75rem;
+    border: 1px solid var(--default-border);
+    background: var(--default-body-bg-color);
+    color: var(--default-text-color);
+    transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.22s ease,
+                background 0.22s ease,
+                box-shadow 0.22s ease;
+}
+
+.admin-portal .hr-search .hr-search__input::placeholder {
+    color: var(--text-muted);
+    transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-portal .hr-search:hover .hr-search__input:not(:focus) {
+    border-color: rgba(var(--primary-rgb), 0.35);
+}
+
+.admin-portal .hr-search .hr-search__input:focus {
+    width: 420px;
+    border-color: rgb(var(--primary-rgb));
+    background: var(--custom-white);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.14);
+    outline: 0;
+}
+
+.admin-portal .hr-search .hr-search__input:focus::placeholder {
+    opacity: 0.55;
+    transform: translateX(-4px);
+}
+
+.admin-portal .hr-search .hr-search__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0;
+    padding-inline: 0.75rem;
+    border: 0 !important;
+    background-color: transparent;
+    color: var(--text-muted);
+    transition: color 0.22s ease;
+}
+
+.admin-portal .hr-search .hr-search__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: none;
+    stroke: currentColor;
+    transition: transform 0.28s cubic-bezier(0.34, 1.5, 0.64, 1), color 0.22s ease;
+}
+
+.admin-portal .hr-search:focus-within .hr-search__btn,
+.admin-portal .hr-search .hr-search__btn:hover {
+    color: rgb(var(--primary-rgb));
+}
+
+.admin-portal .hr-search:focus-within .hr-search__icon {
+    transform: scale(1.12) rotate(-8deg);
+}
+
+.admin-portal .hr-search .hr-search__btn:active .hr-search__icon {
+    transform: scale(0.92);
+}
+
+.admin-portal .hr-search .hr-search__underline {
+    position: absolute;
+    inset-block-end: -1px;
+    inset-inline-start: 0;
+    width: 350px;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(var(--primary-rgb));
+    transform: scaleX(0);
+    transform-origin: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.22s ease,
+                width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.admin-portal .hr-search:focus-within .hr-search__underline {
+    width: 420px;
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+[data-header-styles="dark"] .admin-portal .hr-search .hr-search__input,
+[data-header-styles="color"] .admin-portal .hr-search .hr-search__input,
+[data-header-styles="gradient"] .admin-portal .hr-search .hr-search__input {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+[data-header-styles="dark"] .admin-portal .hr-search .hr-search__input::placeholder,
+[data-header-styles="color"] .admin-portal .hr-search .hr-search__input::placeholder,
+[data-header-styles="gradient"] .admin-portal .hr-search .hr-search__input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+[data-header-styles="dark"] .admin-portal .hr-search .hr-search__input:focus,
+[data-header-styles="color"] .admin-portal .hr-search .hr-search__input:focus,
+[data-header-styles="gradient"] .admin-portal .hr-search .hr-search__input:focus {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+[data-header-styles="dark"] .admin-portal .hr-search .hr-search__btn,
+[data-header-styles="color"] .admin-portal .hr-search .hr-search__btn,
+[data-header-styles="gradient"] .admin-portal .hr-search .hr-search__btn {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-header-styles="dark"] .admin-portal .hr-search:focus-within .hr-search__btn,
+[data-header-styles="color"] .admin-portal .hr-search:focus-within .hr-search__btn,
+[data-header-styles="gradient"] .admin-portal .hr-search:focus-within .hr-search__btn {
+    color: #fff;
+}
+
+[data-header-styles="dark"] .admin-portal .hr-search .hr-search__underline,
+[data-header-styles="color"] .admin-portal .hr-search .hr-search__underline,
+[data-header-styles="gradient"] .admin-portal .hr-search .hr-search__underline {
+    background: #fff;
+}
+
+@media (max-width: 1400px) {
+    .admin-portal .hr-search .hr-search__input:focus {
+        width: 350px;
+    }
+
+    .admin-portal .hr-search:focus-within .hr-search__underline {
+        width: 350px;
+    }
+}
+
+/* ==========================================================================
+   2) أيقونات أدوات الهيدر
+   ========================================================================== */
+
+/*
+ * كل أداة تصبح زرّاً دائرياً: خلفية شفافة تظهر عند التمرير.
+ * نُبقي حشو القالب للتباعد الخارجي، ونرسم الدائرة بـ ::before حتى لا نغيّر
+ * أبعاد العنصر ولا نُزيح بقية الأدوات.
+ */
+.admin-portal .main-header-container .header-element .header-link {
+    position: relative;
+    isolation: isolate;
+    border-radius: 50%;
+}
+
+.admin-portal .main-header-container .header-element .header-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: auto;
+    border-radius: 50%;
+    background: rgba(var(--primary-rgb), 0.12);
+    opacity: 0;
+    scale: 0.6;
+    z-index: -1;
+    transition: opacity 0.22s ease, scale 0.26s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.admin-portal .main-header-container .header-element .header-link:hover::before,
+.admin-portal .main-header-container .header-element .header-link.show::before {
+    opacity: 1;
+    scale: 1;
+}
+
+.admin-portal .main-header-container .header-element .header-link:hover .header-link-icon.hr-hicon {
+    color: rgb(var(--primary-rgb));
+    transform: translateY(-1px);
+}
+
+.admin-portal .main-header-container .header-element .header-link .header-link-icon.hr-hicon {
+    transition: transform 0.26s cubic-bezier(0.34, 1.45, 0.64, 1), color 0.2s ease;
+}
+
+.admin-portal .main-header-container .header-element .header-link:active .header-link-icon.hr-hicon {
+    transform: scale(0.9);
+}
+
+.admin-portal .main-header-container .header-element .header-link.show .header-link-icon.hr-hicon {
+    color: rgb(var(--primary-rgb));
+}
+
+.admin-portal .main-header-container .header-element .header-link:focus-visible {
+    outline: 2px solid rgba(var(--primary-rgb), 0.55);
+    outline-offset: -2px;
+}
+
+/* القالب يُدوّر أيقونة إعدادات العرض بلا توقّف؛ نُوقفها ونجعل الدوران استجابةً للتمرير فقط */
+.admin-portal .switcher-icon .header-link-icon {
+    animation: none !important;
+}
+
+.admin-portal .switcher-icon:hover .header-link-icon.hr-hicon {
+    transform: rotate(90deg);
+}
+
+/* الجرس يرتجّ عند التمرير */
+@keyframes hr-bell-swing {
+    0%, 100% { transform: rotate(0deg); }
+    20%      { transform: rotate(-12deg); }
+    45%      { transform: rotate(9deg); }
+    70%      { transform: rotate(-5deg); }
+}
+
+.admin-portal .notifications-dropdown .header-link:hover .header-link-icon.hr-hicon,
+.admin-portal .messages-dropdown .header-link:hover .header-link-icon.hr-hicon {
+    transform: none;
+    transform-origin: top center;
+    animation: hr-bell-swing 0.6s ease;
+}
+
+/* صورة الملف الشخصي (أو حروف الاسم الاحتياطية): حلقة تظهر عند التمرير */
+.admin-portal .headerProfile-dropdown .header-link img,
+.admin-portal .headerProfile-dropdown .header-link svg.rounded-circle {
+    border: 2px solid transparent;
+    border-radius: 50%;
+    transition: border-color 0.22s ease, transform 0.26s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.admin-portal .headerProfile-dropdown .header-link:hover img,
+.admin-portal .headerProfile-dropdown .header-link.show img,
+.admin-portal .headerProfile-dropdown .header-link:hover svg.rounded-circle,
+.admin-portal .headerProfile-dropdown .header-link.show svg.rounded-circle {
+    border-color: rgb(var(--primary-rgb));
+    transform: scale(1.04);
+}
+
+/* الهيدر الداكن/الملوّن: الحلقة الشفافة بلون الواجهة لا تُرى */
+[data-header-styles="dark"] .admin-portal .main-header-container .header-element .header-link::before,
+[data-header-styles="color"] .admin-portal .main-header-container .header-element .header-link::before,
+[data-header-styles="gradient"] .admin-portal .main-header-container .header-element .header-link::before {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+[data-header-styles="dark"] .admin-portal .main-header-container .header-element .header-link:hover .header-link-icon.hr-hicon,
+[data-header-styles="color"] .admin-portal .main-header-container .header-element .header-link:hover .header-link-icon.hr-hicon,
+[data-header-styles="gradient"] .admin-portal .main-header-container .header-element .header-link:hover .header-link-icon.hr-hicon,
+[data-header-styles="dark"] .admin-portal .main-header-container .header-element .header-link.show .header-link-icon.hr-hicon,
+[data-header-styles="color"] .admin-portal .main-header-container .header-element .header-link.show .header-link-icon.hr-hicon,
+[data-header-styles="gradient"] .admin-portal .main-header-container .header-element .header-link.show .header-link-icon.hr-hicon {
+    color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-portal .hr-search .hr-search__input,
+    .admin-portal .hr-search .hr-search__icon,
+    .admin-portal .hr-search .hr-search__underline,
+    .admin-portal .main-header-container .header-link-icon.hr-hicon,
+    .admin-portal .main-header-container .header-element .header-link::before,
+    .admin-portal .headerProfile-dropdown .header-link img,
+    .admin-portal .headerProfile-dropdown .header-link svg.rounded-circle {
+        transition: none;
+        animation: none !important;
+    }
+
+    .admin-portal .hr-search .hr-search__input:focus {
+        width: 350px;
+    }
+
+    .admin-portal .main-header-container .header-element .header-link:hover .header-link-icon.hr-hicon,
+    .admin-portal .switcher-icon:hover .header-link-icon.hr-hicon {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   3) زرّ طيّ الشريط الجانبي (nav-toggle)
+   ========================================================================== */
+
+.admin-portal .hr-navtoggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    line-height: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.admin-portal .hr-navtoggle__box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    width: 2.375rem;
+    height: 2.375rem;
+    padding: 0.6875rem 0.625rem;
+    border: 1px solid rgba(var(--primary-rgb), 0.16);
+    border-radius: 0.75rem;
+    background: rgba(var(--primary-rgb), 0.08);
+    box-sizing: border-box;
+    transition: background 0.25s ease, border-color 0.25s ease,
+                transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1),
+                box-shadow 0.25s ease;
+}
+
+.admin-portal .hr-navtoggle__bar {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(var(--primary-rgb));
+    transition: width 0.28s cubic-bezier(0.34, 1.4, 0.64, 1),
+                background 0.25s ease;
+}
+
+.admin-portal .hr-navtoggle__bar:nth-child(1) { width: 100%; transition-delay: 0s; }
+.admin-portal .hr-navtoggle__bar:nth-child(2) { width: 58%; transition-delay: 0.04s; }
+.admin-portal .hr-navtoggle__bar:nth-child(3) { width: 78%; transition-delay: 0.08s; }
+
+.admin-portal .hr-navtoggle:hover .hr-navtoggle__box {
+    border-color: rgba(var(--primary-rgb), 0.32);
+    background: rgba(var(--primary-rgb), 0.14);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.18);
+}
+
+.admin-portal .hr-navtoggle:hover .hr-navtoggle__bar:nth-child(2),
+.admin-portal .hr-navtoggle:hover .hr-navtoggle__bar:nth-child(3) {
+    width: 100%;
+}
+
+.admin-portal .hr-navtoggle:active .hr-navtoggle__box {
+    transform: translateY(0) scale(0.96);
+    box-shadow: none;
+}
+
+.admin-portal .hr-navtoggle:focus-visible .hr-navtoggle__box {
+    outline: 2px solid rgba(var(--primary-rgb), 0.55);
+    outline-offset: 2px;
+}
+
+/* حالة «الشريط مطويّ»: الزرّ يمتلئ باللون الأساسي والأشرطة تبيضّ */
+[data-toggled="icon-overlay-close"] .admin-portal .hr-navtoggle__box,
+[data-toggled="close-menu-close"] .admin-portal .hr-navtoggle__box,
+[data-toggled="icon-text-close"] .admin-portal .hr-navtoggle__box,
+[data-toggled="double-menu-close"] .admin-portal .hr-navtoggle__box,
+[data-toggled="icon-click-closed"] .admin-portal .hr-navtoggle__box,
+[data-toggled="icon-hover-closed"] .admin-portal .hr-navtoggle__box,
+[data-toggled="detached-close"] .admin-portal .hr-navtoggle__box {
+    border-color: transparent;
+    background: rgb(var(--primary-rgb));
+    box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.35);
+}
+
+[data-toggled="icon-overlay-close"] .admin-portal .hr-navtoggle__bar,
+[data-toggled="close-menu-close"] .admin-portal .hr-navtoggle__bar,
+[data-toggled="icon-text-close"] .admin-portal .hr-navtoggle__bar,
+[data-toggled="double-menu-close"] .admin-portal .hr-navtoggle__bar,
+[data-toggled="icon-click-closed"] .admin-portal .hr-navtoggle__bar,
+[data-toggled="icon-hover-closed"] .admin-portal .hr-navtoggle__bar,
+[data-toggled="detached-close"] .admin-portal .hr-navtoggle__bar {
+    background: #fff;
+}
+
+[data-toggled="icon-overlay-close"] .admin-portal .hr-navtoggle__bar:nth-child(2),
+[data-toggled="close-menu-close"] .admin-portal .hr-navtoggle__bar:nth-child(2),
+[data-toggled="icon-text-close"] .admin-portal .hr-navtoggle__bar:nth-child(2),
+[data-toggled="double-menu-close"] .admin-portal .hr-navtoggle__bar:nth-child(2),
+[data-toggled="icon-click-closed"] .admin-portal .hr-navtoggle__bar:nth-child(2),
+[data-toggled="icon-hover-closed"] .admin-portal .hr-navtoggle__bar:nth-child(2),
+[data-toggled="detached-close"] .admin-portal .hr-navtoggle__bar:nth-child(2) {
+    width: 78%;
+}
+
+[data-toggled="icon-overlay-close"] .admin-portal .hr-navtoggle__bar:nth-child(3),
+[data-toggled="close-menu-close"] .admin-portal .hr-navtoggle__bar:nth-child(3),
+[data-toggled="icon-text-close"] .admin-portal .hr-navtoggle__bar:nth-child(3),
+[data-toggled="double-menu-close"] .admin-portal .hr-navtoggle__bar:nth-child(3),
+[data-toggled="icon-click-closed"] .admin-portal .hr-navtoggle__bar:nth-child(3),
+[data-toggled="icon-hover-closed"] .admin-portal .hr-navtoggle__bar:nth-child(3),
+[data-toggled="detached-close"] .admin-portal .hr-navtoggle__bar:nth-child(3) {
+    width: 58%;
+}
+
+/* الهيدر الداكن: الزرّ الخفيف يذوب فيه، فنرفع تباينه */
+[data-header-styles="dark"] .admin-portal .hr-navtoggle__box,
+[data-header-styles="color"] .admin-portal .hr-navtoggle__box,
+[data-header-styles="gradient"] .admin-portal .hr-navtoggle__box {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+[data-header-styles="dark"] .admin-portal .hr-navtoggle__bar,
+[data-header-styles="color"] .admin-portal .hr-navtoggle__bar,
+[data-header-styles="gradient"] .admin-portal .hr-navtoggle__bar {
+    background: #fff;
+}
+
+[data-header-styles="dark"] .admin-portal .hr-navtoggle:hover .hr-navtoggle__box,
+[data-header-styles="color"] .admin-portal .hr-navtoggle:hover .hr-navtoggle__box,
+[data-header-styles="gradient"] .admin-portal .hr-navtoggle:hover .hr-navtoggle__box {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-portal .hr-navtoggle__box,
+    .admin-portal .hr-navtoggle__bar {
+        transition: none;
+    }
+
+    .admin-portal .hr-navtoggle:hover .hr-navtoggle__box,
+    .admin-portal .hr-navtoggle:active .hr-navtoggle__box {
+        transform: none;
+    }
+}

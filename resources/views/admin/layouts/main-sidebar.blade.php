@@ -1,5 +1,5 @@
         <!-- Start::app-sidebar -->
-        <aside class="app-sidebar sticky" id="sidebar">
+        <aside class="app-sidebar admin-sidebar sticky" id="sidebar">
 
             @php
                 use App\Services\SiteSettingsService;
@@ -58,7 +58,7 @@
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                                 </svg>
-                                <span class="side-menu__label">المستخدمون والصلاحيات</span>
+                                <span class="side-menu__label">المستخدمون</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -78,7 +78,7 @@
                         <li class="slide has-sub {{ request()->routeIs('admin.categories.*', 'admin.brands.*', 'admin.products.*', 'admin.attributes.*', 'admin.inventory.*') ? 'open active' : '' }}">
                             <a href="javascript:void(0);" class="side-menu__item">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                                <span class="side-menu__label">المنتجات والمخزون</span>
+                                <span class="side-menu__label">المنتجات</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -104,7 +104,7 @@
                         <li class="slide has-sub {{ request()->routeIs('admin.orders.*', 'admin.order-returns.*') ? 'open active' : '' }}">
                             <a href="javascript:void(0);" class="side-menu__item">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                                <span class="side-menu__label">المبيعات والطلبات</span>
+                                <span class="side-menu__label">المبيعات</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -125,7 +125,7 @@
                                     <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
                                     <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
                                 </svg>
-                                <span class="side-menu__label">العروض والدفع</span>
+                                <span class="side-menu__label">العروض</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -157,7 +157,7 @@
                                     <path d="M3 3v18h18"/>
                                     <path d="M7 16l4-8 4 5 5-9"/>
                                 </svg>
-                                <span class="side-menu__label">التسويق والتقارير</span>
+                                <span class="side-menu__label">التسويق</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -188,7 +188,7 @@
                                     <path d="M7 21v-2"/>
                                     <path d="M17 21v-2"/>
                                 </svg>
-                                <span class="side-menu__label">الشحن والمالية</span>
+                                <span class="side-menu__label">الشحن</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -242,7 +242,7 @@
                                     <line x1="8" y1="7" x2="18" y2="7"/>
                                     <line x1="8" y1="11" x2="18" y2="11"/>
                                 </svg>
-                                <span class="side-menu__label">المحتوى والمدونة</span>
+                                <span class="side-menu__label">المحتوى</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -297,15 +297,15 @@
                             </ul>
                         </li>
 
-                        <!-- التواصل والذكاء الاصطناعي -->
-                        <li class="slide has-sub {{ request()->routeIs('admin.whatsapp*', 'admin.ai.*') ? 'open active' : '' }}">
+                        <!-- التواصل -->
+                        <li class="slide has-sub {{ request()->routeIs('admin.whatsapp*') ? 'open active' : '' }}">
                             <a href="javascript:void(0);" class="side-menu__item">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                                     <path d="M2 17l10 5 10-5"/>
                                     <path d="M2 12l10 5 10-5"/>
                                 </svg>
-                                <span class="side-menu__label">التواصل والذكاء الاصطناعي</span>
+                                <span class="side-menu__label">التواصل</span>
                                 <i class="fe fe-chevron-right side-menu__angle"></i>
                             </a>
                             <ul class="slide-menu child1">
@@ -321,6 +321,20 @@
                                 <li class="slide {{ request()->routeIs('admin.whatsapp-web-settings.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.whatsapp-web-settings.index') }}" class="side-menu__item">إعدادات واتساب ويب</a>
                                 </li>
+                            </ul>
+                        </li>
+
+                        <!-- الذكاء الاصطناعي -->
+                        <li class="slide has-sub {{ request()->routeIs('admin.ai.*') ? 'open active' : '' }}">
+                            <a href="javascript:void(0);" class="side-menu__item">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="7" y="7" width="10" height="10" rx="1"/>
+                                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2 2M17.1 17.1l2 2M4.9 19.1l2-2M17.1 6.9l2-2"/>
+                                </svg>
+                                <span class="side-menu__label">الذكاء الاصطناعي</span>
+                                <i class="fe fe-chevron-right side-menu__angle"></i>
+                            </a>
+                            <ul class="slide-menu child1">
                                 <li class="slide {{ request()->routeIs('admin.ai.models.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.ai.models.index') }}" class="side-menu__item">نماذج AI</a>
                                 </li>

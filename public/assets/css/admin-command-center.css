@@ -221,9 +221,53 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
+/*
+ * Compact KPI cards: same punchy gradient-per-tone treatment as the hero
+ * card, just smaller. Previously these were plain bordered cards with a
+ * tiny soft-tint icon — visually flat next to the hero, and any hover-only
+ * effects (shine/ring) don't register in a static screenshot with zero
+ * demo data. This makes the tone itself the headline, no interaction needed.
+ */
+.cmd-widget--compact {
+    color: #fff;
+    border: none;
+    background: linear-gradient(145deg, var(--widget-accent) 0%, color-mix(in srgb, var(--widget-accent) 78%, #000) 100%);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--widget-accent) 32%, transparent);
+}
+
+.cmd-widget--compact:hover {
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--widget-accent) 40%, transparent);
+    border-color: transparent;
+    color: #fff;
+}
+
+.cmd-widget--compact .cmd-widget__label {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.cmd-widget--compact .cmd-widget__value {
+    color: #fff;
+}
+
+.cmd-widget--compact .cmd-widget__icon {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.cmd-widget--compact .cmd-widget__icon-ring {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.cmd-widget--compact .cmd-widget__trend {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
 .cmd-widget__top,
 .cmd-widget__body,
-.cmd-widget__footer {
+.cmd-widget__footer,
+.cmd-widget__row {
     position: relative;
     z-index: 1;
 }
@@ -263,7 +307,7 @@
 .cmd-widget__icon {
     width: 46px;
     height: 46px;
-    border-radius: 14px;
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -271,12 +315,12 @@
     background: var(--widget-soft);
     color: var(--widget-accent);
     flex-shrink: 0;
+    backdrop-filter: blur(8px);
 }
 
 .cmd-widget__icon--sm {
     width: 40px;
     height: 40px;
-    border-radius: 12px;
     font-size: 1.15rem;
 }
 
@@ -315,6 +359,8 @@
 }
 
 .cmd-widget__trend {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
@@ -342,6 +388,182 @@
 .cmd-widget__trend--neutral {
     color: var(--cmd-muted);
     background: var(--default-background);
+}
+
+/* ── Entrance animation ── */
+@keyframes cmd-card-enter {
+    from { opacity: 0; transform: translateY(24px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cmd-widget {
+    animation: cmd-card-enter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation-delay: var(--card-delay, 0s);
+}
+
+/* ── Shine sweep (on hover, every widget) ── */
+.cmd-widget__shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.18) 48%,
+        rgba(255, 255, 255, 0.28) 50%,
+        rgba(255, 255, 255, 0.18) 52%,
+        transparent 62%);
+    transform: translateX(-120%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cmd-widget--hero:hover .cmd-widget__shine,
+.cmd-widget--compact:hover .cmd-widget__shine {
+    animation: cmd-shine-sweep 0.85s ease;
+}
+
+@keyframes cmd-shine-sweep {
+    to { transform: translateX(120%); }
+}
+
+/* ── Mesh, floating bubbles, glow blob — decorative, behind content ── */
+.cmd-widget__mesh {
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.cmd-widget__bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.cmd-widget__bubble--1 {
+    width: 70px;
+    height: 70px;
+    inset-inline-start: -20px;
+    top: -24px;
+    animation: cmd-bubble-float 5s ease-in-out infinite;
+}
+
+.cmd-widget__bubble--2 {
+    width: 46px;
+    height: 46px;
+    inset-inline-end: 26%;
+    bottom: -16px;
+    animation: cmd-bubble-float 4s ease-in-out infinite reverse;
+    animation-delay: -1.5s;
+}
+
+.cmd-widget__bubble--3 {
+    width: 32px;
+    height: 32px;
+    inset-inline-end: -8px;
+    top: 40%;
+    animation: cmd-bubble-float 3.5s ease-in-out infinite;
+    animation-delay: -0.8s;
+}
+
+@keyframes cmd-bubble-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5px, -8px) scale(1.08); }
+}
+
+.cmd-widget__glow {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    inset-inline-start: -40px;
+    bottom: -48px;
+    pointer-events: none;
+    z-index: 0;
+    animation: cmd-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes cmd-glow-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ── Icon: idle float + idle pulsing ring, both intensify on hover ── */
+.cmd-widget__icon-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.cmd-widget__icon-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--widget-border);
+    animation: cmd-ring-pulse 2.5s ease-out infinite;
+    pointer-events: none;
+}
+
+.cmd-widget--hero .cmd-widget__icon-ring,
+.cmd-widget--compact .cmd-widget__icon-ring {
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.cmd-widget:hover .cmd-widget__icon-ring {
+    animation-duration: 1.2s;
+}
+
+@keyframes cmd-ring-pulse {
+    0% { transform: scale(0.85); opacity: 0.8; }
+    70%, 100% { transform: scale(1.35); opacity: 0; }
+}
+
+.cmd-widget__icon {
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+    animation: cmd-icon-float 3s ease-in-out infinite;
+}
+
+@keyframes cmd-icon-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.cmd-widget:hover .cmd-widget__icon {
+    animation: none;
+    transform: scale(1.15) rotate(8deg);
+}
+
+/* ── Count-up value: pop once the animation lands ── */
+.cmd-widget__value.cmd-value-done {
+    animation: cmd-value-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cmd-value-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cmd-widget,
+    .cmd-widget__shine,
+    .cmd-widget__bubble,
+    .cmd-widget__glow,
+    .cmd-widget__icon-ring,
+    .cmd-widget__icon,
+    .cmd-widget__value.cmd-value-done {
+        animation: none !important;
+    }
+
+    .cmd-widget:hover .cmd-widget__icon {
+        transform: none;
+    }
 }
 
 /* Tone variants */

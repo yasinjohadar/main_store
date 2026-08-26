@@ -31,25 +31,30 @@
     @endphp
 
     <div class="main-content app-content">
-        <div class="container-fluid">
-            <div class="admin-detail__header page-header-breadcrumb my-4">
-                <div>
-                    <h5 class="admin-detail__title">طلب {{ $order->order_number }}</h5>
-                    <p class="admin-detail__subtitle">
-                        {{ $order->created_at->format('Y-m-d H:i') }}
-                        @if($customerEmail)
-                            <span class="mx-1">·</span>
-                            {{ $customerEmail }}
-                        @endif
-                    </p>
+        <div class="container-fluid admin-page-shell">
+
+            <div class="admin-page-banner">
+                <div class="admin-page-banner-main">
+                    <span class="admin-page-banner-icon"><i class="las la-shopping-bag"></i></span>
+                    <div class="admin-page-banner-text">
+                        <h1>طلب {{ $order->order_number }}</h1>
+                        <p>
+                            {{ $order->created_at->format('Y-m-d H:i') }}
+                            @if($customerEmail)
+                                <span class="mx-1">·</span>
+                                {{ $customerEmail }}
+                            @endif
+                        </p>
+                    </div>
                 </div>
-                <div class="admin-detail__actions">
+                <div class="admin-page-banner-actions">
                     <span class="admin-order-status" style="background-color: {{ $statusColor }}">
                         <span class="admin-order-status__dot"></span>
                         {{ $order->status->name }}
                     </span>
-                    <a href="{{ route('admin.orders.index') }}" class="btn btn-light btn-sm">
-                        <i class="las la-arrow-right me-1"></i> العودة للقائمة
+                    <a href="{{ route('admin.orders.index') }}" class="admin-btn admin-btn-light">
+                        <i class="las la-arrow-right"></i>
+                        العودة للقائمة
                     </a>
                 </div>
             </div>
@@ -291,6 +296,16 @@
                                     <label class="form-label">ملاحظة إدارية (اختياري)</label>
                                     <textarea name="admin_note" rows="3" class="form-control @error('admin_note') is-invalid @enderror" placeholder="سبب تغيير الحالة أو أي ملاحظات داخلية...">{{ old('admin_note', $order->admin_note) }}</textarea>
                                     @error('admin_note')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">شركة الشحن (اختياري)</label>
+                                    <input type="text" name="tracking_carrier" class="form-control @error('tracking_carrier') is-invalid @enderror" value="{{ old('tracking_carrier', $order->tracking_carrier) }}" placeholder="مثال: أرامكس، سمسا">
+                                    @error('tracking_carrier')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">رقم التتبع (اختياري)</label>
+                                    <input type="text" name="tracking_number" class="form-control @error('tracking_number') is-invalid @enderror" value="{{ old('tracking_number', $order->tracking_number) }}">
+                                    @error('tracking_number')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100">
                                     <i class="las la-save me-1"></i> حفظ الحالة

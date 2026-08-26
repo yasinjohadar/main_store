@@ -1,5 +1,5 @@
-<div class="table-responsive admin-table-wrap">
-    <table class="table admin-table table-striped table-hover align-middle table-nowrap mb-0">
+<div class="table-responsive">
+    <table class="admin-data-table">
         <thead>
             <tr>
                 <th style="width: 40px;">
@@ -12,7 +12,7 @@
                 <th scope="col">السعر</th>
                 <th scope="col">المخزون</th>
                 <th scope="col" style="width: 100px;">الحالة</th>
-                <th scope="col" style="width: 160px;">العمليات</th>
+                <th scope="col" style="width: 70px;">العمليات</th>
             </tr>
         </thead>
         <tbody>
@@ -35,10 +35,10 @@
                     <td>
                         <input type="checkbox" class="admin-table__checkbox" name="ids[]" form="bulk-products-form" value="{{ $product->id }}">
                     </td>
-                    <th scope="row" class="admin-table__index">{{ $products->firstItem() + $loop->index }}</th>
+                    <th scope="row" class="row-number">{{ $products->firstItem() + $loop->index }}</th>
                     <td>
-                        <div class="admin-table__user">
-                            <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="admin-table__thumb">
+                        <div class="admin-user-cell">
+                            <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="admin-thumb">
                             <div class="min-w-0 flex-grow-1">
                                 <div class="admin-table__name-row">
                                     <a href="{{ route('admin.products.show', $product) }}"
@@ -64,9 +64,9 @@
                     </td>
                     <td>
                         @if($product->sku)
-                            <code class="admin-table__sku">{{ $product->sku }}</code>
+                            <code>{{ $product->sku }}</code>
                         @else
-                            <span class="admin-table__muted">—</span>
+                            <span class="text-muted">—</span>
                         @endif
                     </td>
                     <td>
@@ -97,14 +97,14 @@
                                 $qty = (int) $product->stock_quantity;
                                 $threshold = config('store.low_stock_threshold', 5);
                             @endphp
-                            <span class="admin-table__index">{{ $qty }}</span>
+                            <span>{{ $qty }}</span>
                             @if($qty <= 0)
-                                <span class="admin-table__badge admin-table__badge--danger ms-1">منتهي</span>
+                                <span class="admin-badge admin-badge-danger ms-1">منتهي</span>
                             @elseif($qty <= $threshold)
-                                <span class="admin-table__badge admin-table__badge--warning ms-1">منخفض</span>
+                                <span class="admin-badge admin-badge-warning ms-1">منخفض</span>
                             @endif
                         @else
-                            <span class="admin-table__muted">—</span>
+                            <span class="text-muted">—</span>
                         @endif
                     </td>
                     <td>
@@ -120,41 +120,51 @@
                         </span>
                     </td>
                     <td>
-                        <div class="admin-table__actions">
-                            <a class="admin-table__action admin-table__action--view"
-                                href="{{ route('admin.products.show', $product) }}"
-                                title="عرض المنتج">
-                                <i class="las la-eye"></i>
-                            </a>
-                            <a class="admin-table__action admin-table__action--edit"
-                                href="{{ route('admin.products.edit', $product) }}"
-                                title="تعديل المنتج">
-                                <i class="las la-pen"></i>
-                            </a>
-                            <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline"
-                                  onsubmit="return confirm('استنساخ هذا المنتج؟');">
-                                @csrf
-                                <button type="submit" class="admin-table__action admin-table__action--duplicate border-0"
-                                        title="استنساخ">
-                                    <i class="las la-copy"></i>
-                                </button>
-                            </form>
-                            <x-admin.delete-trigger
-                                :action="route('admin.products.destroy', $product)"
-                                title="حذف المنتج"
-                                :item="$product->name"
-                                message="هل تريد حذف هذا المنتج نهائياً؟"
-                                button-class="btn-danger btn-sm"
-                                icon="las la-trash"
-                                title-attr="حذف المنتج"
-                            />
+                        <div class="admin-row-actions dropdown">
+                            <button class="admin-kebab-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="las la-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.products.show', $product) }}">
+                                        <i class="las la-eye text-info me-2"></i>عرض المنتج
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.products.edit', $product) }}">
+                                        <i class="las la-pen text-primary me-2"></i>تعديل
+                                    </a>
+                                </li>
+                                <li>
+                                    <form action="{{ route('admin.products.duplicate', $product) }}" method="POST"
+                                          onsubmit="return confirm('استنساخ هذا المنتج؟');">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item border-0 bg-transparent w-100 text-start">
+                                            <i class="las la-copy text-cyan me-2"></i>استنساخ
+                                        </button>
+                                    </form>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start"
+                                        data-confirm-delete
+                                        data-action="{{ route('admin.products.destroy', $product) }}"
+                                        data-method="DELETE"
+                                        data-title="حذف المنتج"
+                                        data-item="{{ $product->name }}"
+                                        data-message="هل تريد حذف هذا المنتج نهائياً؟"
+                                        data-warning="لن يمكن التراجع عن هذا الإجراء.">
+                                        <i class="las la-trash me-2"></i>حذف المنتج
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="9">
-                        <div class="admin-table-empty">
+                        <div class="admin-empty-state">
                             <i class="las la-box-open"></i>
                             <p class="mb-0 fw-medium">لا توجد منتجات</p>
                         </div>
@@ -165,6 +175,6 @@
     </table>
 </div>
 
-<div class="p-3 border-top admin-table-pagination">
+<div class="admin-table-footer">
     {{ $products->withQueryString()->links() }}
 </div>

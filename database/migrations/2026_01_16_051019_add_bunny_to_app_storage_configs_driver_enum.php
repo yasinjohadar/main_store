@@ -13,6 +13,8 @@ return new class extends Migration
     {
         // في MySQL، لا يمكن تعديل enum مباشرة، يجب حذف العمود وإعادة إنشائه
         Schema::table('app_storage_configs', function (Blueprint $table) {
+            // حذف الفهرس قبل حذف العمود حتى لا يتعارض مع إعادة إنشائه لاحقاً
+            $table->dropIndex(['driver']);
             // حذف العمود القديم
             $table->dropColumn('driver');
         });
@@ -46,6 +48,7 @@ return new class extends Migration
     {
         // إعادة العمود إلى حالته الأصلية بدون 'bunny'
         Schema::table('app_storage_configs', function (Blueprint $table) {
+            $table->dropIndex(['driver']);
             $table->dropColumn('driver');
         });
 

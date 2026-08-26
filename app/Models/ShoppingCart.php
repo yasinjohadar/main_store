@@ -9,10 +9,11 @@ class ShoppingCart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'session_id', 'coupon_code', 'discount_amount'];
+    protected $fillable = ['user_id', 'session_id', 'coupon_code', 'discount_amount', 'reminder_sent_at'];
 
     protected $casts = [
         'discount_amount' => 'decimal:2',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public function user()

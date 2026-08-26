@@ -36,6 +36,8 @@ class EmailTemplate extends Model
             'order_return_status' => 'تحديث حالة طلب المرتجع',
             'user_registered' => 'تسجيل مستخدم جديد',
             'password_reset' => 'إعادة تعيين كلمة المرور',
+            'abandoned_cart' => 'تذكير بسلة مهجورة',
+            'review_request' => 'طلب مراجعة بعد الشراء',
         ];
     }
 

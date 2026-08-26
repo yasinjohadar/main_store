@@ -17,246 +17,286 @@
     @endif
 
     <div class="main-content app-content">
-        <div class="container-fluid">
-            <div class="page-header d-flex justify-content-between align-items-center my-4">
-                <h5 class="page-title mb-0">تعديل: {{ $product->name }}</h5>
-                <div>
-                    <a href="{{ route('admin.products.show', $product) }}" class="btn btn-info">عرض</a>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">العودة</a>
+        <div class="container-fluid admin-page-shell">
+
+            <div class="admin-page-banner">
+                <div class="admin-page-banner-main">
+                    <span class="admin-page-banner-icon"><i class="las la-box"></i></span>
+                    <div class="admin-page-banner-text">
+                        <h1>تعديل: {{ $product->name }}</h1>
+                        <p>تحديث بيانات المنتج والسعر والمخزون والمتغيرات</p>
+                    </div>
+                </div>
+                <div class="admin-page-banner-actions">
+                    <a href="{{ route('admin.products.show', $product) }}" class="admin-btn admin-btn-secondary">
+                        <i class="las la-eye"></i>
+                        عرض
+                    </a>
+                    <a href="{{ route('admin.products.index') }}" class="admin-btn admin-btn-light">
+                        <i class="las la-arrow-right"></i>
+                        العودة
+                    </a>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-body">
-                    <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <div class="row g-3">
-                            <div class="col-12"><h6 class="text-primary mb-2">المعلومات الأساسية</h6></div>
-                            <div class="col-md-6">
-                                <label class="form-label">الاسم <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $product->name) }}" required>
-                                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">الرابط (Slug)</label>
-                                <input type="text" class="form-control" name="slug" value="{{ old('slug', $product->slug) }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">التصنيف</label>
-                                <select name="category_id" class="form-select">
-                                    <option value="">-- اختر --</option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">الماركة</label>
-                                <select name="brand_id" class="form-select">
-                                    <option value="">— لا ماركة —</option>
-                                    @foreach($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">SKU</label>
-                                <input type="text" class="form-control" name="sku" value="{{ old('sku', $product->sku) }}">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">وصف مختصر</label>
-                                <textarea name="short_description" class="form-control" rows="2">{{ old('short_description', $product->short_description) }}</textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">الوصف</label>
-                                <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="10">{{ old('description', $product->description) }}</textarea>
-                                @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">السعر (ر.س) <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="price" value="{{ old('price', $product->price) }}" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">سعر المقارنة</label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="compare_at_price" value="{{ old('compare_at_price', $product->compare_at_price) }}">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">الكمية</label>
-                                <input type="number" min="0" class="form-control" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}">
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check mt-4">
-                                    <input type="hidden" name="track_quantity" value="0">
-                                    <input class="form-check-input" type="checkbox" name="track_quantity" value="1" {{ old('track_quantity', $product->track_quantity) ? 'checked' : '' }}>
-                                    <label class="form-check-label">تتبع الكمية</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check mt-4">
-                                    <input type="hidden" name="allow_backorder" value="0">
-                                    <input class="form-check-input" type="checkbox" name="allow_backorder" value="1" {{ old('allow_backorder', $product->allow_backorder) ? 'checked' : '' }}>
-                                    <label class="form-check-label">السماح بالطلب مع نفاد الكمية</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">الحالة</label>
-                                <select name="status" class="form-select">
-                                    <option value="draft" {{ old('status', $product->status) == 'draft' ? 'selected' : '' }}>مسودة</option>
-                                    <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>نشط</option>
-                                    <option value="archived" {{ old('status', $product->status) == 'archived' ? 'selected' : '' }}>أرشيف</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check mt-4">
-                                    <input type="hidden" name="is_featured" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
-                                    <label class="form-check-label">منتج مميز</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check mt-4">
-                                    <input type="hidden" name="is_visible" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_visible" value="1" {{ old('is_visible', $product->is_visible) ? 'checked' : '' }}>
-                                    <label class="form-check-label">ظاهر في المتجر</label>
-                                </div>
-                            </div>
-                            <div class="col-12"><hr><h6 class="text-primary mb-2">التقييمات والتعليقات</h6></div>
-                            <div class="col-md-6">
-                                @php
-                                    $rra = old('reviews_require_approval');
-                                    if ($rra === null || $rra === '') {
-                                        $rra = $product->reviews_require_approval === null ? 'default' : ($product->reviews_require_approval ? '1' : '0');
-                                    }
-                                @endphp
-                                <div class="form-check mt-2">
-                                    <input type="hidden" name="allow_reviews" value="0">
-                                    <input class="form-check-input" type="checkbox" name="allow_reviews" value="1" id="allow_reviews" {{ old('allow_reviews', $product->allow_reviews ?? true) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="allow_reviews">السماح بالتعليقات والتقييمات لهذا المنتج</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="reviews_approval_wrap">
-                                <label class="form-label">نشر التعليقات</label>
-                                <select name="reviews_require_approval" class="form-select">
-                                    <option value="default" {{ $rra === 'default' ? 'selected' : '' }}>استخدام الإعداد الافتراضي للمتجر</option>
-                                    <option value="1" {{ $rra === '1' ? 'selected' : '' }}>بعد موافقة الإدارة</option>
-                                    <option value="0" {{ $rra === '0' ? 'selected' : '' }}>تلقائياً بدون موافقة</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label d-block">الصورة الرئيسية الحالية</label>
-                                @php
-                                    $primaryImage = $product->primary_image;
-                                @endphp
-                                @if($primaryImage)
-                                    <div class="mb-2">
-                                        <img src="{{ $primaryImage->url }}" alt="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                                    </div>
-                                @else
-                                    <p class="text-muted small">لم يتم تعيين صورة رئيسية بعد، سيتم استخدام أول صورة من المعرض.</p>
-                                @endif
-                                <div class="mb-3">
-                                    <label class="form-label">تعيين صورة رئيسية جديدة (اختياري)</label>
-                                    <input type="file" name="primary_image" class="form-control" accept="image/*">
-                                    <small class="text-muted d-block mt-1">في حال اختيار صورة هنا سيتم استخدامها كصورة رئيسية جديدة.</small>
-                                </div>
-                                <label class="form-label">معرض الصور الحالي</label>
-                                <div class="d-flex gap-2 flex-wrap mb-2">
-                                    @foreach($product->images as $img)
-                                        <div class="position-relative">
-                                            <img src="{{ $img->url }}" alt="" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
-                                            <form action="{{ route('admin.products.images.delete', [$product, $img]) }}" method="POST" class="position-absolute top-0 start-0">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger p-1" onclick="return confirm('حذف الصورة؟');">&times;</button>
-                                            </form>
+            <form method="POST" action="{{ route('admin.products.update', $product) }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+
+                <div class="row">
+                    <!-- العمود الرئيسي -->
+                    <div class="col-lg-8">
+
+                        <!-- المعلومات الأساسية -->
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-blue">
+                                            <i class="las la-info-circle"></i>
                                         </div>
-                                    @endforeach
-                                </div>
-                                <label class="form-label">إضافة صور جديدة للمعرض</label>
-                                <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
-                            </div>
-
-                            <div class="col-12"><hr><h6 class="text-primary mb-2">المنتج الرقمي</h6></div>
-                            <div class="col-md-4">
-                                <div class="form-check mt-2">
-                                    <input type="hidden" name="is_digital" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_digital" value="1" id="is_digital_cb"
-                                           {{ old('is_digital', $product->is_digital) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_digital_cb">منتج رقمي قابل للتحميل</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">حد مرات التحميل (اختياري)</label>
-                                <input type="number" min="1" class="form-control" name="digital_download_limit" value="{{ old('digital_download_limit', $product->digital_download_limit) }}">
-                                <small class="text-muted">اتركه فارغاً لعدد غير محدود</small>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">عدد أيام صلاحية التحميل (اختياري)</label>
-                                <input type="number" min="1" class="form-control" name="digital_download_expiry_days" value="{{ old('digital_download_expiry_days', $product->digital_download_expiry_days) }}">
-                                <small class="text-muted">اتركه فارغاً بدون انتهاء</small>
-                            </div>
-
-                            <div class="col-12" id="digital-files-section" style="{{ old('is_digital', $product->is_digital) ? '' : 'display:none;' }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="text-primary mb-2">ملفات التحميل</h6>
-                                    <button type="button" class="btn btn-outline-primary btn-sm" id="add-digital-file-row">إضافة ملف</button>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered align-middle" id="digital-files-table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>العنوان</th>
-                                                <th>الملف</th>
-                                                <th style="width:120px">الترتيب</th>
-                                                <th style="width:80px"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="digital-files-tbody">
-                                            @php
-                                                $digitalFiles = old('digital_files', $product->files->map(fn($f) => ['id' => $f->id, 'title' => $f->title, 'order' => $f->order, 'url' => $f->url])->toArray());
-                                            @endphp
-                                            @foreach($digitalFiles as $idx => $df)
-                                                <tr class="{{ !empty($df['delete']) ? 'd-none' : '' }}">
-                                                    <td>
-                                                        @if(!empty($df['id']))
-                                                            <input type="hidden" name="digital_files[{{ $idx }}][id]" value="{{ $df['id'] }}">
-                                                        @endif
-                                                        <input type="hidden" class="digital-delete-flag" name="digital_files[{{ $idx }}][delete]" value="{{ $df['delete'] ?? 0 }}">
-                                                        <input type="text" class="form-control" name="digital_files[{{ $idx }}][title]" value="{{ $df['title'] ?? '' }}" placeholder="مثال: ملف PDF">
-                                                        @if(!empty($df['url']))
-                                                            <a class="small d-block mt-1" href="{{ $df['url'] }}" target="_blank">عرض الملف الحالي</a>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        <input type="file" class="form-control" name="digital_files[{{ $idx }}][file]">
-                                                        <small class="text-muted">اتركه فارغاً للإبقاء على الملف الحالي</small>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" min="0" class="form-control" name="digital_files[{{ $idx }}][order]" value="{{ $df['order'] ?? 0 }}">
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-digital-file" data-has-id="{{ !empty($df['id']) ? 1 : 0 }}">حذف</button>
-                                                    </td>
-                                                </tr>
+                                        <div>
+                                            <h3>المعلومات الأساسية</h3>
+                                            <p>الاسم والوصف والتصنيف</p>
+                                        </div>
+                                    </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الاسم <span class="required">*</span></label>
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $product->name) }}" required>
+                                        @error('name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الرابط (Slug)</label>
+                                        <input type="text" class="form-control" name="slug" value="{{ old('slug', $product->slug) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">التصنيف</label>
+                                        <select name="category_id" class="form-select">
+                                            <option value="">-- اختر --</option>
+                                            @foreach($categories as $cat)
+                                                <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                             @endforeach
-                                        </tbody>
-                                    </table>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الماركة</label>
+                                        <select name="brand_id" class="form-select">
+                                            <option value="">— لا ماركة —</option>
+                                            @foreach($brands as $brand)
+                                                <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">SKU</label>
+                                        <input type="text" class="form-control" name="sku" value="{{ old('sku', $product->sku) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">وصف مختصر</label>
+                                        <textarea name="short_description" class="form-control" rows="2">{{ old('short_description', $product->short_description) }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الوصف</label>
+                                        <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="10">{{ old('description', $product->description) }}</textarea>
+                                        @error('description')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                        </div>
+                                    </div>
                                 </div>
-                                <small class="text-muted d-block">يمكنك إضافة ملفات جديدة أو استبدال الملفات الحالية.</small>
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="col-12"><hr><h6 class="text-primary mb-2">سمات هذا المنتج</h6></div>
-                            <div class="col-12">
-                                <p class="text-muted small">اختر السمات التي تنطبق على هذا المنتج — ستظهر قيم كل سمة أسفلها، ثم أنشئ المتغيرات.</p>
+                        <!-- المنتج الرقمي -->
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-teal">
+                                            <i class="las la-download"></i>
+                                        </div>
+                                        <div>
+                                            <h3>المنتج الرقمي (إن وُجد)</h3>
+                                            <p>ملفات قابلة للتحميل بدل الشحن الفعلي</p>
+                                        </div>
+                                    </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="form-check mt-2">
+                                            <input type="hidden" name="is_digital" value="0">
+                                            <input class="form-check-input" type="checkbox" name="is_digital" value="1" id="is_digital_cb"
+                                                   {{ old('is_digital', $product->is_digital) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="is_digital_cb">منتج رقمي قابل للتحميل</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">حد مرات التحميل (اختياري)</label>
+                                        <input type="number" min="1" class="form-control" name="digital_download_limit" value="{{ old('digital_download_limit', $product->digital_download_limit) }}">
+                                        <small class="text-muted">اتركه فارغاً لعدد غير محدود</small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">عدد أيام صلاحية التحميل (اختياري)</label>
+                                        <input type="number" min="1" class="form-control" name="digital_download_expiry_days" value="{{ old('digital_download_expiry_days', $product->digital_download_expiry_days) }}">
+                                        <small class="text-muted">اتركه فارغاً بدون انتهاء</small>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3" id="digital-files-section" style="{{ old('is_digital', $product->is_digital) ? '' : 'display:none;' }}">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-primary mb-0">ملفات التحميل</h6>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-digital-file-row">إضافة ملف</button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle" id="digital-files-table">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>العنوان</th>
+                                                    <th>الملف</th>
+                                                    <th style="width:120px">الترتيب</th>
+                                                    <th style="width:80px"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="digital-files-tbody">
+                                                @php
+                                                    $digitalFiles = old('digital_files', $product->files->map(fn($f) => ['id' => $f->id, 'title' => $f->title, 'order' => $f->order, 'url' => $f->url])->toArray());
+                                                @endphp
+                                                @foreach($digitalFiles as $idx => $df)
+                                                    <tr class="{{ !empty($df['delete']) ? 'd-none' : '' }}">
+                                                        <td>
+                                                            @if(!empty($df['id']))
+                                                                <input type="hidden" name="digital_files[{{ $idx }}][id]" value="{{ $df['id'] }}">
+                                                            @endif
+                                                            <input type="hidden" class="digital-delete-flag" name="digital_files[{{ $idx }}][delete]" value="{{ $df['delete'] ?? 0 }}">
+                                                            <input type="text" class="form-control" name="digital_files[{{ $idx }}][title]" value="{{ $df['title'] ?? '' }}" placeholder="مثال: ملف PDF">
+                                                            @if(!empty($df['url']))
+                                                                <a class="small d-block mt-1" href="{{ $df['url'] }}" target="_blank">عرض الملف الحالي</a>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <input type="file" class="form-control" name="digital_files[{{ $idx }}][file]">
+                                                            <small class="text-muted">اتركه فارغاً للإبقاء على الملف الحالي</small>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" min="0" class="form-control" name="digital_files[{{ $idx }}][order]" value="{{ $df['order'] ?? 0 }}">
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger remove-digital-file" data-has-id="{{ !empty($df['id']) ? 1 : 0 }}">حذف</button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <small class="text-muted d-block">يمكنك إضافة ملفات جديدة أو استبدال الملفات الحالية.</small>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- السعر والمخزون -->
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-green">
+                                            <i class="las la-coins"></i>
+                                        </div>
+                                        <div>
+                                            <h3>السعر والمخزون</h3>
+                                            <p>التسعير وتتبع الكمية</p>
+                                        </div>
+                                    </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">السعر (ر.س) <span class="required">*</span></label>
+                                        <input type="number" step="0.01" min="0" class="form-control" name="price" value="{{ old('price', $product->price) }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">سعر المقارنة (ر.س)</label>
+                                        <input type="number" step="0.01" min="0" class="form-control" name="compare_at_price" value="{{ old('compare_at_price', $product->compare_at_price) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">سعر الجملة (اختياري)</label>
+                                        <input type="number" step="0.01" min="0" class="form-control" name="wholesale_price" value="{{ old('wholesale_price', $product->wholesale_price) }}">
+                                        <small class="text-muted">يُستخدم تلقائياً لعملاء الجملة/B2B المفعّلين</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الكمية</label>
+                                        <input type="number" min="0" class="form-control" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check mt-4">
+                                            <input type="hidden" name="track_quantity" value="0">
+                                            <input class="form-check-input" type="checkbox" name="track_quantity" value="1" {{ old('track_quantity', $product->track_quantity) ? 'checked' : '' }}>
+                                            <label class="form-check-label">تتبع الكمية</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check mt-4">
+                                            <input type="hidden" name="allow_backorder" value="0">
+                                            <input class="form-check-input" type="checkbox" name="allow_backorder" value="1" {{ old('allow_backorder', $product->allow_backorder) ? 'checked' : '' }}>
+                                            <label class="form-check-label">السماح بالطلب مع نفاد الكمية</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- سمات المنتج -->
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-purple">
+                                            <i class="las la-tags"></i>
+                                        </div>
+                                        <div>
+                                            <h3>سمات هذا المنتج</h3>
+                                            <p>اختر السمات التي تنطبق على هذا المنتج — ستظهر قيم كل سمة أسفلها، ثم أنشئ المتغيرات</p>
+                                        </div>
+                                    </div>
                                 @include('admin.pages.products.partials.attributes-picker', [
                                     'selectedAttributeIds' => old('attribute_ids', $product->attributes->pluck('id')->toArray()),
                                 ])
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="col-12"><hr><h6 class="text-primary mb-2">المتغيرات</h6></div>
-                            <div class="col-12">
-                                <p class="text-muted small">كل متغير = تركيبة قيم (مثلاً أحمر + مقاس M) مع سعر ومخزون وSKU اختياري.</p>
+                        <!-- المتغيرات -->
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-blue">
+                                            <i class="las la-layer-group"></i>
+                                        </div>
+                                        <div>
+                                            <h3>المتغيرات</h3>
+                                            <p>كل متغير = تركيبة قيم (مثلاً أحمر + مقاس M) مع سعر ومخزون وSKU اختياري</p>
+                                        </div>
+                                    </div>
                                 <button type="button" class="btn btn-outline-primary btn-sm mb-2" id="btn-generate-variants">توليد متغيرات من السمات المختارة</button>
                                 <div class="table-responsive">
                                     <table class="table table-bordered" id="variants-table">
@@ -291,23 +331,212 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="col-12">
+                        @if($product->is_bundle)
+                            <!-- منتجات الحزمة -->
+                            <div class="admin-page-card mb-4">
+                                <div class="admin-form-body">
+                                    <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                        <div class="admin-form-section-head">
+                                            <div class="admin-section-icon admin-section-icon-purple">
+                                                <i class="las la-cubes"></i>
+                                            </div>
+                                            <div>
+                                                <h3>منتجات الحزمة</h3>
+                                                <p>المنتجات المكوّنة لهذه الحزمة، وسعرها الإجمالي مقابل سعر الحزمة يحدد نسبة التوفير المعروضة للعميل</p>
+                                            </div>
+                                        </div>
+                                    <div class="table-responsive mb-3">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>المنتج</th>
+                                                    <th>الكمية</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($product->bundleItems as $bundleItem)
+                                                    <tr>
+                                                        <td>{{ $bundleItem->itemProduct->name ?? 'منتج محذوف' }}</td>
+                                                        <td>{{ $bundleItem->quantity }}</td>
+                                                        <td>
+                                                            <form action="{{ route('admin.products.bundle-items.destroy', [$product, $bundleItem]) }}" method="POST" onsubmit="return confirm('إزالة هذا المنتج من الحزمة؟');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-danger">إزالة</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr><td colspan="3" class="text-muted text-center">لا توجد منتجات في هذه الحزمة بعد.</td></tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <form action="{{ route('admin.products.bundle-items.store', $product) }}" method="POST" class="row g-2 align-items-end">
+                                        @csrf
+                                        <div class="col-md-6">
+                                            <label class="admin-form-label">إضافة منتج للحزمة</label>
+                                            <select name="item_product_id" class="form-select" required>
+                                                <option value="">اختر منتجاً...</option>
+                                                @foreach($bundleableProducts as $p)
+                                                    <option value="{{ $p->id }}">{{ $p->name }} @if($p->sku) ({{ $p->sku }}) @endif</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="admin-form-label">الكمية</label>
+                                            <input type="number" name="quantity" min="1" value="1" class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="submit" class="btn btn-primary w-100">إضافة</button>
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                    </div>
+
+                    <!-- الشريط الجانبي -->
+                    <div class="col-lg-4">
+
+                        <!-- الحالة والنشر -->
+                        <div class="admin-page-card mb-4">
+                            <div class="card-header">
+                                <div class="card-title">إعدادات النشر</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">الحالة</label>
+                                    <select name="status" class="form-select">
+                                        <option value="draft" {{ old('status', $product->status) == 'draft' ? 'selected' : '' }}>مسودة</option>
+                                        <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>نشط</option>
+                                        <option value="archived" {{ old('status', $product->status) == 'archived' ? 'selected' : '' }}>أرشيف</option>
+                                    </select>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="hidden" name="is_featured" value="0">
+                                    <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="is_featured" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_featured">منتج مميز</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input type="hidden" name="is_visible" value="0">
+                                    <input class="form-check-input" type="checkbox" name="is_visible" value="1" id="is_visible" {{ old('is_visible', $product->is_visible) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_visible">ظاهر في المتجر</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="hidden" name="is_bundle" value="0">
+                                    <input class="form-check-input" type="checkbox" name="is_bundle" value="1" id="is_bundle_cb" {{ old('is_bundle', $product->is_bundle) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_bundle_cb">هذا المنتج عبارة عن حزمة (Bundle)</label>
+                                    <small class="text-muted d-block">يمكنك اختيار المنتجات المكوّنة للحزمة بعد الحفظ</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- التقييمات والتعليقات -->
+                        <div class="admin-page-card mb-4">
+                            <div class="card-header">
+                                <div class="card-title">التقييمات والتعليقات</div>
+                            </div>
+                            <div class="card-body">
+                                @php
+                                    $rra = old('reviews_require_approval');
+                                    if ($rra === null || $rra === '') {
+                                        $rra = $product->reviews_require_approval === null ? 'default' : ($product->reviews_require_approval ? '1' : '0');
+                                    }
+                                @endphp
+                                <div class="form-check mb-3">
+                                    <input type="hidden" name="allow_reviews" value="0">
+                                    <input class="form-check-input" type="checkbox" name="allow_reviews" value="1" id="allow_reviews" {{ old('allow_reviews', $product->allow_reviews ?? true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="allow_reviews">
+                                        السماح بالتعليقات والتقييمات لهذا المنتج
+                                    </label>
+                                </div>
+                                <div id="reviews_approval_wrap">
+                                    <label class="form-label">نشر التعليقات</label>
+                                    <select name="reviews_require_approval" class="form-select">
+                                        <option value="default" {{ $rra === 'default' ? 'selected' : '' }}>استخدام الإعداد الافتراضي للمتجر</option>
+                                        <option value="1" {{ $rra === '1' ? 'selected' : '' }}>بعد موافقة الإدارة</option>
+                                        <option value="0" {{ $rra === '0' ? 'selected' : '' }}>تلقائياً بدون موافقة</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- صور المنتج -->
+                        <div class="admin-page-card mb-4">
+                            <div class="card-header">
+                                <div class="card-title">صور المنتج</div>
+                            </div>
+                            <div class="card-body">
+                                <label class="form-label d-block">الصورة الرئيسية الحالية</label>
+                                @php
+                                    $primaryImage = $product->primary_image;
+                                @endphp
+                                @if($primaryImage)
+                                    <div class="mb-2">
+                                        <img src="{{ $primaryImage->url }}" alt="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                                    </div>
+                                @else
+                                    <p class="text-muted small">لم يتم تعيين صورة رئيسية بعد، سيتم استخدام أول صورة من المعرض.</p>
+                                @endif
+                                <div class="mb-3">
+                                    <label class="form-label">تعيين صورة رئيسية جديدة (اختياري)</label>
+                                    <input type="file" name="primary_image" class="form-control" accept="image/*">
+                                    <small class="text-muted d-block mt-1">في حال اختيار صورة هنا سيتم استخدامها كصورة رئيسية جديدة.</small>
+                                </div>
+                                <label class="form-label">معرض الصور الحالي</label>
+                                <div class="d-flex gap-2 flex-wrap mb-2">
+                                    @foreach($product->images as $img)
+                                        <div class="position-relative">
+                                            <img src="{{ $img->url }}" alt="" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                                            <form action="{{ route('admin.products.images.delete', [$product, $img]) }}" method="POST" class="position-absolute top-0 start-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger p-1" onclick="return confirm('حذف الصورة؟');">&times;</button>
+                                            </form>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <label class="form-label">إضافة صور جديدة للمعرض</label>
+                                <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
+                            </div>
+                        </div>
+
+                        <!-- SEO -->
+                        <div class="admin-page-card mb-4">
+                            <div class="card-body p-0">
                                 <x-admin.seo-panel entity-type="product" :values="$product->only([
                                     'meta_title','meta_description','meta_keywords','canonical_url',
                                     'focus_keyword','og_title','og_description','og_image','robots_meta','schema_type'
                                 ])" />
                             </div>
+                        </div>
 
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">إلغاء</a>
+                        <!-- أزرار الحفظ -->
+                        <div class="admin-page-card">
+                            <div class="card-body d-flex flex-column gap-2">
+                                <button type="submit" class="admin-btn admin-btn-primary w-100">
+                                    <i class="las la-save"></i>
+                                    حفظ التعديلات
+                                </button>
+                                <a href="{{ route('admin.products.index') }}" class="admin-btn admin-btn-secondary w-100">
+                                    <i class="las la-times-circle"></i>
+                                    إلغاء
+                                </a>
                             </div>
                         </div>
-                    </form>
+
+                    </div>
                 </div>
-            </div>
+
+            </form>
         </div>
     </div>
 @stop
@@ -384,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() { setTimeout(initProduc
     const addDigitalBtn = document.getElementById('add-digital-file-row');
 
     const tbody = document.getElementById('variants-tbody');
-    const productPrice = {{ json_encode($product->price ?? 0) }};
+    const productPrice = {!! json_encode($product->price ?? 0) !!};
 
     function toggleDigital() {
         if (!digitalCb || !digitalSection) return;

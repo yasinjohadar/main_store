@@ -51,7 +51,14 @@ class OrderController extends Controller
         $orders = $query->paginate($perPage);
         $statuses = OrderStatus::orderBy('order')->get();
 
-        $data = compact('orders', 'statuses');
+        $orderStats = [
+            'total' => Order::count(),
+            'pending' => Order::whereHas('status', fn ($q) => $q->where('slug', 'pending'))->count(),
+            'today' => Order::whereDate('created_at', now()->toDateString())->count(),
+            'total_sales' => (float) Order::sum('total'),
+        ];
+
+        $data = compact('orders', 'statuses', 'orderStats');
 
         return $this->adminTableView(
             $request,
@@ -109,9 +116,18 @@ class OrderController extends Controller
         $data = $request->validate([
             'order_status_id' => 'required|exists:order_statuses,id',
             'admin_note' => 'nullable|string|max:2000',
+            'tracking_number' => 'nullable|string|max:100',
+            'tracking_carrier' => 'nullable|string|max:100',
         ]);
 
         $newStatusId = (int) $data['order_status_id'];
+
+        if (array_key_exists('tracking_number', $data) || array_key_exists('tracking_carrier', $data)) {
+            $order->update([
+                'tracking_number' => $data['tracking_number'] ?? $order->tracking_number,
+                'tracking_carrier' => $data['tracking_carrier'] ?? $order->tracking_carrier,
+            ]);
+        }
 
         if ($newStatusId !== (int) $order->order_status_id) {
             $this->applyOrderStatusChange($order, $newStatusId, $data['admin_note'] ?? null);

@@ -86,7 +86,14 @@ public function index(Request $request)
         // تنفيذ الاستعلام
         $users = $usersQuery->paginate($perPage)->withQueryString();
 
-        $data = compact('users', 'roles', 'sessions');
+        $userStats = [
+            'total' => User::count(),
+            'active' => User::where('is_active', true)->count(),
+            'inactive' => User::where('is_active', false)->count(),
+            'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
+        ];
+
+        $data = compact('users', 'roles', 'sessions', 'userStats');
 
         return $this->adminTableView(
             $request,

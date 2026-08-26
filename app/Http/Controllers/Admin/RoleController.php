@@ -33,8 +33,15 @@ public function __construct()
     public function index()
         {
             $permissions = Permission::all();
-            $roles = Role::all();
-            return view("admin.pages.roles.index" , compact("roles" , "permissions"));
+            $roles = Role::withCount('permissions')->get();
+
+            $roleStats = [
+                'total' => $roles->count(),
+                'permissions' => $permissions->count(),
+                'without_permissions' => $roles->where('permissions_count', 0)->count(),
+            ];
+
+            return view("admin.pages.roles.index" , compact("roles" , "permissions", "roleStats"));
         }
 
     /**

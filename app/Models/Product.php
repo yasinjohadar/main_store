@@ -9,16 +9,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Scout\Searchable;
 
 class Product extends Model implements Seoable
 {
-    use HasFactory, SoftDeletes, HasSeoFields;
+    use HasFactory, SoftDeletes, HasSeoFields, Searchable;
 
     protected $fillable = [
         'category_id',
         'brand_id',
         'tax_class_id',
         'is_digital',
+        'is_bundle',
         'digital_download_limit',
         'digital_download_expiry_days',
         'name',
@@ -28,6 +30,7 @@ class Product extends Model implements Seoable
         'description',
         'price',
         'compare_at_price',
+        'wholesale_price',
         'cost',
         'stock_quantity',
         'track_quantity',
@@ -59,11 +62,13 @@ class Product extends Model implements Seoable
     protected $casts = [
         'price' => 'decimal:2',
         'compare_at_price' => 'decimal:2',
+        'wholesale_price' => 'decimal:2',
         'cost' => 'decimal:2',
         'stock_quantity' => 'integer',
         'track_quantity' => 'boolean',
         'allow_backorder' => 'boolean',
         'is_digital' => 'boolean',
+        'is_bundle' => 'boolean',
         'digital_download_limit' => 'integer',
         'digital_download_expiry_days' => 'integer',
         'is_featured' => 'boolean',
@@ -212,6 +217,49 @@ class Product extends Model implements Seoable
         return $this->hasMany(StockMovement::class);
     }
 
+    /**
+     * The component products this bundle contains (only meaningful when is_bundle is true).
+     */
+    public function bundleItems()
+    {
+        return $this->hasMany(BundleItem::class, 'bundle_product_id')->with('itemProduct');
+    }
+
+    /**
+     * The retail-or-wholesale unit price for a given customer. Falls back to the
+     * normal effective_price when the product has no wholesale price set or the
+     * buyer isn't a flagged wholesale customer.
+     */
+    public function priceFor(?User $user): float
+    {
+        if ($user?->is_wholesale_customer && $this->wholesale_price !== null) {
+            return (float) $this->wholesale_price;
+        }
+
+        return (float) $this->effective_price;
+    }
+
+    /**
+     * Percentage saved by buying this bundle vs. its components at their own prices.
+     * Returns null if there isn't a meaningful discount (or no items).
+     */
+    public function getBundleSavingsPercentAttribute(): ?int
+    {
+        if (! $this->is_bundle) {
+            return null;
+        }
+
+        $componentsTotal = $this->bundleItems->sum(fn ($bundleItem) => $bundleItem->itemProduct
+            ? (float) $bundleItem->itemProduct->effective_price * $bundleItem->quantity
+            : 0);
+
+        if ($componentsTotal <= 0 || $this->effective_price >= $componentsTotal) {
+            return null;
+        }
+
+        return (int) round((1 - ($this->effective_price / $componentsTotal)) * 100);
+    }
+
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
@@ -310,5 +358,34 @@ class Product extends Model implements Seoable
             return 0;
         }
         return $this->reviews->avg('rating');
+    }
+
+    public function searchableAs(): string
+    {
+        return 'products_index';
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status === 'active' && $this->is_visible;
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'sku' => $this->sku,
+            'short_description' => $this->short_description,
+            'description' => strip_tags((string) $this->description),
+            'category_id' => $this->category_id,
+            'category_name' => $this->category?->name,
+            'brand_id' => $this->brand_id,
+            'brand_name' => $this->brand?->name,
+            'price' => (float) $this->price,
+            'is_visible' => (bool) $this->is_visible,
+            'status' => $this->status,
+            'created_at' => $this->created_at?->timestamp,
+        ];
     }
 }

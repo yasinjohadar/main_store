@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\StoreCustomerNoteRequest;
 use App\Http\Requests\Admin\UpdateCustomerAddressRequest;
 use App\Models\CustomerAddress;
 use App\Models\CustomerNote;
+use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Category;
@@ -67,7 +68,14 @@ class CustomerController extends Controller
 
         $customers = $query->paginate(15)->withQueryString();
 
-        return view('admin.pages.customers.index', compact('customers'));
+        $customerStats = [
+            'total' => User::count(),
+            'with_orders' => User::has('orders')->count(),
+            'total_spent' => (float) Order::whereNull('deleted_at')->sum('total'),
+            'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
+        ];
+
+        return view('admin.pages.customers.index', compact('customers', 'customerStats'));
     }
 
     public function show(User $customer)
@@ -208,6 +216,17 @@ class CustomerController extends Controller
 
         return redirect()->route('admin.customers.show', $customer)
             ->with('success', $message);
+    }
+
+    public function toggleWholesale(User $customer)
+    {
+        $customer->update(['is_wholesale_customer' => ! $customer->is_wholesale_customer]);
+
+        $message = $customer->is_wholesale_customer
+            ? 'تم تفعيل تسعير الجملة/B2B لهذا العميل.'
+            : 'تم إلغاء تسعير الجملة/B2B لهذا العميل.';
+
+        return redirect()->route('admin.customers.show', $customer)->with('success', $message);
     }
 }
 

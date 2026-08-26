@@ -54,8 +54,17 @@
             {{-- Featured revenue --}}
             <a href="{{ route('admin.reports.dashboard') }}" class="cmd-widget cmd-widget--hero cmd-widget--tone-indigo text-decoration-none">
                 <div class="cmd-widget__bg"></div>
+                <div class="cmd-widget__shine"></div>
+                <div class="cmd-widget__mesh"></div>
+                <div class="cmd-widget__bubble cmd-widget__bubble--1"></div>
+                <div class="cmd-widget__bubble cmd-widget__bubble--2"></div>
+                <div class="cmd-widget__bubble cmd-widget__bubble--3"></div>
+                <div class="cmd-widget__glow"></div>
                 <div class="cmd-widget__top">
-                    <span class="cmd-widget__icon"><i class="las la-wallet"></i></span>
+                    <span class="cmd-widget__icon-wrap">
+                        <span class="cmd-widget__icon-ring" aria-hidden="true"></span>
+                        <span class="cmd-widget__icon"><i class="las la-wallet"></i></span>
+                    </span>
                     <span class="cmd-widget__chip">الأداء المالي</span>
                 </div>
                 <div class="cmd-widget__body">
@@ -70,13 +79,13 @@
                     @endif
                 </div>
                 <div class="cmd-widget__footer">
-                    <span><strong>{{ number_format((int) $ordersKpi['value']) }}</strong> طلب مؤكد</span>
+                    <span><strong data-count="{{ (int) $ordersKpi['value'] }}">0</strong> طلب مؤكد</span>
                     <span class="cmd-widget__link">التقارير <i class="las la-arrow-left"></i></span>
                 </div>
             </a>
 
             <div class="cmd-widgets__grid">
-                @foreach($kpiCards as $card)
+                @foreach($kpiCards as $index => $card)
                     @php $kpi = $kpis[$card['key']] ?? ['value' => 0, 'trend' => null]; @endphp
                     @php
                         $tag = isset($card['href']) ? 'a' : 'div';
@@ -85,18 +94,25 @@
                     @endphp
                     <{{ $tag }}
                         @if(isset($card['href'])) href="{{ $card['href'] }}" @endif
+                        style="--card-delay: {{ ($index + 1) * 0.08 }}s"
                         class="cmd-widget cmd-widget--compact cmd-widget--tone-{{ $card['tone'] }}{{ isset($card['href']) ? ' cmd-widget--link' : '' }}">
+                        <div class="cmd-widget__shine"></div>
+                        <div class="cmd-widget__mesh"></div>
+                        <div class="cmd-widget__bubble cmd-widget__bubble--1"></div>
+                        <div class="cmd-widget__bubble cmd-widget__bubble--3"></div>
+                        <div class="cmd-widget__glow"></div>
                         <div class="cmd-widget__row">
-                            <span class="cmd-widget__icon cmd-widget__icon--sm"><i class="las {{ $card['icon'] }}"></i></span>
+                            <span class="cmd-widget__icon-wrap">
+                                <span class="cmd-widget__icon-ring" aria-hidden="true"></span>
+                                <span class="cmd-widget__icon cmd-widget__icon--sm"><i class="las {{ $card['icon'] }}"></i></span>
+                            </span>
                             <div class="cmd-widget__meta">
                                 <span class="cmd-widget__label">{{ $card['label'] }}</span>
-                                <span class="cmd-widget__value cmd-widget__value--sm">
-                                    @if($card['format'] === 'money')
-                                        {{ $currencyService->format((float) $kpi['value']) }}
-                                    @else
-                                        {{ number_format((int) $kpi['value']) }}
-                                    @endif
-                                </span>
+                                @if($card['format'] === 'money')
+                                    <span class="cmd-widget__value cmd-widget__value--sm">{{ $currencyService->format((float) $kpi['value']) }}</span>
+                                @else
+                                    <span class="cmd-widget__value cmd-widget__value--sm" data-count="{{ (int) $kpi['value'] }}">0</span>
+                                @endif
                             </div>
                         </div>
                         @if($kpi['trend'] !== null)
@@ -369,4 +385,8 @@
 
     </div>
 </div>
+@stop
+
+@section('script')
+<script src="{{ asset('assets/js/admin-command-center.js') }}"></script>
 @stop

@@ -44,6 +44,11 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Refresh so DB defaults (e.g. is_active) are hydrated before we check
+        // them and log the user in, otherwise CheckUserActive treats the
+        // unhydrated attribute as falsy and immediately logs the user back out.
+        $user->refresh();
+
         event(new Registered($user));
 
         Auth::login($user);

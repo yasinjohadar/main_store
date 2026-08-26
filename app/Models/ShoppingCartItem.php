@@ -33,7 +33,7 @@ class ShoppingCartItem extends Model
         if ($this->variant) {
             return $this->variant->effective_price;
         }
-        return $this->product->effective_price;
+        return $this->product->priceFor($this->cart?->user);
     }
 
     public function getLineTotalAttribute()

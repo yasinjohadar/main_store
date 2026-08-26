@@ -95,6 +95,8 @@ Route::prefix('')->name('frontend.')->group(function () {
         Route::post('account/addresses', [\App\Http\Controllers\Frontend\CustomerAddressController::class, 'store'])->name('account.addresses.store');
         Route::put('account/addresses/{address}', [\App\Http\Controllers\Frontend\CustomerAddressController::class, 'update'])->name('account.addresses.update');
         Route::delete('account/addresses/{address}', [\App\Http\Controllers\Frontend\CustomerAddressController::class, 'destroy'])->name('account.addresses.destroy');
+        Route::get('account/privacy/export', [\App\Http\Controllers\Frontend\AccountPrivacyController::class, 'export'])->name('account.privacy.export');
+        Route::delete('account/privacy', [\App\Http\Controllers\Frontend\AccountPrivacyController::class, 'destroy'])->name('account.privacy.destroy');
     });
 
     Route::get('wishlist', [WishlistController::class, 'index'])->name('wishlist');

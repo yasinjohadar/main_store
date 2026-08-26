@@ -13,56 +13,86 @@
     @endif
 
     <div class="main-content app-content">
-        <div class="container-fluid">
-            <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-                <div class="my-auto">
-                    <h5 class="page-title fs-21 mb-1">الطلبات</h5>
-                </div>
-            </div>
+        <div class="container-fluid admin-page-shell">
 
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="card admin-table-card">
-                        <div class="admin-table-toolbar">
-                            <form action="{{ route('admin.orders.index') }}" method="GET"
-                                class="admin-table-filter-form d-flex align-items-center gap-2 flex-wrap ms-auto"
-                                data-admin-table-target="#admin-table-orders"
-                                data-admin-table-autosubmit>
-                                <input type="text" name="order_number" class="form-control"
-                                    style="min-width: 180px; max-width: 220px;"
-                                    placeholder="رقم الطلب" value="{{ request('order_number') }}">
-
-                                <select name="status" class="form-select" style="width: auto;">
-                                    <option value="">كل الحالات</option>
-                                    @foreach($statuses as $s)
-                                        <option value="{{ $s->slug }}" {{ request('status') == $s->slug ? 'selected' : '' }}>{{ $s->name }}</option>
-                                    @endforeach
-                                </select>
-
-                                <input type="date" name="from" class="form-control" style="width: auto;" value="{{ request('from') }}" title="من تاريخ">
-                                <input type="date" name="to" class="form-control" style="width: auto;" value="{{ request('to') }}" title="إلى تاريخ">
-
-                                <select name="per_page" class="form-select" style="width: auto;" title="عدد العناصر في الصفحة">
-                                    <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10 / صفحة</option>
-                                    <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / صفحة</option>
-                                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 / صفحة</option>
-                                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 / صفحة</option>
-                                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 / صفحة</option>
-                                </select>
-
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="las la-search"></i>
-                                </button>
-                                <a href="{{ route('admin.orders.index') }}" class="btn btn-light btn-sm" data-admin-table-reset>مسح</a>
-                            </form>
-                        </div>
-
-                        <div class="card-body p-0" id="admin-table-orders" data-admin-table>
-                            @include('admin.pages.orders.partials.table-body')
-                        </div>
+            <div class="admin-page-banner">
+                <div class="admin-page-banner-main">
+                    <span class="admin-page-banner-icon"><i class="las la-shopping-bag"></i></span>
+                    <div class="admin-page-banner-text">
+                        <h1>الطلبات</h1>
+                        <p>متابعة طلبات المتجر وحالاتها</p>
                     </div>
                 </div>
             </div>
+
+            <div class="admin-report-stats">
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-blue">
+                    <span class="admin-report-stat-icon"><i class="las la-shopping-bag"></i></span>
+                    <span class="admin-report-stat-label">إجمالي الطلبات</span>
+                    <span class="admin-report-stat-value">{{ number_format($orderStats['total'] ?? 0) }}</span>
+                </div>
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-amber">
+                    <span class="admin-report-stat-icon"><i class="las la-clock"></i></span>
+                    <span class="admin-report-stat-label">قيد الانتظار</span>
+                    <span class="admin-report-stat-value">{{ number_format($orderStats['pending'] ?? 0) }}</span>
+                </div>
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-green">
+                    <span class="admin-report-stat-icon"><i class="las la-calendar-day"></i></span>
+                    <span class="admin-report-stat-label">طلبات اليوم</span>
+                    <span class="admin-report-stat-value">{{ number_format($orderStats['today'] ?? 0) }}</span>
+                </div>
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-cyan">
+                    <span class="admin-report-stat-icon"><i class="las la-coins"></i></span>
+                    <span class="admin-report-stat-label">إجمالي المبيعات</span>
+                    <span class="admin-report-stat-value">{{ $currencyService->format($orderStats['total_sales'] ?? 0) }}</span>
+                </div>
+            </div>
+
+            <div class="admin-page-card admin-table-card">
+                <div class="card-toolbar">
+                    <form action="{{ route('admin.orders.index') }}" method="GET"
+                        class="admin-filters admin-table-filter-form"
+                        data-admin-table-target="#admin-table-orders"
+                        data-admin-table-autosubmit>
+                        <div class="search-input-wrap">
+                            <i class="las la-search"></i>
+                            <input type="text" name="order_number" class="form-control"
+                                placeholder="رقم الطلب" value="{{ request('order_number') }}" autocomplete="off">
+                        </div>
+
+                        <select name="status" class="form-select admin-filter-select">
+                            <option value="">كل الحالات</option>
+                            @foreach($statuses as $s)
+                                <option value="{{ $s->slug }}" {{ request('status') == $s->slug ? 'selected' : '' }}>{{ $s->name }}</option>
+                            @endforeach
+                        </select>
+
+                        <div class="admin-filter-dates">
+                            <input type="date" name="from" class="form-control" value="{{ request('from') }}" title="من تاريخ">
+                            <span class="admin-filter-dates-sep">—</span>
+                            <input type="date" name="to" class="form-control" value="{{ request('to') }}" title="إلى تاريخ">
+                        </div>
+
+                        <select name="per_page" class="form-select admin-filter-select" title="عدد العناصر في الصفحة">
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10 / صفحة</option>
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / صفحة</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 / صفحة</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 / صفحة</option>
+                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 / صفحة</option>
+                        </select>
+
+                        <button type="submit" class="admin-btn admin-btn-primary admin-btn-sm">
+                            <i class="las la-search"></i>
+                        </button>
+                        <a href="{{ route('admin.orders.index') }}" class="admin-btn admin-btn-secondary admin-btn-sm" data-admin-table-reset>مسح</a>
+                    </form>
+                </div>
+
+                <div class="admin-table-wrap" id="admin-table-orders" data-admin-table>
+                    @include('admin.pages.orders.partials.table-body')
+                </div>
+            </div>
+
         </div>
     </div>
 

@@ -11,6 +11,8 @@ class CouponUsage extends Model
 
     protected $table = 'coupon_usages';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'user_id',
         'coupon_id',

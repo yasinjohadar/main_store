@@ -83,6 +83,25 @@
                     <button type="submit" class="account-btn account-btn--primary account-btn--sm">تحديث كلمة المرور</button>
                 </form>
             </div>
+
+            <div class="account-form-card mt-4">
+                <h5 class="account-form-card__title">الخصوصية والبيانات</h5>
+
+                <a href="{{ route('frontend.account.privacy.export') }}" class="account-btn account-btn--outline account-btn--sm">
+                    تنزيل بياناتي
+                </a>
+
+                <form class="account-form mt-3" method="POST" action="{{ route('frontend.account.privacy.destroy') }}"
+                    onsubmit="return confirm('سيتم حذف بيانات حسابك بشكل نهائي. هل أنت متأكد؟');">
+                    @csrf
+                    @method('delete')
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="confirm_delete" name="confirm" required>
+                        <label class="form-check-label" for="confirm_delete">أفهم أن هذا الإجراء نهائي ولا يمكن التراجع عنه</label>
+                    </div>
+                    <button type="submit" class="account-btn account-btn--danger account-btn--sm">حذف حسابي نهائياً</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

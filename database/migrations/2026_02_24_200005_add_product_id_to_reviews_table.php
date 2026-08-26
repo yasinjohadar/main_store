@@ -11,6 +11,9 @@ return new class extends Migration
         if (!Schema::hasColumn('reviews', 'product_id')) {
             Schema::table('reviews', function (Blueprint $table) {
                 $table->foreignId('product_id')->nullable()->after('id')->constrained('products')->onDelete('cascade');
+            });
+
+            Schema::table('reviews', function (Blueprint $table) {
                 $table->index('product_id');
             });
         }

@@ -13,47 +13,76 @@
     @endif
 
     <div class="main-content app-content">
-        <div class="container-fluid">
-            <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-                <h5 class="page-title fs-21 mb-1">العملاء</h5>
+        <div class="container-fluid admin-page-shell">
+
+            <div class="admin-page-banner">
+                <div class="admin-page-banner-main">
+                    <span class="admin-page-banner-icon"><i class="las la-user-friends"></i></span>
+                    <div class="admin-page-banner-text">
+                        <h1>العملاء</h1>
+                        <p>إدارة بيانات العملاء وسجل الطلبات والإنفاق</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <form action="{{ route('admin.customers.index') }}" method="GET" class="row g-2 align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label">بحث</label>
-                            <input type="text" name="search" class="form-control" placeholder="الاسم أو البريد أو الجوال" value="{{ request('search') }}">
+            <div class="admin-report-stats">
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-blue">
+                    <span class="admin-report-stat-icon"><i class="las la-user-friends"></i></span>
+                    <span class="admin-report-stat-label">إجمالي العملاء</span>
+                    <span class="admin-report-stat-value">{{ number_format($customerStats['total'] ?? 0) }}</span>
+                </div>
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-green">
+                    <span class="admin-report-stat-icon"><i class="las la-shopping-bag"></i></span>
+                    <span class="admin-report-stat-label">لديهم طلبات</span>
+                    <span class="admin-report-stat-value">{{ number_format($customerStats['with_orders'] ?? 0) }}</span>
+                </div>
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-cyan">
+                    <span class="admin-report-stat-icon"><i class="las la-coins"></i></span>
+                    <span class="admin-report-stat-label">إجمالي الإنفاق</span>
+                    <span class="admin-report-stat-value">{{ number_format($customerStats['total_spent'] ?? 0, 2) }} ر.س</span>
+                </div>
+                <div class="admin-report-stat admin-report-stat-static admin-report-stat-amber">
+                    <span class="admin-report-stat-icon"><i class="las la-user-plus"></i></span>
+                    <span class="admin-report-stat-label">جدد هذا الشهر</span>
+                    <span class="admin-report-stat-value">{{ number_format($customerStats['new_this_month'] ?? 0) }}</span>
+                </div>
+            </div>
+
+            <div class="admin-page-card">
+                <div class="card-toolbar">
+                    <form action="{{ route('admin.customers.index') }}" method="GET" class="admin-filters">
+                        <div class="search-input-wrap">
+                            <i class="las la-search"></i>
+                            <input type="text" name="search" class="form-control"
+                                placeholder="الاسم أو البريد أو الجوال" value="{{ request('search') }}" autocomplete="off">
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">حالة الطلبات</label>
-                            <select name="has_orders" class="form-select">
-                                <option value="">الكل</option>
-                                <option value="1" {{ request('has_orders') === '1' ? 'selected' : '' }}>لديه طلبات</option>
-                                <option value="0" {{ request('has_orders') === '0' ? 'selected' : '' }}>بدون طلبات</option>
-                            </select>
+
+                        <select name="has_orders" class="form-select admin-filter-select">
+                            <option value="">كل حالات الطلبات</option>
+                            <option value="1" {{ request('has_orders') === '1' ? 'selected' : '' }}>لديه طلبات</option>
+                            <option value="0" {{ request('has_orders') === '0' ? 'selected' : '' }}>بدون طلبات</option>
+                        </select>
+
+                        <input type="number" name="min_total" class="form-control admin-filter-select" min="0" step="0.01"
+                            placeholder="إجمالي إنفاق من" value="{{ request('min_total') }}">
+
+                        <div class="admin-filter-dates">
+                            <input type="date" name="registered_from" class="form-control" value="{{ request('registered_from') }}" title="تسجيل من">
+                            <span class="admin-filter-dates-sep">—</span>
+                            <input type="date" name="registered_to" class="form-control" value="{{ request('registered_to') }}" title="تسجيل إلى">
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">إجمالي إنفاق من</label>
-                            <input type="number" name="min_total" class="form-control" min="0" step="0.01" value="{{ request('min_total') }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">تسجيل من</label>
-                            <input type="date" name="registered_from" class="form-control" value="{{ request('registered_from') }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">تسجيل إلى</label>
-                            <input type="date" name="registered_to" class="form-control" value="{{ request('registered_to') }}">
-                        </div>
-                        <div class="col-md-1 d-grid">
-                            <button type="submit" class="btn btn-secondary">بحث</button>
-                        </div>
+
+                        <button type="submit" class="admin-btn admin-btn-primary admin-btn-sm">
+                            <i class="las la-search"></i>
+                        </button>
+                        <a href="{{ route('admin.customers.index') }}" class="admin-btn admin-btn-secondary admin-btn-sm">مسح</a>
                     </form>
                 </div>
-                <div class="card-body">
+
+                <div class="admin-table-wrap">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle table-nowrap mb-0">
-                            <thead class="table-light">
+                        <table class="admin-data-table">
+                            <thead>
                                 <tr>
                                     <th>العميل</th>
                                     <th>البريد الإلكتروني</th>
@@ -62,43 +91,58 @@
                                     <th>عدد الطلبات</th>
                                     <th>إجمالي الإنفاق</th>
                                     <th>تاريخ التسجيل</th>
-                                    <th>إجراءات</th>
+                                    <th style="width: 110px;">إجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($customers as $customer)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('admin.customers.show', $customer) }}">
-                                                {{ $customer->name }}
-                                            </a>
+                                            <div class="admin-user-cell">
+                                                <span class="admin-avatar-initial">{{ mb_substr($customer->name, 0, 1) }}</span>
+                                                <a href="{{ route('admin.customers.show', $customer) }}" class="admin-user-link">
+                                                    {{ $customer->name }}
+                                                </a>
+                                            </div>
                                         </td>
                                         <td>{{ $customer->email }}</td>
-                                        <td>{{ $customer->phone ?? '—' }}</td>
-                                        <td>{{ number_format($customer->loyalty_points_balance ?? 0, 0) }} نقطة</td>
-                                        <td>{{ $customer->orders_count ?? 0 }}</td>
-                                        <td>{{ number_format($customer->total_spent ?? 0, 2) }} ر.س</td>
-                                        <td>{{ $customer->created_at?->format('Y-m-d H:i') }}</td>
                                         <td>
-                                            <a href="{{ route('admin.customers.show', $customer) }}" class="btn btn-sm btn-outline-primary">
+                                            @if($customer->phone)
+                                                <span class="admin-phone-cell">{{ $customer->phone }}</span>
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
+                                        <td><span class="admin-badge admin-badge-role">{{ number_format($customer->loyalty_points_balance ?? 0, 0) }} نقطة</span></td>
+                                        <td>{{ $customer->orders_count ?? 0 }}</td>
+                                        <td class="fw-bold">{{ number_format($customer->total_spent ?? 0, 2) }} ر.س</td>
+                                        <td class="text-muted">{{ $customer->created_at?->format('Y-m-d H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.customers.show', $customer) }}" class="admin-btn admin-btn-secondary admin-btn-sm">
                                                 عرض الملف
                                             </a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center py-4 text-muted">لا يوجد عملاء مطابقون لشروط البحث.</td>
+                                        <td colspan="8">
+                                            <div class="admin-empty-state">
+                                                <i class="las la-user-friends"></i>
+                                                لا يوجد عملاء مطابقون لشروط البحث
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-3">
-                        {{ $customers->links() }}
-                    </div>
+                </div>
+
+                <div class="admin-table-footer">
+                    {{ $customers->links() }}
                 </div>
             </div>
+
         </div>
     </div>
 @stop
-

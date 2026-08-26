@@ -41,6 +41,15 @@
                                     عدد الطلبات: {{ $ordersCount }}<br>
                                     متوسط قيمة الطلب: {{ number_format($averageOrderValue, 2) }} ر.س
                                 </div>
+                                <form action="{{ route('admin.customers.toggle-wholesale', $customer) }}" method="POST" class="mt-2">
+                                    @csrf
+                                    @if($customer->is_wholesale_customer)
+                                        <span class="badge bg-success mb-1 d-block">عميل جملة/B2B</span>
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm">إلغاء تسعير الجملة</button>
+                                    @else
+                                        <button type="submit" class="btn btn-outline-success btn-sm">تفعيل تسعير الجملة/B2B</button>
+                                    @endif
+                                </form>
                             </div>
                         </div>
                         <div class="card-body">

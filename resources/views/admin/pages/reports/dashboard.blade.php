@@ -39,12 +39,24 @@
                 </div>
             </div>
 
+            @php
+                $changeBadge = function ($percent) {
+                    if ($percent === null) {
+                        return '<span class="badge bg-light text-muted">جديد</span>';
+                    }
+                    $class = $percent > 0 ? 'bg-success-subtle text-success' : ($percent < 0 ? 'bg-danger-subtle text-danger' : 'bg-light text-muted');
+                    $sign = $percent > 0 ? '+' : '';
+                    return '<span class="badge ' . $class . '">' . $sign . number_format($percent, 1) . '%</span>';
+                };
+            @endphp
+
             <div class="row g-3">
                 <div class="col-md-3">
                     <div class="card text-center">
                         <div class="card-body">
                             <p class="text-muted mb-1">إجمالي المبيعات</p>
                             <h4 class="mb-0">{{ $currencyService->format((float) ($kpis['total_sales'] ?? 0)) }}</h4>
+                            <div class="mt-1">{!! $changeBadge($comparison['total_sales']['change_percent'] ?? null) !!} <small class="text-muted">مقارنة بالفترة السابقة</small></div>
                         </div>
                     </div>
                 </div>
@@ -53,6 +65,7 @@
                         <div class="card-body">
                             <p class="text-muted mb-1">عدد الطلبات</p>
                             <h4 class="mb-0">{{ $kpis['orders_count'] ?? 0 }}</h4>
+                            <div class="mt-1">{!! $changeBadge($comparison['orders_count']['change_percent'] ?? null) !!} <small class="text-muted">مقارنة بالفترة السابقة</small></div>
                         </div>
                     </div>
                 </div>
@@ -61,6 +74,7 @@
                         <div class="card-body">
                             <p class="text-muted mb-1">متوسط قيمة الطلب</p>
                             <h4 class="mb-0">{{ $currencyService->format((float) ($kpis['average_order_value'] ?? 0)) }}</h4>
+                            <div class="mt-1">{!! $changeBadge($comparison['average_order_value']['change_percent'] ?? null) !!} <small class="text-muted">مقارنة بالفترة السابقة</small></div>
                         </div>
                     </div>
                 </div>
@@ -69,6 +83,7 @@
                         <div class="card-body">
                             <p class="text-muted mb-1">إجمالي الخصومات</p>
                             <h4 class="mb-0 text-success">-{{ $currencyService->format((float) ($kpis['total_discounts'] ?? 0)) }}</h4>
+                            <div class="mt-1">{!! $changeBadge($comparison['total_discounts']['change_percent'] ?? null) !!} <small class="text-muted">مقارنة بالفترة السابقة</small></div>
                         </div>
                     </div>
                 </div>

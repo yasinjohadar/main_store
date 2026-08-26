@@ -57,7 +57,16 @@ class ProductController extends Controller
         $categories = Category::orderBy('name')->get();
         $currencyService = app(CurrencyService::class);
 
-        $data = compact('products', 'categories', 'currencyService');
+        $productStats = [
+            'total' => Product::count(),
+            'active' => Product::where('status', 'active')->count(),
+            'draft' => Product::where('status', 'draft')->count(),
+            'low_stock' => Product::where('track_quantity', true)
+                ->where('stock_quantity', '<=', config('store.low_stock_threshold', 5))
+                ->count(),
+        ];
+
+        $data = compact('products', 'categories', 'currencyService', 'productStats');
 
         return $this->adminTableView(
             $request,
@@ -275,8 +284,14 @@ class ProductController extends Controller
         $categories = Category::orderBy('name')->get();
         $brands = Brand::orderBy('order')->orderBy('name')->get();
         $attributes = ProductAttribute::with('values')->orderBy('order')->get();
-        $product->load(['images', 'attributes', 'variants.attributeValues', 'files']);
-        return view('admin.pages.products.edit', compact('product', 'categories', 'brands', 'attributes'));
+        $product->load(['images', 'attributes', 'variants.attributeValues', 'files', 'bundleItems.itemProduct']);
+
+        $bundleableProducts = Product::where('id', '!=', $product->id)
+            ->where('is_bundle', false)
+            ->orderBy('name')
+            ->get(['id', 'name', 'sku']);
+
+        return view('admin.pages.products.edit', compact('product', 'categories', 'brands', 'attributes', 'bundleableProducts'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
@@ -372,6 +387,35 @@ class ProductController extends Controller
         Storage::disk('public')->delete($image->path);
         $image->delete();
         return back()->with('success', 'تم حذف الصورة.');
+    }
+
+    public function addBundleItem(Request $request, Product $product)
+    {
+        $data = $request->validate([
+            'item_product_id' => ['required', 'exists:products,id', 'different:product,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        if ((int) $data['item_product_id'] === $product->id) {
+            return back()->withErrors(['item_product_id' => 'لا يمكن أن تحتوي الحزمة على نفسها.']);
+        }
+
+        \App\Models\BundleItem::updateOrCreate(
+            ['bundle_product_id' => $product->id, 'item_product_id' => $data['item_product_id']],
+            ['quantity' => $data['quantity']],
+        );
+
+        return back()->with('success', 'تمت إضافة المنتج إلى الحزمة.');
+    }
+
+    public function removeBundleItem(Product $product, \App\Models\BundleItem $bundleItem)
+    {
+        if ($bundleItem->bundle_product_id !== $product->id) {
+            abort(404);
+        }
+        $bundleItem->delete();
+
+        return back()->with('success', 'تمت إزالة المنتج من الحزمة.');
     }
 
     private function syncDigitalFiles(Product $product, Request $request): void

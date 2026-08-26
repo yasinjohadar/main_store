@@ -1,5 +1,5 @@
-<div class="table-responsive admin-table-wrap">
-    <table class="table admin-table table-striped table-hover align-middle table-nowrap mb-0">
+<div class="table-responsive">
+    <table class="admin-data-table">
         <thead>
             <tr>
                 <th scope="col" style="width: 48px;">#</th>
@@ -9,7 +9,7 @@
                 <th scope="col">آخر دخول</th>
                 <th scope="col">الأدوار</th>
                 <th scope="col" style="width: 130px;">التفعيل</th>
-                <th scope="col" style="width: 140px;">العمليات</th>
+                <th scope="col" style="width: 70px;">العمليات</th>
             </tr>
         </thead>
         <tbody>
@@ -19,12 +19,16 @@
                     $lastSession = $userSessions ? $userSessions->first() : null;
                 @endphp
                 <tr>
-                    <th scope="row" class="admin-table__index">{{ $users->firstItem() + $loop->index }}</th>
+                    <th scope="row" class="row-number">{{ $users->firstItem() + $loop->index }}</th>
 
                     <td>
-                        <div class="admin-table__user">
-                            <span class="admin-table__avatar">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
-                            <a href="{{ route('users.show', $user->id) }}" class="admin-table__user-name">
+                        <div class="admin-user-cell">
+                            @if ($user->photo)
+                                <img src="{{ asset('storage/' . $user->photo) }}" alt="" class="admin-avatar-img">
+                            @else
+                                <span class="admin-avatar-initial">{{ mb_substr($user->name, 0, 1) }}</span>
+                            @endif
+                            <a href="{{ route('users.show', $user->id) }}" class="admin-user-link">
                                 {{ $user->name }}
                             </a>
                         </div>
@@ -36,22 +40,24 @@
                                 {{ $user->email }}
                             </a>
                         @else
-                            <span class="admin-table__muted">—</span>
+                            <span class="text-muted">—</span>
                         @endif
                     </td>
 
                     <td>
                         @if ($user->phone)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $user->phone) }}"
-                                target="_blank" class="text-success text-decoration-none" title="فتح WhatsApp">
-                                <i class="fab fa-whatsapp me-1"></i>{{ $user->phone }}
-                            </a>
+                            <span class="admin-phone-cell">
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $user->phone) }}"
+                                    target="_blank" rel="noopener" title="فتح WhatsApp">
+                                    <i class="fab fa-whatsapp me-1"></i>{{ $user->phone }}
+                                </a>
+                            </span>
                         @else
-                            <span class="admin-table__muted">—</span>
+                            <span class="text-muted">—</span>
                         @endif
                     </td>
 
-                    <td class="admin-table__muted">
+                    <td class="text-muted">
                         @if ($lastSession)
                             {{ \Carbon\Carbon::createFromTimestamp($lastSession->last_activity)->diffForHumans() }}
                         @else
@@ -61,14 +67,14 @@
 
                     <td>
                         @forelse ($user->getRoleNames() as $role)
-                            <span class="admin-table__badge admin-table__badge--role me-1">{{ $role }}</span>
+                            <span class="admin-badge admin-badge-role">{{ $role }}</span>
                         @empty
-                            <span class="admin-table__muted">—</span>
+                            <span class="text-muted">—</span>
                         @endforelse
                     </td>
 
                     <td>
-                        <div class="form-check form-switch admin-table__switch mb-0">
+                        <div class="admin-status-switch">
                             <input type="checkbox"
                                    class="form-check-input user-active-switch"
                                    role="switch"
@@ -78,46 +84,54 @@
                                    data-user-name="{{ e($user->name) }}"
                                    data-toggle-url="{{ route('users.toggle-status', $user) }}"
                                    @if($user->id === auth()->id()) disabled title="لا يمكنك تغيير تفعيل حسابك" @endif>
-                            <label class="form-check-label" for="user-active-{{ $user->id }}">
+                            <label class="status-label {{ $user->is_active ? 'is-active' : '' }}" for="user-active-{{ $user->id }}">
                                 {{ $user->is_active ? 'مفعّل' : 'موقوف' }}
                             </label>
                         </div>
                     </td>
 
                     <td>
-                        <div class="admin-table__actions">
-                            <a class="admin-table__action admin-table__action--view"
-                                href="{{ route('users.show', $user->id) }}"
-                                title="عرض المستخدم">
-                                <i class="las la-eye"></i>
-                            </a>
-                            <a class="admin-table__action admin-table__action--edit"
-                                href="{{ route('users.edit', $user->id) }}"
-                                title="تعديل المستخدم">
-                                <i class="las la-pen"></i>
-                            </a>
-                            <x-admin.delete-trigger
-                                :action="route('users.destroy', $user)"
-                                title="حذف المستخدم"
-                                :item="$user->name"
-                                message="هل تريد حذف هذا المستخدم نهائياً؟"
-                                button-class="btn-danger btn-sm"
-                                icon="las la-trash"
-                                title-attr="حذف المستخدم"
-                            />
-                            <a href="#" class="admin-table__action admin-table__action--warning"
-                                data-bs-toggle="modal"
-                                data-bs-target="#change_password{{ $user->id }}"
-                                title="تعديل كلمة السر">
-                                <i class="las la-key"></i>
-                            </a>
+                        <div class="admin-row-actions dropdown">
+                            <button class="admin-kebab-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="las la-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('users.show', $user->id) }}">
+                                        <i class="las la-eye text-info me-2"></i>عرض المستخدم
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">
+                                        <i class="las la-pen text-primary me-2"></i>تعديل
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#change_password{{ $user->id }}">
+                                        <i class="las la-key text-warning me-2"></i>تغيير كلمة المرور
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start"
+                                        data-confirm-delete
+                                        data-action="{{ route('users.destroy', $user) }}"
+                                        data-method="DELETE"
+                                        data-title="حذف المستخدم"
+                                        data-item="{{ $user->name }}"
+                                        data-message="هل تريد حذف هذا المستخدم نهائياً؟"
+                                        data-warning="لن يمكن التراجع عن هذا الإجراء.">
+                                        <i class="las la-trash me-2"></i>حذف المستخدم
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="8">
-                        <div class="admin-table-empty">
+                        <div class="admin-empty-state">
                             <i class="las la-users"></i>
                             <p class="mb-0 fw-medium">لا توجد بيانات متاحة</p>
                         </div>
@@ -132,6 +146,6 @@
     @include('admin.pages.users.change_password')
 @endforeach
 
-<div class="p-3 border-top admin-table-pagination">
+<div class="admin-table-footer">
     {{ $users->withQueryString()->links() }}
 </div>

@@ -65,7 +65,14 @@ class CategoryController extends Controller
         $categories = $categoriesQuery->paginate($perPage)->withQueryString();
         $parentCategories = Category::whereNull('parent_id')->orderBy('name')->get();
 
-        $data = compact('categories', 'parentCategories');
+        $categoryStats = [
+            'total' => Category::count(),
+            'active' => Category::where('status', 'active')->count(),
+            'parents' => Category::whereNull('parent_id')->count(),
+            'children' => Category::whereNotNull('parent_id')->count(),
+        ];
+
+        $data = compact('categories', 'parentCategories', 'categoryStats');
 
         return $this->adminTableView(
             $request,

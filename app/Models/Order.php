@@ -17,6 +17,8 @@ class Order extends Model
         'guest_email',
         'order_status_id',
         'shipping_method_id',
+        'tracking_number',
+        'tracking_carrier',
         'subtotal',
         'shipping_amount',
         'tax_amount',

@@ -34,7 +34,14 @@ class OrderReturnController extends Controller
 
         $returns = $query->paginate(20);
 
-        return view('admin.pages.order-returns.index', compact('returns'));
+        $returnStats = [
+            'total' => OrderReturn::count(),
+            'pending' => OrderReturn::where('status', 'pending')->count(),
+            'approved' => OrderReturn::where('status', 'approved')->count(),
+            'rejected' => OrderReturn::where('status', 'rejected')->count(),
+        ];
+
+        return view('admin.pages.order-returns.index', compact('returns', 'returnStats'));
     }
 
     public function show(OrderReturn $orderReturn)

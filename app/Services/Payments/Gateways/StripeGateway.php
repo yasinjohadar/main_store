@@ -36,24 +36,37 @@ class StripeGateway implements PaymentGatewayInterface
         try {
             \Stripe\Stripe::setApiKey($secret);
 
-            $order->loadMissing('items');
+            $order->loadMissing('items', 'user');
 
             $lineItems = $this->buildLineItems($order);
             $currency = strtolower($order->currency ?? 'sar');
 
-            $session = \Stripe\Checkout\Session::create([
+            $sessionParams = [
                 'mode' => 'payment',
                 'success_url' => route('frontend.checkout.success', $order) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('frontend.checkout.index', ['cancelled' => 1]),
                 'client_reference_id' => $order->order_number,
-                'customer_email' => $this->customerEmail($order),
                 'line_items' => $lineItems,
                 'metadata' => [
                     'order_id' => (string) $order->id,
                     'payment_id' => (string) $payment->id,
                     'order_number' => $order->order_number,
                 ],
-            ]);
+            ];
+
+            // Attach a Stripe Customer for logged-in users so the hosted Checkout page
+            // can offer "save this card" and auto-surface previously saved cards —
+            // Apple Pay / Google Pay wallets are already shown automatically by
+            // Stripe Checkout when enabled on the Dashboard, no extra params needed.
+            $stripeCustomerId = $order->user ? $this->resolveStripeCustomerId($order->user) : null;
+            if ($stripeCustomerId) {
+                $sessionParams['customer'] = $stripeCustomerId;
+                $sessionParams['saved_payment_method_options'] = ['payment_method_save' => 'enabled'];
+            } else {
+                $sessionParams['customer_email'] = $this->customerEmail($order);
+            }
+
+            $session = \Stripe\Checkout\Session::create($sessionParams);
 
             $payment->update([
                 'transaction_id' => $session->id,
@@ -194,6 +207,37 @@ class StripeGateway implements PaymentGatewayInterface
         }
 
         return $items;
+    }
+
+    /**
+     * Get (or lazily create) the Stripe Customer for a logged-in user, so their
+     * card can be saved/reused across orders. Returns null on any Stripe error —
+     * checkout still proceeds without a linked customer in that case.
+     */
+    protected function resolveStripeCustomerId(\App\Models\User $user): ?string
+    {
+        if ($user->stripe_customer_id) {
+            return $user->stripe_customer_id;
+        }
+
+        try {
+            $customer = \Stripe\Customer::create([
+                'email' => $user->email,
+                'name' => $user->name,
+                'metadata' => ['user_id' => (string) $user->id],
+            ]);
+
+            $user->update(['stripe_customer_id' => $customer->id]);
+
+            return $customer->id;
+        } catch (\Throwable $e) {
+            Log::warning('Stripe customer creation failed, continuing without saved-card support', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     protected function customerEmail(Order $order): ?string

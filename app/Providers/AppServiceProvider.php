@@ -4,10 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
-use App\Events\WhatsAppMessageReceived;
-use App\Listeners\AutoReplyWhatsAppListener;
 use App\Models\Category;
 use App\Models\Currency;
 use App\Services\CurrencyService;
@@ -41,32 +38,13 @@ class AppServiceProvider extends ServiceProvider
         // تسجيل PermissionServiceProvider
         $this->app->register(PermissionServiceProvider::class);
 
-        // Register WhatsApp auto-reply listener
-        Event::listen(
-            WhatsAppMessageReceived::class,
-            AutoReplyWhatsAppListener::class
-        );
-
-        Event::listen(
-            \App\Events\OrderPlaced::class,
-            [\App\Listeners\SendOrderConfirmationEmail::class, 'handle']
-        );
-        Event::listen(
-            \App\Events\OrderPlaced::class,
-            [\App\Listeners\SendAdminNewOrderEmail::class, 'handle']
-        );
-        Event::listen(
-            \App\Events\OrderStatusChanged::class,
-            [\App\Listeners\HandleOrderStatusChanged::class, 'handle']
-        );
-        Event::listen(
-            \App\Events\OrderPlaced::class,
-            [\App\Listeners\DispatchOrderWebhooks::class, 'handleOrderPlaced']
-        );
-        Event::listen(
-            \App\Events\OrderStatusChanged::class,
-            [\App\Listeners\DispatchOrderWebhooks::class, 'handleOrderStatusChanged']
-        );
+        // NOTE: order/webhook/registration listeners (AutoReplyWhatsAppListener,
+        // SendOrderConfirmationEmail, SendAdminNewOrderEmail, HandleOrderStatusChanged,
+        // DispatchOrderWebhooks, CreateReferralCoupon) are picked up automatically by
+        // Laravel's event auto-discovery (their handle()/named methods type-hint the
+        // event). Do NOT also register them here with Event::listen() — `php artisan
+        // event:list` confirmed that double-registering fired every order email,
+        // webhook, and referral coupon twice per event.
 
         \App\Models\Product::observe(\App\Observers\ProductObserver::class);
 

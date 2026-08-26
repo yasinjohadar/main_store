@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ShopCatalogService
 {
@@ -60,11 +61,19 @@ class ShopCatalogService
                 ->where('is_visible', true);
         }
 
+        $searchRelevanceIds = null;
+
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('description', 'like', '%' . $request->search . '%');
-            });
+            $searchRelevanceIds = $this->searchProductIds($request->search);
+
+            if ($searchRelevanceIds !== null) {
+                $query->whereIn('id', $searchRelevanceIds ?: [0]);
+            } else {
+                $query->where(function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('description', 'like', '%' . $request->search . '%');
+                });
+            }
         }
 
         if ($request->filled('category') && ! $category) {
@@ -87,7 +96,7 @@ class ShopCatalogService
             });
         }
 
-        return $this->applySort($query, $request);
+        return $this->applySort($query, $request, $searchRelevanceIds);
     }
 
     public function paginate(Request $request, ?Category $category = null): LengthAwarePaginator
@@ -189,7 +198,7 @@ class ShopCatalogService
         return route('frontend.shop.products', $params);
     }
 
-    protected function applySort(Builder|Relation $query, Request $request): Builder|Relation
+    protected function applySort(Builder|Relation $query, Request $request, ?array $searchRelevanceIds = null): Builder|Relation
     {
         switch ($request->sort) {
             case 'popularity':
@@ -208,10 +217,37 @@ class ShopCatalogService
                 $query->orderBy('price', 'desc');
                 break;
             default:
-                $query->orderByDesc('created_at');
+                if ($searchRelevanceIds) {
+                    $case = 'CASE id ';
+                    foreach ($searchRelevanceIds as $rank => $id) {
+                        $case .= 'WHEN ' . (int) $id . ' THEN ' . (int) $rank . ' ';
+                    }
+                    $case .= 'ELSE ' . count($searchRelevanceIds) . ' END';
+                    $query->orderByRaw($case);
+                } else {
+                    $query->orderByDesc('created_at');
+                }
         }
 
         return $query;
+    }
+
+    /**
+     * Search product IDs via Scout (Meilisearch), ordered by relevance.
+     * Returns null (not empty array) if the search engine itself failed, so callers
+     * can fall back to a plain SQL search instead of showing zero results.
+     */
+    protected function searchProductIds(string $term): ?array
+    {
+        try {
+            return Product::search($term)->keys()->map(fn ($id) => (int) $id)->all();
+        } catch (\Throwable $e) {
+            Log::warning('Product search engine unavailable, falling back to LIKE search', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     protected function isValidLayoutValue(string $key, mixed $value): bool

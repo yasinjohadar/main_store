@@ -17,15 +17,19 @@
     @endif
 
     <div class="main-content app-content">
-        <div class="container-fluid">
-            <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-                <div>
-                    <h4 class="mb-0">إضافة منتج جديد</h4>
-                    <p class="mb-0 text-muted">إنشاء منتج جديد مع التحكم الكامل في السعر والمخزون والسمات</p>
+        <div class="container-fluid admin-page-shell">
+
+            <div class="admin-page-banner">
+                <div class="admin-page-banner-main">
+                    <span class="admin-page-banner-icon"><i class="las la-box"></i></span>
+                    <div class="admin-page-banner-text">
+                        <h1>إضافة منتج جديد</h1>
+                        <p>إنشاء منتج جديد مع التحكم الكامل في السعر والمخزون والسمات</p>
+                    </div>
                 </div>
-                <div class="ms-auto">
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-right me-2"></i>
+                <div class="admin-page-banner-actions">
+                    <a href="{{ route('admin.products.index') }}" class="admin-btn admin-btn-light">
+                        <i class="las la-arrow-right"></i>
                         العودة للقائمة
                     </a>
                 </div>
@@ -39,63 +43,92 @@
                     <div class="col-lg-8">
 
                         <!-- المعلومات الأساسية -->
-                        <div class="card custom-card mb-4">
-                            <div class="card-header">
-                                <div class="card-title">المعلومات الأساسية</div>
-                            </div>
-                            <div class="card-body">
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-blue">
+                                            <i class="las la-info-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h3>المعلومات الأساسية</h3>
+                                            <p>الاسم والوصف والتصنيف</p>
+                                        </div>
+                                    </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">الاسم <span class="text-danger">*</span></label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الاسم <span class="required">*</span></label>
                                         <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required>
-                                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        @error('name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">الرابط (Slug)</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الرابط (Slug)</label>
                                         <input type="text" class="form-control @error('slug') is-invalid @enderror" name="slug" value="{{ old('slug') }}">
-                                        @error('slug')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        @error('slug')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">التصنيف</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">التصنيف</label>
                                         <select name="category_id" class="form-select">
                                             <option value="">-- اختر --</option>
                                             @foreach($categories as $cat)
                                                 <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                             @endforeach
                                         </select>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">الماركة</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الماركة</label>
                                         <select name="brand_id" class="form-select">
                                             <option value="">— لا ماركة —</option>
                                             @foreach($brands as $brand)
                                                 <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
                                             @endforeach
                                         </select>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">SKU</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">SKU</label>
                                         <input type="text" class="form-control" name="sku" value="{{ old('sku') }}">
+                                        </div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">وصف مختصر</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">وصف مختصر</label>
                                         <textarea name="short_description" class="form-control" rows="2">{{ old('short_description') }}</textarea>
+                                        </div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">الوصف</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الوصف</label>
                                         <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="10">{{ old('description') }}</textarea>
-                                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        @error('description')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                        </div>
                                     </div>
+                                </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- المنتج الرقمي -->
-                        <div class="card custom-card mb-4">
-                            <div class="card-header">
-                                <div class="card-title">المنتج الرقمي (إن وُجد)</div>
-                            </div>
-                            <div class="card-body">
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-teal">
+                                            <i class="las la-download"></i>
+                                        </div>
+                                        <div>
+                                            <h3>المنتج الرقمي (إن وُجد)</h3>
+                                            <p>ملفات قابلة للتحميل بدل الشحن الفعلي</p>
+                                        </div>
+                                    </div>
                                 <div class="row g-3">
                                     <div class="col-md-4">
                                         <div class="form-check mt-2">
@@ -154,27 +187,48 @@
                                     </div>
                                     <small class="text-muted d-block">ملاحظة: يجب رفع ملف على الأقل لكل صف جديد.</small>
                                 </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- السعر والمخزون -->
-                        <div class="card custom-card mb-4">
-                            <div class="card-header">
-                                <div class="card-title">السعر والمخزون</div>
-                            </div>
-                            <div class="card-body">
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-green">
+                                            <i class="las la-coins"></i>
+                                        </div>
+                                        <div>
+                                            <h3>السعر والمخزون</h3>
+                                            <p>التسعير وتتبع الكمية</p>
+                                        </div>
+                                    </div>
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <label class="form-label">السعر (ر.س) <span class="text-danger">*</span></label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">السعر (ر.س) <span class="required">*</span></label>
                                         <input type="number" step="0.01" min="0" class="form-control" name="price" value="{{ old('price', 0) }}" required>
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">سعر المقارنة (ر.س)</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">سعر المقارنة (ر.س)</label>
                                         <input type="number" step="0.01" min="0" class="form-control" name="compare_at_price" value="{{ old('compare_at_price') }}">
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">الكمية</label>
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">سعر الجملة (اختياري)</label>
+                                        <input type="number" step="0.01" min="0" class="form-control" name="wholesale_price" value="{{ old('wholesale_price') }}">
+                                        <small class="text-muted">يُستخدم تلقائياً لعملاء الجملة/B2B المفعّلين</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="admin-form-field">
+                                        <label class="admin-form-label">الكمية</label>
                                         <input type="number" min="0" class="form-control" name="stock_quantity" value="{{ old('stock_quantity', 0) }}">
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-check mt-4">
@@ -191,21 +245,27 @@
                                         </div>
                                     </div>
                                 </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- سمات المنتج -->
-                        <div class="card custom-card mb-4">
-                            <div class="card-header">
-                                <div class="card-title">سمات هذا المنتج</div>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-muted small mb-3">
-                                    اختر السمات التي تنطبق على هذا المنتج (مثل اللون، المقاس). ستظهر قيم كل سمة أسفلها مباشرة.
-                                </p>
+                        <div class="admin-page-card mb-4">
+                            <div class="admin-form-body">
+                                <div class="admin-form-section" style="border-bottom: 0; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="admin-form-section-head">
+                                        <div class="admin-section-icon admin-section-icon-purple">
+                                            <i class="las la-tags"></i>
+                                        </div>
+                                        <div>
+                                            <h3>سمات هذا المنتج</h3>
+                                            <p>اختر السمات التي تنطبق على هذا المنتج (مثل اللون، المقاس)</p>
+                                        </div>
+                                    </div>
                                 @include('admin.pages.products.partials.attributes-picker', [
                                     'selectedAttributeIds' => old('attribute_ids', []),
                                 ])
+                                </div>
                             </div>
                         </div>
 
@@ -215,7 +275,7 @@
                     <div class="col-lg-4">
 
                         <!-- الحالة والنشر -->
-                        <div class="card custom-card mb-4">
+                        <div class="admin-page-card mb-4">
                             <div class="card-header">
                                 <div class="card-title">إعدادات النشر</div>
                             </div>
@@ -233,16 +293,22 @@
                                     <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="is_featured" {{ old('is_featured') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_featured">منتج مميز</label>
                                 </div>
-                                <div class="form-check">
+                                <div class="form-check mb-2">
                                     <input type="hidden" name="is_visible" value="0">
                                     <input class="form-check-input" type="checkbox" name="is_visible" value="1" id="is_visible" {{ old('is_visible', true) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="is_visible">ظاهر في المتجر</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="hidden" name="is_bundle" value="0">
+                                    <input class="form-check-input" type="checkbox" name="is_bundle" value="1" id="is_bundle" {{ old('is_bundle') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_bundle">هذا المنتج عبارة عن حزمة (Bundle)</label>
+                                    <small class="text-muted d-block">يمكنك اختيار المنتجات المكوّنة للحزمة بعد الحفظ</small>
                                 </div>
                             </div>
                         </div>
 
                         <!-- التقييمات والتعليقات -->
-                        <div class="card custom-card mb-4">
+                        <div class="admin-page-card mb-4">
                             <div class="card-header">
                                 <div class="card-title">التقييمات والتعليقات</div>
                             </div>
@@ -266,7 +332,7 @@
                         </div>
 
                         <!-- صور المنتج -->
-                        <div class="card custom-card mb-4">
+                        <div class="admin-page-card mb-4">
                             <div class="card-header">
                                 <div class="card-title">صور المنتج</div>
                             </div>
@@ -285,21 +351,21 @@
                         </div>
 
                         <!-- SEO -->
-                        <div class="card custom-card mb-4">
+                        <div class="admin-page-card mb-4">
                             <div class="card-body p-0">
                                 <x-admin.seo-panel entity-type="product" :values="[]" />
                             </div>
                         </div>
 
                         <!-- أزرار الحفظ -->
-                        <div class="card custom-card">
-                            <div class="card-body">
-                                <button type="submit" class="btn btn-primary w-100 mb-2">
-                                    <i class="bi bi-save me-2"></i>
+                        <div class="admin-page-card">
+                            <div class="card-body d-flex flex-column gap-2">
+                                <button type="submit" class="admin-btn admin-btn-primary w-100">
+                                    <i class="las la-save"></i>
                                     حفظ المنتج
                                 </button>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary w-100">
-                                    <i class="bi bi-x-circle me-2"></i>
+                                <a href="{{ route('admin.products.index') }}" class="admin-btn admin-btn-secondary w-100">
+                                    <i class="las la-times-circle"></i>
                                     إلغاء
                                 </a>
                             </div>

@@ -74,7 +74,14 @@ class ReviewController extends Controller
 
         $products = Product::where('allow_reviews', true)->orderBy('name')->get(['id', 'name']);
 
-        return view('admin.pages.reviews.index', compact('reviews', 'products'));
+        $reviewStats = [
+            'total' => Review::count(),
+            'approved' => Review::where('status', 'approved')->count(),
+            'pending' => Review::where('status', 'pending')->count(),
+            'average_rating' => round((float) Review::where('status', 'approved')->avg('rating'), 1),
+        ];
+
+        return view('admin.pages.reviews.index', compact('reviews', 'products', 'reviewStats'));
     }
 
     /**
