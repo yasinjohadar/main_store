@@ -4,8 +4,8 @@
     <title>@yield('title', $seo->title ?? config('app.name'))</title>
     @include('frontend.layouts.head')
     @stack('styles')
-    <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/custom-fonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('frontend/assets/css/store-theme-overrides.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/custom-fonts.css') }}?v={{ filemtime(public_path('frontend/assets/css/custom-fonts.css')) }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/store-theme-overrides.css') }}?v={{ filemtime(public_path('frontend/assets/css/store-theme-overrides.css')) }}">
 </head>
 <body class="@yield('body-class', 'home')" dir="rtl">
     <div class="page-wrapper">

@@ -8,8 +8,8 @@
     <link rel="icon" href="{{ $faviconUrl }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/vendor/fontawesome-free/css/all.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/demo-rtl.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/custom-fonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('frontend/assets/css/store-theme-overrides.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('frontend/assets/css/custom-fonts.css') }}?v={{ filemtime(public_path('frontend/assets/css/custom-fonts.css')) }}">
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/store-theme-overrides.css') }}?v={{ filemtime(public_path('frontend/assets/css/store-theme-overrides.css')) }}">
     @include('frontend.partials.store-theme')
     @stack('styles')
 </head>
