@@ -30,7 +30,12 @@ class HomeController extends Controller
             ->withAvg('reviews', 'rating');
 
         $newArrivals = $baseQuery()->latest()->limit(10)->get();
-        $bestSellers = $baseQuery()->orderByDesc('stock_quantity')->limit(10)->get();
+        $bestSellers = $baseQuery()
+            ->withSum('orderItems as sold_count', 'quantity')
+            ->orderByDesc('sold_count')
+            ->orderByDesc('stock_quantity')
+            ->limit(12)
+            ->get();
         $topRated = $baseQuery()->has('reviews')->orderByDesc('reviews_avg_rating')->limit(10)->get();
         $featuredProducts = $baseQuery()->featured()->latest()->limit(10)->get();
         $onSale = $baseQuery()

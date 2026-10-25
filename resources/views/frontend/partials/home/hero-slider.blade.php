@@ -20,6 +20,10 @@
 
                     <div class="container home-hero__container">
                         @if($slide->product_image_url)
+                            <span class="home-hero__halo" style="--hero-accent: {{ $slide->resolved_accent_color }};" aria-hidden="true">
+                                <span class="home-hero__ring"></span>
+                                <span class="home-hero__dots"></span>
+                            </span>
                             <figure class="slide-image home-hero__figure skrollable slide-animate">
                                 <img src="{{ $slide->product_image_url }}" alt="{{ $slide->title }}" class="home-hero__product-img"
                                     data-bottom-top="transform: translateY(8vh);"
@@ -56,13 +60,18 @@
                                 </p>
                             @endif
 
-                            <a href="{{ $slide->button_url }}"
-                                class="btn home-hero__btn slide-animate"
-                                style="--hero-accent: {{ $slide->resolved_accent_color }};"
+                            <div class="home-hero__actions slide-animate"
                                 data-animation-options="{ 'name': 'fadeInRightShorter', 'duration': '1s', 'delay': '.65s' }">
-                                <span>{{ $slide->button_text }}</span>
-                                <i class="w-icon-long-arrow-left"></i>
-                            </a>
+                                <a href="{{ $slide->button_url }}"
+                                    class="btn home-hero__btn"
+                                    style="--hero-accent: {{ $slide->resolved_accent_color }};">
+                                    <span>{{ $slide->button_text }}</span>
+                                    <i class="w-icon-long-arrow-left"></i>
+                                </a>
+                                <a href="{{ route('frontend.shop.index') }}" class="home-hero__btn-ghost">
+                                    كل المنتجات
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -74,4 +83,20 @@
         <button class="swiper-button-prev home-hero__nav appear-animate" aria-label="الشريحة السابقة"></button>
     </div>
 </section>
+<script>
+    (function () {
+        var hero = document.querySelector('.home-hero');
+        if (!hero) return;
+
+        // Keep the always-open category panel from overflowing the hero
+        function syncHeroHeight() {
+            document.documentElement.style.setProperty('--store-hero-height', hero.offsetHeight + 'px');
+        }
+
+        syncHeroHeight();
+        window.addEventListener('load', syncHeroHeight);
+        window.addEventListener('resize', syncHeroHeight);
+        if (window.ResizeObserver) new ResizeObserver(syncHeroHeight).observe(hero);
+    })();
+</script>
 @endif

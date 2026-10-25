@@ -221,6 +221,23 @@ select:focus {
     color: #fff;
 }
 
+/* Uploaded header logo: fit inside a fixed box whatever the image's own size */
+.header .logo .store-header-logo {
+    --store-logo-size: 60px;
+    display: block;
+    width: auto !important;
+    height: auto !important;
+    max-width: var(--store-logo-size) !important;
+    max-height: var(--store-logo-size) !important;
+    object-fit: contain;
+}
+
+@media (max-width: 767px) {
+    .header .logo .store-header-logo {
+        --store-logo-size: 48px;
+    }
+}
+
 /* Dynamic border radius — --store-radius from site settings (default 5px) */
 
 .store-product-card__inner,

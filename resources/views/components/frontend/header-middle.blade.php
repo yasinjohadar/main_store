@@ -8,7 +8,7 @@
                         @php($siteLogoUrl = site_setting_url(\App\Services\SiteSettingsService::KEY_SITE_LOGO))
                         <a href="{{ route('frontend.home') }}" class="logo ml-lg-0" title="{{ $siteName }}">
                             @if($siteLogoUrl)
-                                <img src="{{ $siteLogoUrl }}" alt="{{ $siteName }}" width="144" height="45" />
+                                <img src="{{ $siteLogoUrl }}" alt="{{ $siteName }}" class="store-header-logo" width="60" height="60" />
                             @else
                                 <span class="store-site-logo">{{ $siteName }}</span>
                             @endif

@@ -8,12 +8,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
 
 class Product extends Model implements Seoable
 {
-    use HasFactory, SoftDeletes, HasSeoFields, Searchable;
+    use HasFactory, SoftDeletes, HasSeoFields;
+    use Searchable {
+        queueMakeSearchable as protected scoutQueueMakeSearchable;
+        queueRemoveFromSearch as protected scoutQueueRemoveFromSearch;
+    }
 
     protected $fillable = [
         'category_id',
@@ -152,6 +157,11 @@ class Product extends Model implements Seoable
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 
     public function tags()
@@ -363,6 +373,28 @@ class Product extends Model implements Seoable
     public function searchableAs(): string
     {
         return 'products_index';
+    }
+
+    /**
+     * Search indexing is best-effort: an unreachable search engine must not block saving
+     * products (search already falls back to the database in ShopCatalogService).
+     */
+    public function queueMakeSearchable($models)
+    {
+        try {
+            return $this->scoutQueueMakeSearchable($models);
+        } catch (\Throwable $e) {
+            Log::warning('Product search indexing failed: ' . $e->getMessage());
+        }
+    }
+
+    public function queueRemoveFromSearch($models)
+    {
+        try {
+            return $this->scoutQueueRemoveFromSearch($models);
+        } catch (\Throwable $e) {
+            Log::warning('Product search de-indexing failed: ' . $e->getMessage());
+        }
     }
 
     public function shouldBeSearchable(): bool

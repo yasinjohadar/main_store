@@ -4,6 +4,8 @@
     $ratingPercent = (($product->reviews_avg_rating ?? 0) / 5) * 100;
     $reviewCount = $product->relationLoaded('reviews') ? $product->reviews->count() : 0;
     $productUrl = route('frontend.product.show', $product->slug);
+    $isNew = $product->created_at && $product->created_at->gt(now()->subDays(14));
+    $outOfStock = ! $product->in_stock;
 @endphp
 
 <div class="product-wrap store-product-card">
@@ -25,11 +27,19 @@
                 <x-frontend.compare-button :product-id="$product->id" />
             </div>
 
-            @if($product->has_discount)
+            @if($product->has_discount || $isNew || $outOfStock)
                 <div class="product-label-group store-product-card__labels">
-                    <label class="product-label label-discount store-product-card__discount">
-                        خصم {{ $product->discount_percentage }}%
-                    </label>
+                    @if($outOfStock)
+                        <label class="product-label store-product-card__badge store-product-card__badge--out">نفد</label>
+                    @endif
+                    @if($product->has_discount)
+                        <label class="product-label label-discount store-product-card__discount" dir="ltr">
+                            -{{ $product->discount_percentage }}%
+                        </label>
+                    @endif
+                    @if($isNew)
+                        <label class="product-label store-product-card__badge store-product-card__badge--new">جديد</label>
+                    @endif
                 </div>
             @endif
 
@@ -41,9 +51,9 @@
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="store-product-card__cart-btn btn-add-cart" title="أضف للسلة">
+                <button type="submit" class="store-product-card__cart-btn btn-add-cart" title="أضف للسلة" @disabled($outOfStock)>
                     <i class="w-icon-cart"></i>
-                    <span>أضف للسلة</span>
+                    <span>{{ $outOfStock ? 'غير متوفر' : 'أضف للسلة' }}</span>
                 </button>
             </form>
         </figure>
@@ -62,9 +72,9 @@
                     <span class="ratings" style="width: {{ $ratingPercent }}%;"></span>
                     <span class="tooltiptext tooltip-top"></span>
                 </div>
-                <a href="{{ $productUrl }}" class="rating-reviews">
-                    ({{ $reviewCount }} {{ $reviewCount === 1 ? 'تقييم' : 'تقييمات' }})
-                </a>
+                @if($reviewCount > 0)
+                    <a href="{{ $productUrl }}" class="rating-reviews">({{ $reviewCount }})</a>
+                @endif
             </div>
             <div class="product-price store-product-card__price">
                 @if($product->has_discount)
